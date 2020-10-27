@@ -1,0 +1,135 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: kafka-cluster
+  namespace: kashtanka
+  labels:
+    app: kafka
+spec:
+  selector:
+    app: kafka
+  ports:
+    - protocol: TCP
+      name: plaintext
+      port: 9092
+---
+apiVersion: policy/v1beta1
+kind: PodDisruptionBudget
+metadata:
+  name: kafka-pdb
+  namespace: kashtanka
+spec:
+  selector:
+    matchLabels:
+      app: kafka
+  maxUnavailable: 1
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: kafka
+  namespace: kashtanka
+spec:
+  selector:
+    matchLabels:
+      app: kafka
+  serviceName: kafka-cluster
+  replicas: 3
+  updateStrategy:
+    type: RollingUpdate
+  podManagementPolicy: OrderedReady
+  template:
+    metadata:
+      labels:
+        app: kafka
+    spec:
+      # affinity:
+      #   podAntiAffinity:
+      #     requiredDuringSchedulingIgnoredDuringExecution:
+      #       - labelSelector:
+      #           matchExpressions:
+      #             - key: "app"
+      #               operator: In
+      #               values:
+      #               - zk
+      #         topologyKey: "kubernetes.io/hostname"
+      containers:
+      - name: kafka
+        imagePullPolicy: Always
+        image: "wurstmeister/kafka:2.13-2.6.0"
+        resources:
+          requests:
+            memory: "256Mi"
+          limits:
+            memory: "320Mi"
+            cpu: "0.25"
+        env:
+            - name: KAFKA_ZOOKEEPER_CONNECT
+              value: zk-cs
+            - name: KAFKA_ADVERTISED_HOST_NAME
+              valueFrom:
+                    fieldRef:
+                        fieldPath: status.podIP
+            - name: KAFKA_HEAP_OPTS
+              value: -Xmx256M -Xms128M
+        ports:
+        - containerPort: 9092
+          name: plaintext                        
+        volumeMounts:
+        - name: datadir
+          mountPath: /kafka      
+  volumeClaimTemplates:
+  - metadata:
+      name: datadir
+      namespace: kafka
+    spec:
+      accessModes: [ "ReadWriteOnce" ]
+      resources:
+        requests:
+          storage: 4Gi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: kafka-ui
+  namespace: kashtanka
+spec:
+  selector:
+    app: kafka-ui
+  ports:
+  - port: 80
+    targetPort: 9000
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kafka-ui
+  namespace: kashtanka
+spec:
+  selector:
+    matchLabels:
+      app: kafka-ui
+  template:
+    metadata:
+      labels:
+        app: kafka-ui
+    spec:
+      containers:
+      - name: kafdrop
+        image: obsidiandynamics/kafdrop      
+        env:
+         - name: KAFKA_BROKERCONNECT
+           value: kafka-cluster.kashtanka:9092
+         - name: SERVER_SERVLET_CONTEXTPATH
+           value: /
+         - name: JVM_OPTS
+           value: -Xms32M -Xmx64M
+        resources:
+          requests:
+            memory: "64Mi"
+          limits:
+            memory: "96Mi"
+            cpu: "200m"        
+        ports:
+        - containerPort: 9000
+
