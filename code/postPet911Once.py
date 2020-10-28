@@ -1,4 +1,3 @@
-import json
 import asyncio
 import sys
 import pet911
@@ -9,7 +8,7 @@ kafkaAddr = sys.argv[1]
 targetDir = sys.argv[2]
 
 async def work():
-    queue = kafkaJobQueue.JobQueueProducer(kafkaAddr, "detectPetJobs", "postPet911Once.py")
+    queue = kafkaJobQueue.JobQueueProducer(kafkaAddr, "CrawledPetCards", "postPet911Once.py")
 
     card = pet911.GetPetCard(targetDir)
 
