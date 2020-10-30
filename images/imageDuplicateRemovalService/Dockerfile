@@ -11,6 +11,6 @@ RUN pip3 install -r requirements.txt
 
 ENV KAFKA_URL=kafka-cluster.kashtanka:9092
 ENV INPUT_QUEUE=CrawledPetCards
-ENV OUTPUT_QUEUE=DistinctPhotosPetCatds
+ENV OUTPUT_QUEUE=DistinctPhotosPetCards
 
 CMD python3.8 petPhotoDuplicateRemovalService.py

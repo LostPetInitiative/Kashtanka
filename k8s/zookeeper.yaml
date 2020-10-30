@@ -74,8 +74,10 @@ spec:
         imagePullPolicy: Always
         image: "k8s.gcr.io/kubernetes-zookeeper:1.0-3.4.10"
         resources:
+          requests:
+            memory: "128Mi"
+            cpu: "0.01"
           limits:
-            #memory: "1Gi"
             memory: "192Mi"
             cpu: "0.15"
         ports:

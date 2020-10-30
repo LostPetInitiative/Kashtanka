@@ -1,0 +1,33 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: duplicate-image-remover
+  namespace: kashtanka
+spec:
+  selector:
+    matchLabels:
+      app: duplicate-image-remover
+  template:
+    metadata:
+      labels:
+        app: duplicate-image-remover
+    spec:
+      containers:
+      - name: worker
+        image: lostpetinitiative/duplicate-image-remover:1.1
+        resources:
+          requests:
+            memory: "64Mi"
+            cpu: "25m"
+          limits:
+            memory: "128Mi"
+            cpu: "500m"
+        # ports:
+        # - containerPort: <Port>
+        env:
+        - name: KAFKA_URL
+          value: kafka-cluster.kashtanka:9092
+        - name: INPUT_QUEUE
+          value: CrawledPetCards
+        - name: OUTPUT_QUEUE
+          value: DistinctPhotosPetCards
