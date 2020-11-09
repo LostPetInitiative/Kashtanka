@@ -13,4 +13,4 @@ ENV KAFKA_URL=kafka-cluster.kashtanka:9092
 ENV INPUT_QUEUE=CrawledPetCards
 ENV OUTPUT_QUEUE=DistinctPhotosPetCards
 
-CMD python3.8 petPhotoDuplicateRemovalService.py
+CMD python3.8 -u petPhotoDuplicateRemovalService.py

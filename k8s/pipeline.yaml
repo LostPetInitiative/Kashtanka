@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
       - name: worker
-        image: lostpetinitiative/duplicate-image-remover:1.1
+        image: lostpetinitiative/duplicate-image-remover:1.2
         resources:
           requests:
             memory: "64Mi"
@@ -31,3 +31,115 @@ spec:
           value: CrawledPetCards
         - name: OUTPUT_QUEUE
           value: DistinctPhotosPetCards
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: pet-image-detector
+  namespace: kashtanka
+spec:
+  selector:
+    matchLabels:
+      app: pet-image-detector
+  template:
+    metadata:
+      labels:
+        app: pet-image-detector
+    spec:
+      containers:
+      - name: worker
+        image: lostpetinitiative/pet-image-extractor-yolo4:1.0
+        command: ["python3.8"]                
+        args: ["-u","detect.py"]
+        resources:
+          requests:
+            memory: "2048Mi"
+            # cpu: "25m"
+          limits:
+            memory: "3072Mi"
+        #     cpu: "500m"
+        # ports:
+        # - containerPort: <Port>
+        env:
+        - name: KAFKA_URL
+          value: kafka-cluster.kashtanka:9092
+        - name: INPUT_QUEUE
+          value: DistinctPhotosPetCards
+        - name: OUTPUT_QUEUE
+          value: DetectedPets
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: feature-extractor-dogs
+  namespace: kashtanka
+spec:
+  selector:
+    matchLabels:
+      app: feature-extractor-dogs
+  template:
+    metadata:
+      labels:
+        app: feature-extractor-dogs
+    spec:
+      containers:
+      - name: worker
+        image: lostpetinitiative/pet-feature-extractor:1.0
+        #command: ["python3.8"]                
+        #args: ["-u","detect.py"]
+        resources:
+          #requests:
+            #memory: "2048Mi"
+            # cpu: "25m"
+          limits:
+            memory: "3072Mi"
+        #     cpu: "500m"
+        # ports:
+        # - containerPort: <Port>
+        env:
+        - name: KAFKA_URL
+          value: kafka-cluster.kashtanka:9092
+        - name: INPUT_QUEUE
+          value: DetectedPets
+        - name: OUTPUT_QUEUE
+          value: ProcessedCards
+        - name: PET_TYPE
+          value: dog
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: feature-extractor-cats
+  namespace: kashtanka
+spec:
+  selector:
+    matchLabels:
+      app: feature-extractor-cats
+  template:
+    metadata:
+      labels:
+        app: feature-extractor-cats
+    spec:
+      containers:
+      - name: worker
+        image: lostpetinitiative/pet-feature-extractor:1.0
+        #command: ["python3.8"]                
+        #args: ["-u","detect.py"]
+        resources:
+          #requests:
+            #memory: "2048Mi"
+            # cpu: "25m"
+          limits:
+            memory: "3072Mi"
+        #     cpu: "500m"
+        # ports:
+        # - containerPort: <Port>
+        env:
+        - name: KAFKA_URL
+          value: kafka-cluster.kashtanka:9092
+        - name: INPUT_QUEUE
+          value: DetectedPets
+        - name: OUTPUT_QUEUE
+          value: ProcessedCards
+        - name: PET_TYPE
+          value: cat

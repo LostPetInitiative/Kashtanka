@@ -1,0 +1,137 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: cass-hs
+  labels:
+    app: cass
+spec:
+  ports:
+  - port: 7000
+    name: gossip
+  - port: 9042
+    name: csql  
+  clusterIP: None
+  selector:
+    app: cass
+---
+apiVersion: policy/v1beta1
+kind: PodDisruptionBudget
+metadata:
+  name: cass-pdb
+spec:
+  selector:
+    matchLabels:
+      app: cass
+  maxUnavailable: 1
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: cass
+spec:
+  selector:
+    matchLabels:
+      app: cass
+  serviceName: cass-hs
+  replicas: 3
+  updateStrategy:
+    type: RollingUpdate
+  podManagementPolicy: OrderedReady
+  template:
+    metadata:
+      labels:
+        app: cass
+    spec:
+      # affinity:
+      #   podAntiAffinity:
+      #     requiredDuringSchedulingIgnoredDuringExecution:
+      #       - labelSelector:
+      #           matchExpressions:
+      #             - key: "app"
+      #               operator: In
+      #               values:
+      #               - cass
+      #         topologyKey: "kubernetes.io/hostname"
+      terminationGracePeriodSeconds: 1800
+      containers:
+      - name: cassandra
+        imagePullPolicy: Always
+        image: "dgrechka/k8s-cassandra:0.1"
+        env:
+            - name: CASSANDRA_BROADCAST_ADDRESS
+              valueFrom:
+                    fieldRef:
+                        fieldPath: status.podIP
+            - name: CASSANDRA_SEEDS
+              value: cass-0.cass-hs.default.svc.cluster.local
+            - name: CASSANDRA_NUM_TOKENS
+              value: "32"
+            - name: CASSANDRA_DC
+              # valueFrom:
+              #     fieldRef:
+              #       fieldPath: metadata.labels['region']
+              value: dc1
+        securityContext:
+          capabilities:
+            add:
+              - IPC_LOCK
+        lifecycle:
+          preStop:
+            exec:
+              command: 
+              - /bin/sh
+              - -c
+              - nodetool drain
+        resources:
+          limits:
+            cpu: "1"
+            memory: 2Gi
+          requests:
+            cpu: "200m"
+            memory: 2Gi
+        ports:
+        - containerPort: 7000
+          name: gossip
+        - containerPort: 9042
+          name: client
+        # readinessProbe:
+        #   exec:
+        #     command:
+        #     - sh
+        #     - -c
+        #     - "zookeeper-ready 2181"
+        #   initialDelaySeconds: 10
+        #   timeoutSeconds: 5
+        # livenessProbe:
+        #   exec:
+        #     command:
+        #     - sh
+        #     - -c
+        #     - "zookeeper-ready 2181"
+        #   initialDelaySeconds: 10
+        #   timeoutSeconds: 5
+        volumeMounts:
+        - name: datadir
+          mountPath: /var/lib/cassandra
+        # - name: config
+        #   mountPath: /etc/cassandra/cassandra-env.sh
+        #   subPath: cassandra-env.sh
+          #readOnly: true
+      # securityContext:
+      #   runAsUser: 1000
+      #   fsGroup: 1000
+      # volumes:
+      #   - name: config
+      #     configMap:
+      #       name: cassandra-etc
+      #       items:
+      #       - key: cassandra-env.sh
+      #         path: cassandra-env.sh
+  volumeClaimTemplates:
+  - metadata:
+      name: datadir
+    spec:
+      accessModes: [ "ReadWriteOnce" ]
+      resources:
+        requests:
+          storage: 4Gi
