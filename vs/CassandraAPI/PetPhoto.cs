@@ -7,7 +7,8 @@ namespace CassandraAPI
 {
     public class PetPhoto
     {
-        public Guid CardGlobalID { get; set; }
+        public string Namespace { get; set; }
+        public string LocalID { get; set; }
         public int ImageNum { get; set; }
         public byte[] AnnotatedImage { get; set; }
         public string AnnotatedImageType { get; set; }

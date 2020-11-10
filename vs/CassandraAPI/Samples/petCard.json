@@ -1,0 +1,17 @@
+{
+  "Namespace": "pet911ru",
+  "LocalID": "rf123",
+  "CardType": "found",
+  "ContactInfo": {
+    "Comment": "This is a comment",
+    "Tel": "+790312355467"
+  },
+  "EventTime": "2020-01-01",
+  "Location": {
+    "Address": "This is an address",
+    "Lat": 55.4,
+    "Lon": 37.5
+  },
+  "PetType": "cat",
+  "ProvenanceURL": "https://pet911ru/rf123"
+}

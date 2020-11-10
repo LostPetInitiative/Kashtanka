@@ -9,7 +9,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace CassandraAPI.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("[controller]")]
     [ApiController]
     public class PetPhotosController : ControllerBase
     {
@@ -20,10 +20,10 @@ namespace CassandraAPI.Controllers
         }
 
         // GET: api/<PetPhotoController>/b524403d-bddf-4728-a6e9-4c8566c5ab76
-        [HttpGet("{guid}")]
-        public async Task<IEnumerable<PetPhotoMarshaled>> Get(Guid guid)
+        [HttpGet("{ns}/{localID}")]
+        public async Task<IEnumerable<PetPhotoMarshaled>> Get(string ns, string localID)
         {
-            var photos = await this.storage.GetPetPhotosAsync(guid);
+            var photos = await this.storage.GetPetPhotosAsync(ns, localID);
             return photos.Select(photo => new PetPhotoMarshaled(photo));
         }
 

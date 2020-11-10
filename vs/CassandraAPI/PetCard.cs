@@ -7,14 +7,13 @@ namespace CassandraAPI
 {
     public class PetCard
     {
+        public string Namespace { get; set; }
+        public string LocalID { get; set; }
         public string CardType { get; set; }
         public ContactInfo ContactInfo { get; set; }
         public DateTime EventTime { get; set; }
-        public Guid GlobalID { get; set; }
-        public string LocalID { get; set; }
         public Location Location { get; set; }
         public string PetType { get; set; }
-        public string Provenance { get; set; }
         public string ProvenanceURL { get; set; }
     }
 

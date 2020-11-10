@@ -7,11 +7,11 @@ namespace CassandraAPI.Storage
 {
     public interface IStorage
     {
-        Task<PetCard> GetPetCardAsync(Guid guid);
-        Task<Guid> AddPetCardAsync(PetCard card);
-        Task<bool> DeletePetCardAsync(Guid guid);
+        Task<PetCard> GetPetCardAsync(string ns, string localID);
+        Task<bool> AddPetCardAsync(PetCard card);
+        Task<bool> DeletePetCardAsync(string ns, string localID);
 
-        Task<IEnumerable<PetPhoto>> GetPetPhotosAsync(Guid guid);
+        Task<IEnumerable<PetPhoto>> GetPetPhotosAsync(string ns, string localID);
         Task<bool> AddPetPhotoAsync(PetPhoto photo);
     }
 }

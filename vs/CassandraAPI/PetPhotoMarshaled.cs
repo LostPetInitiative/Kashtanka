@@ -7,7 +7,9 @@ namespace CassandraAPI
 {
     public class PetPhotoMarshaled
     {
-        public Guid CardGlobalID { get; private set; }
+        public string Namespace { get; set; }
+        public string LocalID { get; set; }
+
         public int ImageNum { get; private set; }
         public string AnnotatedImage { get; private set; }
         public string AnnotatedImageType { get; private set; }
@@ -16,7 +18,9 @@ namespace CassandraAPI
 
         public PetPhotoMarshaled(PetPhoto photo)
         {
-            this.CardGlobalID = photo.CardGlobalID;
+            this.Namespace = photo.Namespace;
+            this.LocalID = photo.LocalID;
+
             this.ImageNum = photo.ImageNum;
             this.AnnotatedImageType = photo.AnnotatedImageType;
             this.DetectionConfidence = photo.DetectionConfidence;
@@ -27,7 +31,9 @@ namespace CassandraAPI
         public PetPhoto ToPetPhoto() {
             return new PetPhoto()
             {
-                CardGlobalID = this.CardGlobalID,
+                Namespace = this.Namespace,
+                LocalID = this.LocalID,
+
                 AnnotatedImage = Convert.FromBase64String(this.AnnotatedImage),
                 AnnotatedImageType = this.AnnotatedImageType,
                 DetectionConfidence = this.DetectionConfidence,

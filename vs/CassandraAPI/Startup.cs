@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using CassandraAPI.Storage;
@@ -26,7 +27,21 @@ namespace CassandraAPI
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllers();
-            services.AddSingleton(typeof(IStorage), new MemoryTestStorage());
+
+            string cassandra_addrs = Environment.GetEnvironmentVariable("CASSANDRA_ADDRS");
+            string keyspace = Environment.GetEnvironmentVariable("KEYSPACE");
+            if (cassandra_addrs == null || keyspace ==null)
+            {
+                Trace.TraceWarning("CASSANDRA_ADDRS or KEYSPACE env var is not found. Thus using test memory storage instead Cassandra");
+                services.AddSingleton(typeof(IStorage), new MemoryTestStorage());
+            }
+            else {
+                var contactPoints = cassandra_addrs.Split(',', StringSplitOptions.RemoveEmptyEntries).Where(addr => !string.IsNullOrEmpty(addr)).ToArray();
+                Trace.TraceWarning($"Connecting to Cassandra contact points {cassandra_addrs} and keyspace {keyspace}");
+                var storage = new Storage.Cassandra(keyspace, contactPoints);
+                Trace.TraceInformation("Cassandra Storage adapter created");
+                services.AddSingleton(typeof(IStorage), storage);
+            }
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -39,7 +54,7 @@ namespace CassandraAPI
 
             app.UseRouting();
 
-            app.UseAuthorization();
+            //app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>
             {
