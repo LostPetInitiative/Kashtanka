@@ -33,14 +33,18 @@ namespace CassandraAPI
             if (cassandra_addrs == null || keyspace ==null)
             {
                 Trace.TraceWarning("CASSANDRA_ADDRS or KEYSPACE env var is not found. Thus using test memory storage instead Cassandra");
-                services.AddSingleton(typeof(IStorage), new MemoryTestStorage());
+                var storage = new MemoryTestStorage();
+                services.AddSingleton(typeof(ICardStorage), storage);
+                services.AddSingleton(typeof(IPhotoStorage), storage);
             }
             else {
                 var contactPoints = cassandra_addrs.Split(',', StringSplitOptions.RemoveEmptyEntries).Where(addr => !string.IsNullOrEmpty(addr)).ToArray();
                 Trace.TraceWarning($"Connecting to Cassandra contact points {cassandra_addrs} and keyspace {keyspace}");
                 var storage = new Storage.Cassandra(keyspace, contactPoints);
                 Trace.TraceInformation("Cassandra Storage adapter created");
-                services.AddSingleton(typeof(IStorage), storage);
+
+                services.AddSingleton(typeof(ICardStorage), storage);
+                services.AddSingleton(typeof(IPhotoStorage), storage);
             }
         }
 

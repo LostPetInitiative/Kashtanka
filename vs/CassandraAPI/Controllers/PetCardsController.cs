@@ -14,13 +14,13 @@ namespace CassandraAPI.Controllers
     [ApiController]
     public class PetCardsController : ControllerBase
     {
-        private IStorage storage;
-        public PetCardsController(IStorage storage)
+        private ICardStorage storage;
+        public PetCardsController(ICardStorage storage)
         {
             this.storage = storage;
         }
 
-        // GET <PetCardsController>/b524403d-bddf-4728-a6e9-4c8566c5ab76
+        // GET <PetCardsController>/pet911ru/rf123
         [HttpGet("{ns}/{localID}")]
         public async Task<ActionResult<PetCard>> Get(string ns, string localID)
         {
@@ -41,7 +41,7 @@ namespace CassandraAPI.Controllers
             }
             catch (Exception err)
             {
-                Trace.TraceError($"Except card for {ns}/{localID}");
+                Trace.TraceError($"Except card for {ns}/{localID}: {err}");
                 return StatusCode(500, err.ToString());
             }
         }
@@ -61,7 +61,7 @@ namespace CassandraAPI.Controllers
                 }
                 else
                 {
-                    Trace.TraceError($"Error while storing {value.Namespace}/{value.LocalID}");
+                    Trace.TraceWarning($"Error while storing {value.Namespace}/{value.LocalID}");
                     return StatusCode(500);
                 }
             }
@@ -72,24 +72,28 @@ namespace CassandraAPI.Controllers
             
         }
 
-        // DELETE api/<PetCardsController>/5
+        // DELETE <PetCardsController>/pet911ru/rf123
         [HttpDelete("{ns}/{localID}")]
         public async Task<ActionResult> Delete(string ns, string localID)
         {
             try
             {
+                Trace.TraceInformation($"Received delete request for {ns}/{localID}");
                 var res = await this.storage.DeletePetCardAsync(ns, localID);
                 if (res)
                 {
+                    Trace.TraceInformation($"Successfully deleted {ns}/{localID} from storage");
                     return Ok();
                 }
                 else
                 {
+                    Trace.TraceError($"Failed to delete {ns}/{localID}");
                     return StatusCode(500);
                 }
             }
             catch (Exception err)
             {
+                Trace.TraceError($"Exception while deleting {ns}/{localID}: {err}");
                 return StatusCode(500, err.ToString());
             }
         }
