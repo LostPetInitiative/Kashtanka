@@ -52,7 +52,7 @@ namespace CassandraAPI.Controllers
 
         // GET: <PetPhotoController>/pet911ru/rf123
         [HttpGet("{ns}/{localID}")]
-        public async IAsyncEnumerable<PetPhotoMarshaled> GetAll(string ns, string localID, [FromQuery] bool includeBinData=false)
+        public async IAsyncEnumerable<JsonPoco.PetPhoto> GetAll(string ns, string localID, [FromQuery] bool includeBinData=false)
         {
             Trace.TraceInformation($"Getting photos for {ns}/{localID}");
             await foreach (var photo in this.storage.GetPetPhotosAsync(ns, localID, includeBinData))
@@ -64,31 +64,31 @@ namespace CassandraAPI.Controllers
                     throw new KeyNotFoundException($"There are no photos for {ns}/{localID}"); // unreachable code?
                 }
                 Trace.TraceInformation($"Yielding photo {photo.ImageNum} for {ns}/{localID}");
-                yield return new PetPhotoMarshaled(photo);
+                yield return new JsonPoco.PetPhoto(photo);
             }
         }
 
-        // POST <PetPhotoController>/
-        [HttpPost()]
-        public async Task<ActionResult> Post(PetPhotoMarshaled photo)
+        // PUT <PetPhotoController>/
+        [HttpPut("{ns}/{localID}/{imNum}")]
+        public async Task<ActionResult> Put(string ns, string localID, int imNum, [FromBody ]JsonPoco.PetPhoto photo)
         {
             try
             {
-                Trace.TraceInformation($"Adding photo {photo.ImageNum} for {photo.Namespace}/{photo.LocalID}");
-                if (await this.storage.AddPetPhotoAsync(photo.ToPetPhoto()))
+                Trace.TraceInformation($"Adding photo {imNum} for {ns}/{localID}");
+                if (await this.storage.AddPetPhotoAsync(ns, localID, imNum, photo.ToPetPhoto()))
                 {
-                    Trace.TraceInformation($"successfully added photo {photo.ImageNum} for {photo.Namespace}/{photo.LocalID}");
+                    Trace.TraceInformation($"successfully added photo {imNum} for {ns}/{localID}");
                     return Ok();
                 }
                 else
                 {
-                    Trace.TraceError($"Failed to add photo {photo.ImageNum} for {photo.Namespace}/{photo.LocalID}");
+                    Trace.TraceError($"Failed to add photo {imNum} for {ns}/{localID}");
                     return StatusCode(500);
                 }
             }
             catch (Exception ex)
             {
-                Trace.TraceError($"Exception during adding a photo {photo.ImageNum} for {photo.Namespace}/{photo.LocalID}: {ex}");
+                Trace.TraceError($"Exception during adding a photo {imNum} for {ns}/{localID}: {ex}");
                 return StatusCode(500, ex.ToString());
             }
         }

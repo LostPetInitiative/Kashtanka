@@ -7,12 +7,12 @@ namespace CassandraAPI.Storage
 {
     public class MemoryTestStorage : ICardStorage, IPhotoStorage
     {
-        public Task<bool> AddPetCardAsync(PetCard card)
+        public Task<bool> SetPetCardAsync(string ns, string localID, PetCard card)
         {
             throw new NotImplementedException();
         }
 
-        public Task<bool> AddPetPhotoAsync(PetPhoto photo)
+        public Task<bool> AddPetPhotoAsync(string ns, string localID, int photoNum, PetPhoto photo)
         {
             throw new NotImplementedException();
         }
@@ -37,8 +37,6 @@ namespace CassandraAPI.Storage
                     CardType = "found",
                     ContactInfo = new ContactInfo() { Comment = "This is comment", Tel = "911" },
                     EventTime = new DateTime(2010, 1, 1),
-                    Namespace = "pet911ru",
-                    LocalID = "rf123",
                     Location = new Location() { Address = "Moscow", Lat = 55.3, Lon = 37.5 },
                     PetType = "cat",
                     ProvenanceURL = "http://fake.ru/rf12332123"
@@ -64,11 +62,9 @@ namespace CassandraAPI.Storage
                         AnnotatedImage = includeBinData ? (new byte[] { 0, 1, 3, 53, 31, 4, 5 }) : null,
                         ExtractedImage = includeBinData ? (new byte[] { 0, 1, 3, 53, 31, 4, 5 }) : null,
                         AnnotatedImageType = "jpg",
-                        Namespace = "pet911ru",
-                        LocalID = "rf123",
                         DetectionConfidence = 0.32,
                         DetectionRotation = 0,
-                        ImageNum = 0
+                        ImageNum = 2
                     };
                 yield return new PetPhoto()
                 {
@@ -76,8 +72,6 @@ namespace CassandraAPI.Storage
                     ExtractedImage = includeBinData ? (new byte[] { 0, 1, 3, 53, 31, 63, 5 }) : null,
 
                     AnnotatedImageType = "jpg",
-                    Namespace = "pet911ru",
-                    LocalID = "rf123",
                     DetectionConfidence = 0.87,
                     DetectionRotation = 2,
                     ImageNum = 1
@@ -85,6 +79,11 @@ namespace CassandraAPI.Storage
             }
             else
                 yield return null;
+        }
+
+        public Task<bool> SetFeatureVectorAsync(string ns, string localID, string featuredIdent, double[] features)
+        {
+            throw new NotImplementedException();
         }
     }
 }

@@ -46,30 +46,48 @@ namespace CassandraAPI.Controllers
             }
         }
 
-        // POST <PetCardsController>
-        [HttpPost]
-        public async Task<ActionResult> Post([FromBody] PetCard value)
+        [HttpPut("{ns}/{localID}/{featuresIdent}")]
+        public async Task<IActionResult> PutFeatures(string ns, string localID, string featuresIdent, [FromBody] JsonPoco.FeaturesPOCO features)
         {
             try
             {
-                Trace.TraceInformation($"Storing {value.Namespace}/{value.LocalID} into storage");
-                var res = await this.storage.AddPetCardAsync(value);
+                Trace.TraceInformation($"Setting features {featuresIdent} for {ns}/{localID}");
+                await this.storage.SetFeatureVectorAsync(ns, localID, featuresIdent, features.Features);
+                Trace.TraceInformation($"Successfully set features {featuresIdent} for {ns}/{localID}");
+                return Ok();
+            }
+            catch (Exception err)
+            {
+                Trace.TraceError($"Except card for {ns}/{localID}: {err}");
+                return StatusCode(500, err.ToString());
+            }
+        }
+
+        // PUT <PetCardsController>
+        [HttpPut("{ns}/{localID}")]
+        public async Task<ActionResult> Put(string ns, string localID, [FromBody] PetCard value)
+        {
+            try
+            {
+                Trace.TraceInformation($"Storing {ns}/{localID} into storage");
+                var res = await this.storage.SetPetCardAsync(ns, localID, value);
                 if (res)
                 {
-                    Trace.TraceInformation($"Stored {value.Namespace}/{value.LocalID}");
+                    Trace.TraceInformation($"Stored {ns}/{localID}");
                     return Ok();
                 }
                 else
                 {
-                    Trace.TraceWarning($"Error while storing {value.Namespace}/{value.LocalID}");
+                    Trace.TraceWarning($"Error while storing {ns}/{localID}");
                     return StatusCode(500);
                 }
             }
-            catch (Exception err) {
-                Trace.TraceError($"Exception while storing {value.Namespace}/{value.LocalID}: {err}");
+            catch (Exception err)
+            {
+                Trace.TraceError($"Exception while storing {ns}/{localID}: {err}");
                 return StatusCode(500, err.ToString());
             }
-            
+
         }
 
         // DELETE <PetCardsController>/pet911ru/rf123

@@ -3,13 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace CassandraAPI
+namespace CassandraAPI.JsonPoco
 {
-    public class PetPhotoMarshaled
+    public class PetPhoto
     {
-        public string Namespace { get; set; }
-        public string LocalID { get; set; }
-
         public int ImageNum { get; set; }
         public string AnnotatedImage { get; set; }
         public string AnnotatedImageType { get; set; }
@@ -17,11 +14,8 @@ namespace CassandraAPI
         public double DetectionConfidence { get; set; }
         public int DetectionRotation { get; set; }
 
-        public PetPhotoMarshaled(PetPhoto photo)
+        public PetPhoto(CassandraAPI.PetPhoto photo)
         {
-            this.Namespace = photo.Namespace;
-            this.LocalID = photo.LocalID;
-
             this.ImageNum = photo.ImageNum;
             this.AnnotatedImageType = photo?.AnnotatedImageType ?? null;
             this.DetectionConfidence = photo.DetectionConfidence;
@@ -30,20 +24,17 @@ namespace CassandraAPI
             this.ExtractedImage = photo.ExtractedImage != null ? Convert.ToBase64String(photo.ExtractedImage) : null;
         }
 
-        public PetPhotoMarshaled() { }
+        public PetPhoto() { }
 
-        public PetPhoto ToPetPhoto() {
-            return new PetPhoto()
+        public CassandraAPI.PetPhoto ToPetPhoto() {
+            return new CassandraAPI.PetPhoto()
             {
-                Namespace = this.Namespace,
-                LocalID = this.LocalID,
-
+                ImageNum = this.ImageNum,
                 AnnotatedImage = this.AnnotatedImage != null ? Convert.FromBase64String(this.AnnotatedImage) : null,
                 ExtractedImage = this.ExtractedImage != null ? Convert.FromBase64String(this.ExtractedImage) : null,
                 AnnotatedImageType = this?.AnnotatedImageType ?? null,
                 DetectionConfidence = this.DetectionConfidence,
-                DetectionRotation = this.DetectionRotation,
-                ImageNum = this.ImageNum
+                DetectionRotation = this.DetectionRotation
             };
 
         }

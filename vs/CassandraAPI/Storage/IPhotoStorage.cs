@@ -18,6 +18,6 @@ namespace CassandraAPI.Storage
         /// <param name="photoNum"></param>
         /// <returns></returns>
         Task<bool> DeletePetPhoto(string ns, string localID, int photoNum = -1);
-        Task<bool> AddPetPhotoAsync(PetPhoto photo);
+        Task<bool> AddPetPhotoAsync(string ns, string localID, int imageNum, PetPhoto photo);
     }
 }
