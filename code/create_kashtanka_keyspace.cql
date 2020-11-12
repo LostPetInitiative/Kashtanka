@@ -1,5 +1,5 @@
 -- modify keyspace name
-CREATE KEYSPACE pet_cards
+CREATE KEYSPACE kashtanka
 	WITH REPLICATION = {
 		'class': 'SimpleStrategy',
 		'replication_factor': 3

@@ -1,6 +1,6 @@
-CREATE TYPE pet_cards.location(
+CREATE TYPE kashtanka.location(
    address text,
-   coords_provenance text,
    lat double,
-   lon double
+   lon double,
+   coords_provenance text
 );

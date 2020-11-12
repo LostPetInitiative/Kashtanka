@@ -1,4 +1,4 @@
-CREATE TABLE pet_cards.images_by_card_id(
+CREATE TABLE kashtanka.images_by_card_id(
     namespace text,
     local_id text,
 	image_num tinyint,

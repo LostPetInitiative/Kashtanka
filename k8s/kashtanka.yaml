@@ -143,3 +143,51 @@ spec:
           value: ProcessedCards
         - name: PET_TYPE
           value: cat
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: cassandra-rest-api
+  namespace: kashtanka
+  labels:
+    app: cassandra-rest-api
+spec:
+  ports:
+  - port: 80
+    targetPort: 5000
+    name: web
+  selector:
+    app: cassandra-rest-api
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cassandra-rest-api
+  namespace: kashtanka
+spec:
+  selector:
+    matchLabels:
+      app: cassandra-rest-api
+  replicas: 2
+  template:
+    metadata:
+      labels:
+        app: cassandra-rest-api
+    spec:
+      containers:
+      - name: rest-api
+        image: lostpetinitiative/cassandra-rest-api:1.0.3
+        resources:
+          limits:
+            memory: "128Mi"
+            cpu: "200m"
+          requests:
+            memory: "64Mi"
+            cpu: "100m"
+        env:
+        - name: CASSANDRA_ADDRS
+          value: cass-hs.default.svc.cluster.local
+        - name: KEYSPACE
+          value: kashtanka
+        ports:
+        - containerPort: 5000

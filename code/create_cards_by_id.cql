@@ -1,12 +1,13 @@
-CREATE TABLE pet_cards.cards_by_id(
+CREATE TABLE kashtanka.cards_by_id(
 	namespace text,
 	local_id text,
 	provenance_url text,
 	pet_type tinyint,
 	card_type tinyint,
-	event_time timestamp,
-	location location,
-	contact_info contact_info,
-	features_exp_3_4 list<double>
+	event_time tuple<timestamp,text>, -- time moment + provenance
+	card_creation_time timestamp,
+	event_location location,
+	contact_info frozen<contact_info>, -- frozen as contact info contains collections
+	features map<text,frozen<list<double>>>,
 	PRIMARY KEY((namespace,local_id))
 );

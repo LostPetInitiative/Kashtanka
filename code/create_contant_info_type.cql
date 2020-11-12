@@ -1,7 +1,7 @@
-CREATE TYPE pet_cards.contact_info(
-   comment text,
+CREATE TYPE kashtanka.contact_info(
    name text,
-   tel text,
-   vk text,
-   email text
+   tel set<text>,
+   website set<text>,
+   email set<text>,
+   comment text
 );
