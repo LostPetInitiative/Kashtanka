@@ -46,7 +46,7 @@ namespace CassandraAPI.Controllers
             }
         }
 
-        [HttpPut("{ns}/{localID}/{featuresIdent}")]
+        [HttpPut("{ns}/{localID}/features/{featuresIdent}")]
         public async Task<IActionResult> PutFeatures(string ns, string localID, string featuresIdent, [FromBody] JsonPoco.FeaturesPOCO features)
         {
             try

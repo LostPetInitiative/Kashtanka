@@ -40,7 +40,7 @@ namespace CassandraAPI
             else {
                 var contactPoints = cassandra_addrs.Split(',', StringSplitOptions.RemoveEmptyEntries).Where(addr => !string.IsNullOrEmpty(addr)).ToArray();
                 Trace.TraceWarning($"Connecting to Cassandra contact points {cassandra_addrs} and keyspace {keyspace}");
-                var storage = new Storage.Cassandra(keyspace, contactPoints);
+                var storage = new Storage.CassandraStorage(keyspace, contactPoints);
                 Trace.TraceInformation("Cassandra Storage adapter created");
 
                 services.AddSingleton(typeof(ICardStorage), storage);

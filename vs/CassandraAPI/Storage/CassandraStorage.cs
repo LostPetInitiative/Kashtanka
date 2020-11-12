@@ -9,7 +9,7 @@ using Cassandra.Mapping;
 
 namespace CassandraAPI.Storage
 {
-    public class Cassandra : ICardStorage, IPhotoStorage
+    public class CassandraStorage : ICardStorage, IPhotoStorage
     {
         private readonly ICluster cluster;
         private readonly ISession session;
@@ -43,7 +43,7 @@ namespace CassandraAPI.Storage
         private readonly PreparedStatement getParticularPetImageStatement;
         private readonly PreparedStatement addPetImageStatement;
 
-        public Cassandra(string keyspace, params string[] contactPoints)
+        public CassandraStorage(string keyspace, params string[] contactPoints)
         {
             this.cluster = Cluster.Builder()
                      .AddContactPoints(contactPoints.Select(EndpointFromString))
@@ -58,7 +58,7 @@ namespace CassandraAPI.Storage
             Trace.TraceInformation($"Binary protocol version: {this.session.BinaryProtocolVersion}");
 
             this.getPetCardStatement = session.Prepare("SELECT * FROM cards_by_id WHERE namespace = ? AND local_id = ?");
-            this.insertPetCardStatement = session.Prepare("INSERT INTO cards_by_id (namespace, local_id, provenance_url, pet_type, card_type, event_time, location, contact_info) values (?,?,?,?, ?,?,?,?)");
+            this.insertPetCardStatement = session.Prepare("INSERT INTO cards_by_id (namespace, local_id, provenance_url, pet_type, card_type, event_time,card_creation_time, event_location, contact_info) values (?,?,?,?,?,?,?,?,?)");
             this.deletePetCardStatement = session.Prepare("DELETE FROM cards_by_id WHERE namespace = ? AND local_id = ?");
 
             this.deleteSpecificPetImageStatement = session.Prepare("DELETE FROM images_by_card_id WHERE namespace = ? AND local_id = ? AND image_num = ?");
@@ -74,10 +74,11 @@ namespace CassandraAPI.Storage
                 .Map(v => v.Lat, "lat")
                 .Map(v => v.Lon, "lon"));
             this.session.UserDefinedTypes.Define(UdtMap.For<ContactInfo>("contact_info")
+                .Map(v => v.Name,"name")
                 .Map(v => v.Comment,"comment")
                 .Map(v => v.Email,"email")
                 .Map(v => v.Tel, "tel")
-                .Map(v => v.VK, "vk"));
+                .Map(v => v.Website, "website"));
         }
 
         public static sbyte EncodePetType(string petType)
@@ -125,12 +126,15 @@ namespace CassandraAPI.Storage
             /*
             namespace text,
 	        local_id text,
-            provenance_url text,
+	        provenance_url text,
 	        pet_type tinyint,
-            card_type tinyint,
-	        event_time timestamp,
-            location location,
-	        contact_info contact_info,
+	        card_type tinyint,
+	        event_time tuple<timestamp,text>, -- time moment + provenance
+	        card_creation_time timestamp,
+	        event_location location,
+	        contact_info frozen<contact_info>, -- frozen as contact info contains collections
+	        features map<text,frozen<list<double>>>
+            
             */
 
             var statement = this.insertPetCardStatement.Bind(
@@ -138,8 +142,9 @@ namespace CassandraAPI.Storage
                 localID,
                 card.ProvenanceURL,
                 EncodePetType(card.PetType),
-                EncodeCardType(card.CardType),
-                card.EventTime,
+                EncodeCardType(card.CardType),  
+                Tuple.Create(card.EventTime,card.EventTimeProvenance),
+                card.CardCreationTime,
                 card.Location,
                 card.ContactInfo
                 );
@@ -189,31 +194,19 @@ namespace CassandraAPI.Storage
             Row extracted = rows.FirstOrDefault();
             if (extracted != null)
             {
+                var et = extracted.GetValue<Tuple<DateTimeOffset,string>>("event_time");
                 var result =  new PetCard()
                 {
                     CardType = DecodeCardType(extracted.GetValue<sbyte>("card_type")),
                     ContactInfo = extracted.GetValue<ContactInfo>("contact_info"),
-                    EventTime = extracted.GetValue<DateTime>("event_time"),
-                    Location = extracted.GetValue<Location>("location"),
+                    EventTime = et.Item1,
+                    EventTimeProvenance = et.Item2,
+                    CardCreationTime = extracted.GetValue<DateTimeOffset>("card_creation_time"),
+                    Location = extracted.GetValue<Location>("event_location"),
                     PetType = DecodePetType(extracted.GetValue<sbyte>("pet_type")),
-                    ProvenanceURL = extracted.GetValue<string>("provenance_url")
+                    ProvenanceURL = extracted.GetValue<string>("provenance_url"),
+                    Features = extracted.GetValue<SortedDictionary<string, double[]>>("features")
                 };
-
-                var columns = rows.Columns;
-                Dictionary<string, double[]> features = new Dictionary<string, double[]>();
-
-                foreach(var column  in columns)
-                {
-                    if (column.Name.StartsWith("features_")) {
-                        var colContent = extracted.GetValue<IEnumerable<double>>(column.Name);
-                        if (colContent != null) {
-                            double[] curFeatures = colContent.ToArray();
-                            features.Add(column.Name.Substring("features_".Length), curFeatures);
-                        }
-                    }
-                }
-                if (features.Count > 0)
-                    result.Features = features;
 
                 return result;
             }
@@ -279,8 +272,10 @@ namespace CassandraAPI.Storage
 
         public async Task<bool> SetFeatureVectorAsync(string ns, string localID, string featuredIdent, double[] features)
         {
-            var statement = new SimpleStatement($"UPDATE cards_by_id SET features_{featuredIdent} = ? WHERE namespace = ? AND local_id = ?",
-                features, ns, localID);
+            var newDict = new Dictionary<string, IEnumerable<double>>();
+            newDict.Add(featuredIdent, features);
+            var statement = new SimpleStatement($"UPDATE cards_by_id SET features = features + ? WHERE namespace = ? AND local_id = ?",
+                newDict, ns, localID);
             await this.session.ExecuteAsync(statement);
             return true;
         }

@@ -35,7 +35,7 @@ namespace CassandraAPI.Storage
                 var res = new PetCard
                 {
                     CardType = "found",
-                    ContactInfo = new ContactInfo() { Comment = "This is comment", Tel = "911" },
+                    ContactInfo = new ContactInfo() { Comment = "This is comment", Tel = new string[] { "911" } },
                     EventTime = new DateTime(2010, 1, 1),
                     Location = new Location() { Address = "Moscow", Lat = 55.3, Lon = 37.5 },
                     PetType = "cat",
