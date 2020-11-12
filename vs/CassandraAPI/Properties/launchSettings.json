@@ -22,7 +22,7 @@
       "launchBrowser": true,
       "launchUrl": "PetCards/pet911ru/rf123",
       "environmentVariables": {
-        "KEYSPACE": "pet_cards",
+        "KEYSPACE": "kashtanka",
         "CASSANDRA_ADDRS": "10.0.4.12:30303",
         "ASPNETCORE_ENVIRONMENT": "Development"
       },
