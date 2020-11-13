@@ -15,21 +15,23 @@ namespace CassandraAPI.Storage
         private readonly ISession session;
         private readonly string keyspace;
 
-        public static IPEndPoint EndpointFromString(string str)
+        public static IEnumerable<IPEndPoint> EndpointFromString(string str)
         {
-            var parts = str.Split(":", StringSplitOptions.RemoveEmptyEntries);
-            IPAddress addr;
+            var parts = str.Split(":", StringSplitOptions.RemoveEmptyEntries).Select(p => p.Trim()).ToArray();
             int port = 9042; // default port
+            string host = parts[0];
             if (parts.Length == 2)
             {
-                addr = Dns.GetHostEntry(parts[0]).AddressList[0];
                 port = int.Parse(parts[1]);
             }
-            else
+            Trace.TraceInformation($"Tying to resolve {host}");
+            foreach (IPAddress addr in Dns.GetHostEntry(host).AddressList)
             {
-                addr = IPAddress.Parse(parts[0]);
+                Trace.TraceInformation($"Possible contact point is {addr}:{port}");
+                Trace.Flush();
+                yield return new IPEndPoint(addr, port);
             }
-            return new IPEndPoint(addr, port);
+
         }
 
         private readonly PreparedStatement insertPetCardStatement;
@@ -45,17 +47,40 @@ namespace CassandraAPI.Storage
 
         public CassandraStorage(string keyspace, params string[] contactPoints)
         {
-            this.cluster = Cluster.Builder()
-                     .AddContactPoints(contactPoints.Select(EndpointFromString))
-                     .WithApplicationName("RestAPI")
-                     .WithCompression(CompressionType.LZ4)
-                     .WithMaxProtocolVersion(ProtocolVersion.V4)
-                     .Build();
-
             this.keyspace = keyspace;
-            this.session = cluster.Connect(this.keyspace);
 
-            Trace.TraceInformation($"Binary protocol version: {this.session.BinaryProtocolVersion}");
+            bool connected = false;
+
+            do
+            {
+                try
+                {
+                    this.cluster = Cluster.Builder()
+                             .AddContactPoints(contactPoints.SelectMany(EndpointFromString))
+                             .WithApplicationName("RestAPI")
+                             .WithMaxProtocolVersion(ProtocolVersion.V4)
+                             .WithCompression(CompressionType.LZ4)
+                             .Build();
+                }
+                catch (Cassandra.NoHostAvailableException ex)
+                {
+                    string errors = string.Join(";", ex.Errors.Select(kvp => $"{kvp.Key}: {kvp.Value}"));
+                    Trace.TraceError($"Failed to connect to the cluster: {errors}");
+                    throw;
+                }
+
+                this.session = cluster.Connect(this.keyspace);
+
+                Trace.TraceInformation($"Binary protocol version: {this.session.BinaryProtocolVersion}");
+                if (this.session.BinaryProtocolVersion != (int)Cassandra.ProtocolVersion.V4)
+                {
+                    Trace.TraceError($"Can't establish V4 connection to the cluster. Shutting down the connection...");
+                    this.cluster.Shutdown(5000);
+                }
+                else
+                    connected = true;
+            }
+            while (!connected);
 
             this.getPetCardStatement = session.Prepare("SELECT * FROM cards_by_id WHERE namespace = ? AND local_id = ?");
             this.insertPetCardStatement = session.Prepare("INSERT INTO cards_by_id (namespace, local_id, provenance_url, pet_type, card_type, event_time,card_creation_time, event_location, contact_info) values (?,?,?,?,?,?,?,?,?)");
@@ -74,9 +99,9 @@ namespace CassandraAPI.Storage
                 .Map(v => v.Lat, "lat")
                 .Map(v => v.Lon, "lon"));
             this.session.UserDefinedTypes.Define(UdtMap.For<ContactInfo>("contact_info")
-                .Map(v => v.Name,"name")
-                .Map(v => v.Comment,"comment")
-                .Map(v => v.Email,"email")
+                .Map(v => v.Name, "name")
+                .Map(v => v.Comment, "comment")
+                .Map(v => v.Email, "email")
                 .Map(v => v.Tel, "tel")
                 .Map(v => v.Website, "website"));
         }
@@ -142,8 +167,8 @@ namespace CassandraAPI.Storage
                 localID,
                 card.ProvenanceURL,
                 EncodePetType(card.PetType),
-                EncodeCardType(card.CardType),  
-                Tuple.Create(card.EventTime,card.EventTimeProvenance),
+                EncodeCardType(card.CardType),
+                Tuple.Create(card.EventTime, card.EventTimeProvenance),
                 card.CardCreationTime,
                 card.Location,
                 card.ContactInfo
@@ -156,14 +181,14 @@ namespace CassandraAPI.Storage
 
         public async Task<bool> AddPetPhotoAsync(string ns, string localID, int imageNum, PetPhoto photo)
         {
-                //namespace text,
-                //local_id text,
-                //image_num tinyint,
-                //annotated_image blob,
-                //annotated_image_type text,
-                //extracted_pet_image blob,
-                //detection_confidence double,
-                //detection_rotation tinyint,
+            //namespace text,
+            //local_id text,
+            //image_num tinyint,
+            //annotated_image blob,
+            //annotated_image_type text,
+            //extracted_pet_image blob,
+            //detection_confidence double,
+            //detection_rotation tinyint,
             var statement = this.addPetImageStatement.Bind(
                 ns,
                 localID,
@@ -194,8 +219,8 @@ namespace CassandraAPI.Storage
             Row extracted = rows.FirstOrDefault();
             if (extracted != null)
             {
-                var et = extracted.GetValue<Tuple<DateTimeOffset,string>>("event_time");
-                var result =  new PetCard()
+                var et = extracted.GetValue<Tuple<DateTimeOffset, string>>("event_time");
+                var result = new PetCard()
                 {
                     CardType = DecodeCardType(extracted.GetValue<sbyte>("card_type")),
                     ContactInfo = extracted.GetValue<ContactInfo>("contact_info"),
@@ -214,7 +239,8 @@ namespace CassandraAPI.Storage
                 return null;
         }
 
-        private static PetPhoto CovertRowToPetPhoto(Row row, bool includeBinData) {
+        private static PetPhoto CovertRowToPetPhoto(Row row, bool includeBinData)
+        {
             //namespace text,
             //local_id text,
             //image_num tinyint,
@@ -238,10 +264,11 @@ namespace CassandraAPI.Storage
         {
             BoundStatement statement =
                 includeBinData ?
-                    this.getAllPetImagesStatementIncBin.Bind(ns,localID)
+                    this.getAllPetImagesStatementIncBin.Bind(ns, localID)
                     : this.getAllPetImagesStatement.Bind(ns, localID);
             var rows = await this.session.ExecuteAsync(statement);
-            foreach (var row in rows) {
+            foreach (var row in rows)
+            {
                 yield return CovertRowToPetPhoto(row, includeBinData);
             }
         }
