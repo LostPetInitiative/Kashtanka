@@ -39,9 +39,10 @@ def GetPetCard(dirPath):
     
 
     location = {
-        "address": pet['address'],
-        "lat": pet['latitude'],
-        "lon": pet['longitude']
+        "Address": pet['address'],
+        "Lat": float(pet['latitude']),
+        "Lon": float(pet['longitude']),
+        "CoordsProvenance": "Указано на сайте pet911.ru"
     }
 
     #print("t is {0}".format(time.localtime(pet['date'])))
@@ -56,17 +57,28 @@ def GetPetCard(dirPath):
         raise "unknown pet.type {0}".format(pet['type'])
 
     contactInfo = {
-        "comment": pet['description'],
-        "tel": pet['contact_info'],
+        "Comment": pet['description'],
+        "Tel": list(),
+        "Website": list(),
+        "Email": list()
     }
+    if 'author' in pet:
+        author = pet['author']
+        if 'username' in author:
+            contactInfo['Name'] = author['username']
+        if ('phone' in author) and len(author['phone'])>0:
+            contactInfo['Tel'].append(author['phone'])
+        if ('email' in author) and len(author['email'])>0:
+            contactInfo['Email'].append(author['email'])
 
     result = {
         'UID': "pet911ru_{0}".format(pet['art']),
         'pet': petKind,
-        'location': location,
-        'eventTime': eventTime,
-        'cardType': cardType,
-        'contactInfo': contactInfo,
+        'Location': location,
+        'EventTime': eventTime,
+        'EventTimeProvenance': "Указано на сайте pet911.ru",
+        'CardType': cardType,
+        'ContactInfo': contactInfo,
         'images': images
     }
 

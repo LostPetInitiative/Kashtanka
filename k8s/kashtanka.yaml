@@ -71,6 +71,40 @@ spec:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
+  name: processed-cards-persister
+  namespace: kashtanka
+spec:
+  selector:
+    matchLabels:
+      app: processed-cards-persister
+  template:
+    metadata:
+      labels:
+        app: processed-cards-persister
+    spec:
+      containers:
+      - name: worker
+        image: lostpetinitiative/processed-cards-persister:1.0
+        resources:
+          requests:
+            memory: "64Mi"
+            cpu: "100m"
+          limits:
+            memory: "256Mi"
+            cpu: "200m"
+        # ports:
+        # - containerPort: <Port>
+        env:
+        - name: KAFKA_URL
+          value: kafka-cluster.kashtanka:9092
+        - name: INPUT_QUEUE
+          value: ProcessedCards
+        - name: CARD_STORAGE_REST_API_URL
+          value: http://cassandra-rest-api
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
   name: feature-extractor-dogs
   namespace: kashtanka
 spec:

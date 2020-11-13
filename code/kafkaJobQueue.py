@@ -1,5 +1,6 @@
-import kafka
 import json
+import base64
+import kafka
 from kafka.admin import KafkaAdminClient, NewTopic
 
 def strSerializer(jobName):
@@ -82,6 +83,17 @@ class JobQueueWorker(JobQueue):
                 for key in res:
                     jobValue = res.get(key)[0].value
                     return jobValue        
+
+    def TryGetNextJob(self, pollingIntervalMs = 1000):
+        res = self.consumer.poll(pollingIntervalMs, max_records=1)
+        #print("Got {0}. Len {1}".format(res,len(res)))
+        if(len(res) == 1):
+            for key in res:
+                jobValue = res.get(key)[0].value
+                return jobValue
+        else:
+            return None
+
 
     def Commit(self):
         self.consumer.commit()
