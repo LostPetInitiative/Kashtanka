@@ -36,6 +36,13 @@ def GetPetCard(dirPath):
         petKind = "dog"
     else:
         raise "unknown pet type"
+
+    if pet['sex'] == "2":
+        petSex = "male"
+    elif pet['sex'] == "3":
+        petSex = "female"
+    else:
+        petSex = "unknown"
     
 
     location = {
@@ -77,6 +84,7 @@ def GetPetCard(dirPath):
         'Location': location,
         'EventTime': eventTime,
         'EventTimeProvenance': "Указано на сайте pet911.ru",
+        'Sex': petSex,
         'CardType': cardType,
         'ContactInfo': contactInfo,
         'images': images

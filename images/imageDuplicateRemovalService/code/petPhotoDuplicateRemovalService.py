@@ -84,8 +84,10 @@ async def work():
                 if not duplicateFound:
                     distinctImages.append(images[hashImageIdx[idx1]])
 
-            # last one is always added (as we may skip only preceeding duplicates)
-            distinctImages.append(images[hashImageIdx[hashesCount-1]])
+            
+            if hashesCount>0:
+                # last one is always added (as we may skip only preceeding duplicates)
+                distinctImages.append(images[hashImageIdx[hashesCount-1]])
             print("{0}: Found {1} distinct images".format(uid, hashesCount))
 
             job['images'] = distinctImages

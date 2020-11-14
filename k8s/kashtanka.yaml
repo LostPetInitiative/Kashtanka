@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
       - name: worker
-        image: lostpetinitiative/duplicate-image-remover:1.2
+        image: lostpetinitiative/duplicate-image-remover:1.2.1
         resources:
           requests:
             memory: "64Mi"
@@ -26,7 +26,7 @@ spec:
         # - containerPort: <Port>
         env:
         - name: KAFKA_URL
-          value: kafka-cluster.kashtanka:9092
+          value: kafka-cluster.default:9092
         - name: INPUT_QUEUE
           value: CrawledPetCards
         - name: OUTPUT_QUEUE
@@ -62,7 +62,7 @@ spec:
         # - containerPort: <Port>
         env:
         - name: KAFKA_URL
-          value: kafka-cluster.kashtanka:9092
+          value: kafka-cluster.default:9092
         - name: INPUT_QUEUE
           value: DistinctPhotosPetCards
         - name: OUTPUT_QUEUE
@@ -96,7 +96,7 @@ spec:
         # - containerPort: <Port>
         env:
         - name: KAFKA_URL
-          value: kafka-cluster.kashtanka:9092
+          value: kafka-cluster.default:9092
         - name: INPUT_QUEUE
           value: ProcessedCards
         - name: CARD_STORAGE_REST_API_URL
@@ -118,7 +118,7 @@ spec:
     spec:
       containers:
       - name: worker
-        image: lostpetinitiative/pet-feature-extractor:1.0
+        image: lostpetinitiative/pet-feature-extractor:1.0.1
         #command: ["python3.8"]                
         #args: ["-u","detect.py"]
         resources:
@@ -132,7 +132,7 @@ spec:
         # - containerPort: <Port>
         env:
         - name: KAFKA_URL
-          value: kafka-cluster.kashtanka:9092
+          value: kafka-cluster.default:9092
         - name: INPUT_QUEUE
           value: DetectedPets
         - name: OUTPUT_QUEUE
@@ -156,7 +156,7 @@ spec:
     spec:
       containers:
       - name: worker
-        image: lostpetinitiative/pet-feature-extractor:1.0
+        image: lostpetinitiative/pet-feature-extractor:1.0.1
         #command: ["python3.8"]                
         #args: ["-u","detect.py"]
         resources:
@@ -170,7 +170,7 @@ spec:
         # - containerPort: <Port>
         env:
         - name: KAFKA_URL
-          value: kafka-cluster.kashtanka:9092
+          value: kafka-cluster.default:9092
         - name: INPUT_QUEUE
           value: DetectedPets
         - name: OUTPUT_QUEUE
