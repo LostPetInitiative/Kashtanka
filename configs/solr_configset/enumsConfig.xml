@@ -1,0 +1,15 @@
+<?xml version="1.0" ?>
+<enumsConfig>
+  <enum name="animal">
+    <value>Cat</value>
+    <value>Dog</value>
+  </enum>
+  <enum name="sex">
+    <value>Male</value>
+    <value>Female</value>
+  </enum>
+  <enum name="cardType">
+    <value>Lost</value>
+    <value>Found</value>
+  </enum>
+</enumsConfig>

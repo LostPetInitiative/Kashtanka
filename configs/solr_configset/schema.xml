@@ -11,12 +11,9 @@
       <tokenizer class="solr.PathHierarchyTokenizerFactory" delimiter="/"/>
     </analyzer>
   </fieldType>
-  <fieldType name="animalSex" class="solr.EnumFieldType" enumsConfig="enumsConfig.xml" docValues="true" enumName="sex"/>
-  <fieldType name="animalType" class="solr.EnumFieldType" enumsConfig="enumsConfig.xml" docValues="true" enumName="animal"/>
   <fieldType name="binary" class="solr.BinaryField"/>
   <fieldType name="boolean" class="solr.BoolField" sortMissingLast="true"/>
   <fieldType name="booleans" class="solr.BoolField" sortMissingLast="true" multiValued="true"/>
-  <fieldType name="cardType" class="solr.EnumFieldType" enumsConfig="enumsConfig.xml" docValues="true" enumName="cardType"/>
   <fieldType name="delimited_payloads_float" class="solr.TextField" indexed="true" stored="false">
     <analyzer>
       <tokenizer class="solr.WhitespaceTokenizerFactory"/>
@@ -450,21 +447,24 @@
       <tokenizer class="solr.WhitespaceTokenizerFactory"/>
     </analyzer>
   </fieldType>
-  <field name="contactInfoComment" type="text_ru" uninvertible="false" indexed="true" stored="true"/>
-  <field name="contactInfoEmail" type="strings" uninvertible="false" multiValued="true" indexed="true" stored="true"/>
-  <field name="contactInfoName" type="text_ar" uninvertible="false" multiValued="true" indexed="true" stored="true"/>
-  <field name="contactInfoTel" type="strings" uninvertible="false" multiValued="true" indexed="true" stored="true"/>
-  <field name="contactInfoWebSite" type="strings" uninvertible="false" multiValued="true" indexed="true" stored="true"/>
-  <field name="features_exp_3_4" type="point" uninvertible="false" indexed="true" stored="true"/>
+  <field name="_nest_path_" type="_nest_path_"/>
+  <field name="_root_" type="string" docValues="false" indexed="true" stored="false"/>
+  <field name="_text_" type="text_general" multiValued="true" indexed="true" stored="false"/>
   <field name="_version_" type="plong" indexed="false" stored="false"/>
-  <field name="address" type="string" uninvertible="false" indexed="true" stored="true"/>
-  <field name="animal" type="animalType" uninvertible="false" docValues="true" indexed="true" required="true" stored="true"/>
-  <field name="cardType" type="cardType" uninvertible="false" docValues="true" indexed="true" required="true" stored="true"/>
-  <field name="eventTime" type="pdate" uninvertible="false" docValues="true" indexed="true" required="true" stored="true"/>
-  <field name="eventTimeProvenace" type="text_general" uninvertible="false" indexed="true" stored="true"/>
+  <field name="author" type="text_general"/>
+  <field name="cat" type="text_general"/>
+  <field name="features" type="text_general"/>
   <field name="id" type="string" multiValued="false" indexed="true" required="true" stored="true"/>
-  <field name="location" type="location" uninvertible="false" indexed="true" stored="true"/>
-  <field name="locationProvenance" type="text_general" uninvertible="false" indexed="true" stored="true"/>
+  <field name="inStock" type="booleans"/>
+  <field name="includes" type="text_general"/>
+  <field name="manu" type="text_general"/>
+  <field name="name" type="text_general"/>
+  <field name="payloads" type="text_general"/>
+  <field name="popularity" type="plongs"/>
+  <field name="price" type="pdoubles"/>
+  <field name="price_c" type="text_general"/>
+  <field name="store" type="text_general"/>
+  <field name="weight" type="pdoubles"/>
   <dynamicField name="*_txt_en_split_tight" type="text_en_splitting_tight" indexed="true" stored="true"/>
   <dynamicField name="*_descendent_path" type="descendent_path" indexed="true" stored="true"/>
   <dynamicField name="*_ancestor_path" type="ancestor_path" indexed="true" stored="true"/>
@@ -534,4 +534,13 @@
   <dynamicField name="*_f" type="pfloat" indexed="true" stored="true"/>
   <dynamicField name="*_d" type="pdouble" indexed="true" stored="true"/>
   <dynamicField name="*_p" type="location" indexed="true" stored="true"/>
+  <copyField source="author" dest="author_str" maxChars="256"/>
+  <copyField source="cat" dest="cat_str" maxChars="256"/>
+  <copyField source="name" dest="name_str" maxChars="256"/>
+  <copyField source="features" dest="features_str" maxChars="256"/>
+  <copyField source="manu" dest="manu_str" maxChars="256"/>
+  <copyField source="store" dest="store_str" maxChars="256"/>
+  <copyField source="includes" dest="includes_str" maxChars="256"/>
+  <copyField source="payloads" dest="payloads_str" maxChars="256"/>
+  <copyField source="price_c" dest="price_c_str" maxChars="256"/>
 </schema>

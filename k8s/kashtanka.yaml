@@ -118,7 +118,7 @@ spec:
     spec:
       containers:
       - name: worker
-        image: lostpetinitiative/pet-feature-extractor:1.0.1
+        image: lostpetinitiative/pet-feature-extractor:1.0.2
         #command: ["python3.8"]                
         #args: ["-u","detect.py"]
         resources:
@@ -156,7 +156,7 @@ spec:
     spec:
       containers:
       - name: worker
-        image: lostpetinitiative/pet-feature-extractor:1.0.1
+        image: lostpetinitiative/pet-feature-extractor:1.0.2
         #command: ["python3.8"]                
         #args: ["-u","detect.py"]
         resources:
