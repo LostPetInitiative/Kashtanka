@@ -5,13 +5,14 @@ import base64
 
 def GetPetCard(dirPath):
     cardPath = os.path.join(dirPath,"card.json")
+    print("Pasing {0}".format(cardPath))
     if not os.path.exists(cardPath):
         raise "Can't find card.json in {0}".format(dirPath)
     with open(cardPath, 'r') as cardfile:
         card = json.loads(cardfile.read())
     images = []
     pet = card['pet']
-    for photo in pet['photos']:        
+    for photo in pet['photos'] :        
         photoPath = os.path.join(dirPath,"{0}.jpg".format(photo['id']))
         imageType = "jpg"
         if not os.path.exists(photoPath):
@@ -42,7 +43,7 @@ def GetPetCard(dirPath):
     elif pet['sex'] == "3":
         petSex = "female"
     else:
-        petSex = "unknown"
+        petSex = None
     
 
     location = {
@@ -69,9 +70,9 @@ def GetPetCard(dirPath):
         "Website": list(),
         "Email": list()
     }
-    if 'author' in pet:
+    if ('author' in pet) and not(pet['author'] is None):
         author = pet['author']
-        if 'username' in author:
+        if ('username' in author) and not(author['username'] is None):
             contactInfo['Name'] = author['username']
         if ('phone' in author) and len(author['phone'])>0:
             contactInfo['Tel'].append(author['phone'])
@@ -84,11 +85,12 @@ def GetPetCard(dirPath):
         'Location': location,
         'EventTime': eventTime,
         'EventTimeProvenance': "Указано на сайте pet911.ru",
-        'Sex': petSex,
         'CardType': cardType,
         'ContactInfo': contactInfo,
         'images': images
     }
+    if not(petSex is None):
+        result['Sex'] = petSex
 
     return result
     

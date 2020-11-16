@@ -54,10 +54,11 @@ spec:
         resources:
           requests:
             memory: "2048Mi"
-            # cpu: "25m"
+            cpu: "25m"
           limits:
-            memory: "3072Mi"
-        #     cpu: "500m"
+            #memory: "3072Mi"
+            memory: "2048Mi"
+            cpu: "2"
         # ports:
         # - containerPort: <Port>
         env:
@@ -84,7 +85,7 @@ spec:
     spec:
       containers:
       - name: worker
-        image: lostpetinitiative/processed-cards-persister:1.0
+        image: lostpetinitiative/processed-cards-persister:1.0.1
         resources:
           requests:
             memory: "64Mi"
@@ -101,6 +102,8 @@ spec:
           value: ProcessedCards
         - name: CARD_STORAGE_REST_API_URL
           value: http://cassandra-rest-api
+        - name: CARD_INDEX_REST_API_URL
+          value: http://solr.default/solr/kashtankacards/update/json/docs
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -122,12 +125,13 @@ spec:
         #command: ["python3.8"]                
         #args: ["-u","detect.py"]
         resources:
-          #requests:
-            #memory: "2048Mi"
-            # cpu: "25m"
+          requests:
+            memory: "2560Mi"
+            cpu: "25m"
           limits:
-            memory: "3072Mi"
-        #     cpu: "500m"
+            #memory: "3072Mi"
+            memory: "2560Mi"
+            cpu: "1"
         # ports:
         # - containerPort: <Port>
         env:
@@ -160,12 +164,13 @@ spec:
         #command: ["python3.8"]                
         #args: ["-u","detect.py"]
         resources:
-          #requests:
-            #memory: "2048Mi"
-            # cpu: "25m"
+          requests:
+            memory: "2560Mi"
+            cpu: "25m"
           limits:
-            memory: "3072Mi"
-        #     cpu: "500m"
+            #memory: "3072Mi"
+            memory: "2560Mi"
+            cpu: "1"
         # ports:
         # - containerPort: <Port>
         env:

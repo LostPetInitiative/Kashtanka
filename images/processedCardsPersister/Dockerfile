@@ -11,5 +11,6 @@ RUN pip3 install -r requirements.txt
 ENV KAFKA_URL=kafka-cluster.kashtanka:9092
 ENV INPUT_QUEUE=ProcessedCards
 ENV CARD_STORAGE_REST_API_URL=http://storage-api
+ENV CARD_INDEX_REST_API_URL=http://solr/solr/kashtankacards/update/json/docs
 
 CMD python3.8 -u persisterService.py

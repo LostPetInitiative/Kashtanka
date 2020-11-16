@@ -11,9 +11,12 @@
       <tokenizer class="solr.PathHierarchyTokenizerFactory" delimiter="/"/>
     </analyzer>
   </fieldType>
+  <fieldType name="animalSex" class="solr.EnumFieldType" enumsConfig="enumsConfig.xml" docValues="true" enumName="sex"/>
+  <fieldType name="animalType" class="solr.EnumFieldType" enumsConfig="enumsConfig.xml" docValues="true" enumName="animal"/>
   <fieldType name="binary" class="solr.BinaryField"/>
   <fieldType name="boolean" class="solr.BoolField" sortMissingLast="true"/>
   <fieldType name="booleans" class="solr.BoolField" sortMissingLast="true" multiValued="true"/>
+  <fieldType name="cardType" class="solr.EnumFieldType" enumsConfig="enumsConfig.xml" docValues="true" enumName="cardType"/>
   <fieldType name="delimited_payloads_float" class="solr.TextField" indexed="true" stored="false">
     <analyzer>
       <tokenizer class="solr.WhitespaceTokenizerFactory"/>
@@ -40,6 +43,7 @@
       <tokenizer class="solr.KeywordTokenizerFactory"/>
     </analyzer>
   </fieldType>
+  <fieldType name="feature_vector_80d" class="solr.PointType" subFieldSuffix="_d" dimension="80"/>
   <fieldType name="ignored" class="solr.StrField" indexed="false" stored="false" multiValued="true"/>
   <fieldType name="location" class="solr.LatLonPointSpatialField" docValues="true"/>
   <fieldType name="location_rpt" class="solr.SpatialRecursivePrefixTreeFieldType" geo="true" omitNorms="true" omitTermFreqAndPositions="true" maxDistErr="0.001" termOffsets="false" distErrPct="0.025" distanceUnits="kilometers" termPositions="false" omitPositions="true"/>
@@ -451,20 +455,22 @@
   <field name="_root_" type="string" docValues="false" indexed="true" stored="false"/>
   <field name="_text_" type="text_general" multiValued="true" indexed="true" stored="false"/>
   <field name="_version_" type="plong" indexed="false" stored="false"/>
-  <field name="author" type="text_general"/>
-  <field name="cat" type="text_general"/>
-  <field name="features" type="text_general"/>
+  <field name="address" type="string" uninvertible="false" indexed="true" stored="true"/>
+  <field name="animal" type="animalType" uninvertible="false" docValues="true" indexed="true" required="true" stored="true"/>
+  <field name="sex" type="animalSex" uninvertible="false" docValues="true" indexed="true" stored="true"/>
+  <field name="card_creation_time" type="pdate" uninvertible="false" docValues="true" indexed="true" stored="true"/>
+  <field name="card_type" type="cardType" uninvertible="false" docValues="true" indexed="true" required="true" stored="true"/>
+  <field name="contact_info_comment" type="text_ru" uninvertible="false" indexed="true" stored="true"/>
+  <field name="contact_info_email" type="strings" uninvertible="false" multiValued="true" indexed="true" stored="true"/>
+  <field name="contact_info_name" type="text_ar" uninvertible="false" multiValued="true" indexed="true" stored="true"/>
+  <field name="contact_info_tel" type="strings" uninvertible="false" multiValued="true" indexed="true" stored="true"/>
+  <field name="contact_info_website" type="strings" uninvertible="false" multiValued="true" indexed="true" stored="true"/>
+  <field name="event_time" type="pdate" uninvertible="false" docValues="true" indexed="true" required="true" stored="true"/>
+  <field name="event_time_provenance" type="text_general" uninvertible="false" indexed="true" stored="true"/>
+  <field name="features_exp_3_4" type="feature_vector_80d" uninvertible="false" indexed="true" stored="true"/>
   <field name="id" type="string" multiValued="false" indexed="true" required="true" stored="true"/>
-  <field name="inStock" type="booleans"/>
-  <field name="includes" type="text_general"/>
-  <field name="manu" type="text_general"/>
-  <field name="name" type="text_general"/>
-  <field name="payloads" type="text_general"/>
-  <field name="popularity" type="plongs"/>
-  <field name="price" type="pdoubles"/>
-  <field name="price_c" type="text_general"/>
-  <field name="store" type="text_general"/>
-  <field name="weight" type="pdoubles"/>
+  <field name="location" type="location" uninvertible="false" indexed="true" stored="true"/>
+  <field name="location_provenance" type="text_general" uninvertible="false" indexed="true" stored="true"/>
   <dynamicField name="*_txt_en_split_tight" type="text_en_splitting_tight" indexed="true" stored="true"/>
   <dynamicField name="*_descendent_path" type="descendent_path" indexed="true" stored="true"/>
   <dynamicField name="*_ancestor_path" type="ancestor_path" indexed="true" stored="true"/>
@@ -534,13 +540,4 @@
   <dynamicField name="*_f" type="pfloat" indexed="true" stored="true"/>
   <dynamicField name="*_d" type="pdouble" indexed="true" stored="true"/>
   <dynamicField name="*_p" type="location" indexed="true" stored="true"/>
-  <copyField source="author" dest="author_str" maxChars="256"/>
-  <copyField source="cat" dest="cat_str" maxChars="256"/>
-  <copyField source="name" dest="name_str" maxChars="256"/>
-  <copyField source="features" dest="features_str" maxChars="256"/>
-  <copyField source="manu" dest="manu_str" maxChars="256"/>
-  <copyField source="store" dest="store_str" maxChars="256"/>
-  <copyField source="includes" dest="includes_str" maxChars="256"/>
-  <copyField source="payloads" dest="payloads_str" maxChars="256"/>
-  <copyField source="price_c" dest="price_c_str" maxChars="256"/>
 </schema>

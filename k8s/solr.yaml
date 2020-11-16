@@ -9,7 +9,8 @@ spec:
     app: solr
   ports:
     - protocol: TCP
-      port: 8983
+      port: 80
+      targetPort: 8983
 ---
 apiVersion: policy/v1beta1
 kind: PodDisruptionBudget
@@ -53,19 +54,20 @@ spec:
       - name: solr
         imagePullPolicy: Always
         image: "solr:8"
-        # resources:
-          # requests:
-          #   memory: "256Mi"
-          # limits:
-          #   memory: "320Mi"
-          #   cpu: "0.25"
+        resources:
+          requests:
+            memory: 1Gi
+            cpu: "250m"
+          limits:
+            memory: 1Gi
+            cpu: "1"
         env:
             - name: ZK_HOST
               value: zk-0.zk-hs,zk-1.zk-hs,zk-2.zk-hs # solr monitors ZK cluster itself. this, not zk-cs
             - name: SOLR_HEAP
-              value: 512m
+              value: 1024m
             - name: SOLR_JAVA_MEM
-              value: -Xms256m -Xmx512m
+              value: -Xms512m -Xmx1024m
         ports:
         - containerPort: 8983
         volumeMounts:

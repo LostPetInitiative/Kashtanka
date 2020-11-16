@@ -320,7 +320,7 @@
       -->
 
     <autoSoftCommit>
-      <maxTime>${solr.autoSoftCommit.maxTime:-1}</maxTime>
+      <maxTime>${solr.autoSoftCommit.maxTime:1000}</maxTime>
     </autoSoftCommit>
 
     <!-- Update Related Event Listeners
@@ -1183,7 +1183,7 @@
   </updateProcessor>
 
   <!-- The update.autoCreateFields property can be turned to false to disable schemaless mode -->
-  <updateRequestProcessorChain name="add-unknown-fields-to-the-schema" default="${update.autoCreateFields:true}"
+  <updateRequestProcessorChain name="add-unknown-fields-to-the-schema" default="${update.autoCreateFields:false}"
            processor="uuid,remove-blank,field-name-mutating,parse-boolean,parse-long,parse-double,parse-date,add-schema-fields">
     <processor class="solr.LogUpdateProcessorFactory"/>
     <processor class="solr.DistributedUpdateProcessorFactory"/>
@@ -1248,12 +1248,12 @@
     <str name="content-type">text/plain; charset=UTF-8</str>
   </queryResponseWriter>
 
-  <!-- <schemaFactory class="ClassicIndexSchemaFactory"/> -->
+  <schemaFactory class="ClassicIndexSchemaFactory"/>
 
-  <schemaFactory class="ManagedIndexSchemaFactory">
-    <bool name="mutable">true</bool>
+  <!-- <schemaFactory class="ManagedIndexSchemaFactory">
+    <bool name="mutable">false</bool>
     <str name="managedSchemaResourceName">managed-schema</str>
-  </schemaFactory>
+  </schemaFactory> -->
 
 
 
