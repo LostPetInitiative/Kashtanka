@@ -1,0 +1,41 @@
+.App {
+  text-align: center;
+}
+
+.App-logo {
+  height: 10vmin;
+  pointer-events: none;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+}
+
+.App-header {
+  background-color: #282c34;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-size: calc(10px + 2vmin);
+  color: white;
+}
+
+.App-link {
+  color: #61dafb;
+}
+
+.животное {
+  border: solid;
+  border-width: 0.1em;
+  border-radius: 0.5em;
+  padding: 1em;
+}
+
+.кошка {
+  border-color: #A56828;
+}
+
+.собака {
+  border-color: #590209;
+}
