@@ -1,7 +1,9 @@
-import logo from './catndog.png';
-import AnimalCard from './AnimalCard.js';
-import {GetCard} from "./CardStorage.js";
+import * as React from "react";
+import './DataModel'
 import './App.css';
+import logo from './catndog.png';
+import {GetCard} from "./CardStorage.js";
+import AnimalCard from "./AnimalCard";
 
 
 /*------------------------------------------------------------------------------------------*/
