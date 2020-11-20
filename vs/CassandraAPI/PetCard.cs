@@ -16,7 +16,8 @@ namespace CassandraAPI
         public string EventTimeProvenance { get; set; }
         public DateTimeOffset CardCreationTime { get; set; }
         public Location Location { get; set; }
-        public string PetType { get; set; }
+        public string Animal { get; set; }
+        public string AnimalSex { get; set; }
         public string ProvenanceURL { get; set; }
         public SortedDictionary<string, double[]> Features { get; set; }
     }

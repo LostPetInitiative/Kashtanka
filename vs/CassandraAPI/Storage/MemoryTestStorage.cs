@@ -38,7 +38,7 @@ namespace CassandraAPI.Storage
                     ContactInfo = new ContactInfo() { Comment = "This is comment", Tel = new string[] { "911" } },
                     EventTime = new DateTime(2010, 1, 1),
                     Location = new Location() { Address = "Moscow", Lat = 55.3, Lon = 37.5 },
-                    PetType = "cat",
+                    Animal = "cat",
                     ProvenanceURL = "http://fake.ru/rf12332123"
                 };
                 return Task.FromResult(res);
