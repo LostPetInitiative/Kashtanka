@@ -42,16 +42,16 @@ spec:
       labels:
         app: cass
     spec:
-      # affinity:
-      #   podAntiAffinity:
-      #     requiredDuringSchedulingIgnoredDuringExecution:
-      #       - labelSelector:
-      #           matchExpressions:
-      #             - key: "app"
-      #               operator: In
-      #               values:
-      #               - cass
-      #         topologyKey: "kubernetes.io/hostname"
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            - labelSelector:
+                matchExpressions:
+                  - key: "app"
+                    operator: In
+                    values:
+                    - cass
+              topologyKey: "kubernetes.io/hostname"
       terminationGracePeriodSeconds: 1800
       containers:
       - name: cassandra
@@ -67,10 +67,10 @@ spec:
             - name: CASSANDRA_NUM_TOKENS
               value: "32"
             - name: CASSANDRA_DC
-              # valueFrom:
-              #     fieldRef:
-              #       fieldPath: metadata.labels['region']
-              value: dc1
+              valueFrom:
+                  fieldRef:
+                    fieldPath: metadata.labels['region']
+              # value: dc1
         securityContext:
           capabilities:
             add:
@@ -134,4 +134,4 @@ spec:
       accessModes: [ "ReadWriteOnce" ]
       resources:
         requests:
-          storage: 4Gi
+          storage: 32Gi

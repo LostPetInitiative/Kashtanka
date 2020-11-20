@@ -1,9 +1,67 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: kafka-rest-api
+  namespace: kashtanka
+  labels:
+    app: kafka-rest-api
+spec:
+  ports:
+  - port: 80
+    targetPort: 5000
+    name: web
+  selector:
+    app: kafka-rest-api
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kafka-rest-api
+  namespace: kashtanka
+spec:
+  selector:
+    matchLabels:
+      app: kafka-rest-api
+  replicas: 2
+  template:
+    metadata:
+      labels:
+        app: kafka-rest-api
+    spec:
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            - labelSelector:
+                matchExpressions:
+                  - key: "app"
+                    operator: In
+                    values:
+                    - kafka-rest-api
+              topologyKey: "kubernetes.io/hostname"
+      containers:
+      - name: rest-api
+        image: lostpetinitiative/kafka-rest-api:0.1
+        resources:
+          limits:
+            memory: "128Mi"
+            cpu: "200m"
+          requests:
+            memory: "64Mi"
+            cpu: "50m"
+        env:
+        - name: KAFKA_URL
+          value: kafka-cluster.default:9092
+        ports:
+        - containerPort: 5000
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: duplicate-image-remover
   namespace: kashtanka
 spec:
+  strategy:
+    type: Recreate
   selector:
     matchLabels:
       app: duplicate-image-remover
@@ -14,7 +72,7 @@ spec:
     spec:
       containers:
       - name: worker
-        image: lostpetinitiative/duplicate-image-remover:1.2.1
+        image: lostpetinitiative/duplicate-image-remover:1.4.2
         resources:
           requests:
             memory: "64Mi"
@@ -28,9 +86,9 @@ spec:
         - name: KAFKA_URL
           value: kafka-cluster.default:9092
         - name: INPUT_QUEUE
-          value: CrawledPetCards
+          value: kashtanka_crawled_pet_cards
         - name: OUTPUT_QUEUE
-          value: DistinctPhotosPetCards
+          value: kashtanka_distinct_photos_pet_cards
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -41,6 +99,8 @@ spec:
   selector:
     matchLabels:
       app: pet-image-detector
+  strategy:
+    type: Recreate
   template:
     metadata:
       labels:
@@ -48,9 +108,7 @@ spec:
     spec:
       containers:
       - name: worker
-        image: lostpetinitiative/pet-image-extractor-yolo4:1.0
-        command: ["python3.8"]                
-        args: ["-u","detect.py"]
+        image: lostpetinitiative/pet-image-extractor-yolo4:1.1.1
         resources:
           requests:
             memory: "2048Mi"
@@ -65,9 +123,9 @@ spec:
         - name: KAFKA_URL
           value: kafka-cluster.default:9092
         - name: INPUT_QUEUE
-          value: DistinctPhotosPetCards
+          value: kashtanka_distinct_photos_pet_cards
         - name: OUTPUT_QUEUE
-          value: DetectedPets
+          value: kashtanka_detected_pets
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -85,7 +143,7 @@ spec:
     spec:
       containers:
       - name: worker
-        image: lostpetinitiative/processed-cards-persister:1.0.1
+        image: lostpetinitiative/processed-cards-persister:1.1.1
         resources:
           requests:
             memory: "64Mi"
@@ -93,13 +151,11 @@ spec:
           limits:
             memory: "256Mi"
             cpu: "200m"
-        # ports:
-        # - containerPort: <Port>
         env:
         - name: KAFKA_URL
           value: kafka-cluster.default:9092
         - name: INPUT_QUEUE
-          value: ProcessedCards
+          value: kashtanka_cards_with_features
         - name: CARD_STORAGE_REST_API_URL
           value: http://cassandra-rest-api
         - name: CARD_INDEX_REST_API_URL
@@ -114,6 +170,8 @@ spec:
   selector:
     matchLabels:
       app: feature-extractor-dogs
+  strategy:
+    type: Recreate
   template:
     metadata:
       labels:
@@ -121,27 +179,23 @@ spec:
     spec:
       containers:
       - name: worker
-        image: lostpetinitiative/pet-feature-extractor:1.0.2
-        #command: ["python3.8"]                
-        #args: ["-u","detect.py"]
+        image: lostpetinitiative/pet-feature-extractor:1.1.1
         resources:
           requests:
-            memory: "2560Mi"
+            memory: "2048Mi"
             cpu: "25m"
           limits:
             #memory: "3072Mi"
-            memory: "2560Mi"
+            memory: "2048Mi"
             cpu: "1"
-        # ports:
-        # - containerPort: <Port>
         env:
         - name: KAFKA_URL
           value: kafka-cluster.default:9092
         - name: INPUT_QUEUE
-          value: DetectedPets
+          value: kashtanka_detected_pets
         - name: OUTPUT_QUEUE
-          value: ProcessedCards
-        - name: PET_TYPE
+          value: kashtanka_cards_with_features
+        - name: ANIMAL_TYPE
           value: dog
 ---
 apiVersion: apps/v1
@@ -153,6 +207,8 @@ spec:
   selector:
     matchLabels:
       app: feature-extractor-cats
+  strategy:
+    type: Recreate
   template:
     metadata:
       labels:
@@ -160,27 +216,23 @@ spec:
     spec:
       containers:
       - name: worker
-        image: lostpetinitiative/pet-feature-extractor:1.0.2
-        #command: ["python3.8"]                
-        #args: ["-u","detect.py"]
+        image: lostpetinitiative/pet-feature-extractor:1.1.1
         resources:
           requests:
-            memory: "2560Mi"
+            memory: "2048Mi"
             cpu: "25m"
           limits:
             #memory: "3072Mi"
-            memory: "2560Mi"
+            memory: "2048Mi"
             cpu: "1"
-        # ports:
-        # - containerPort: <Port>
         env:
         - name: KAFKA_URL
           value: kafka-cluster.default:9092
         - name: INPUT_QUEUE
-          value: DetectedPets
+          value: kashtanka_detected_pets
         - name: OUTPUT_QUEUE
-          value: ProcessedCards
-        - name: PET_TYPE
+          value: kashtanka_cards_with_features
+        - name: ANIMAL_TYPE
           value: cat
 ---
 apiVersion: v1
@@ -213,16 +265,26 @@ spec:
       labels:
         app: cassandra-rest-api
     spec:
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            - labelSelector:
+                matchExpressions:
+                  - key: "app"
+                    operator: In
+                    values:
+                    - cassandra-rest-api
+              topologyKey: "kubernetes.io/hostname"
       containers:
       - name: rest-api
-        image: lostpetinitiative/cassandra-rest-api:1.0.3
+        image: lostpetinitiative/cassandra-rest-api:1.1.2
         resources:
           limits:
             memory: "128Mi"
             cpu: "200m"
           requests:
             memory: "64Mi"
-            cpu: "100m"
+            cpu: "50m"
         env:
         - name: CASSANDRA_ADDRS
           value: cass-hs.default.svc.cluster.local
