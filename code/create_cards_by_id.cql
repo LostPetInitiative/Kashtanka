@@ -2,7 +2,8 @@ CREATE TABLE kashtanka.cards_by_id(
 	namespace text,
 	local_id text,
 	provenance_url text,
-	pet_type tinyint,
+	animal tinyint,
+	animal_sex tinyint,
 	card_type tinyint,
 	event_time tuple<timestamp,text>, -- time moment + provenance
 	card_creation_time timestamp,
