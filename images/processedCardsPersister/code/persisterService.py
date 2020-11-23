@@ -52,21 +52,27 @@ async def work():
                 print("{0}: Extracted features {1}. Feature vector of {2} elements".format(uid, featuresIdent, len(features)))
                 feature_vectors.append((featuresIdent, features))
         print("{0}: {1} feature vectors detected".format(uid, len(feature_vectors)))
-        
+
+        def copyIfSet(srcDict,destDict, key, newKey = None):
+            if (key in srcDict) and (not(srcDict[key] is None)):
+                if newKey is None:
+                    destDict[key] = srcDict[key]
+                else:
+                    destDict[newKey] = srcDict[key]
+
+        cardCreationTimeStr = datetime.datetime.utcnow().isoformat()[0:-7]+"Z"
 
         # snake_case to PascalCase
-        cassasndaCardJson = {
-            'CardType' : job['card_type'],
-            'ContactInfo' : job['contact_info'],
-            'EventTime' : job ['event_time'],
-            'EventTimeProvenance' : job['event_time_provenance'],
-            'CardCreationTime' : datetime.datetime.utcnow().isoformat()[0:-7]+"Z",
-            'Location': job['location'],
-            'Animal': job["animal"],
-            'AnimalSex' : job["animal_sex"],
-            'ProvenanceURL' : job["provenance_url"]
-        }
-
+        cassasndaCardJson = { 'CardCreationTime' : cardCreationTimeStr }
+        copyIfSet(job, cassasndaCardJson, 'card_type', 'CardType')
+        copyIfSet(job, cassasndaCardJson, 'contact_info', 'ContactInfo')
+        copyIfSet(job, cassasndaCardJson, 'event_time', 'EventTime')
+        copyIfSet(job, cassasndaCardJson, 'event_time_provenance', 'EventTimeProvenance')
+        copyIfSet(job, cassasndaCardJson, 'location', 'Location')
+        copyIfSet(job, cassasndaCardJson, "animal", 'Animal')
+        copyIfSet(job, cassasndaCardJson, "animal_sex", 'AnimalSex')
+        copyIfSet(job, cassasndaCardJson, "provenance_url", 'ProvenanceURL')
+        
         # solr card schema transforming
         solrCardJson = {
             "id":  "{0}/{1}".format(namespace,local_id)
@@ -111,6 +117,7 @@ async def work():
             print("{0}: Got card put status code {1}".format(uid,response.status_code))
             if response.status_code != 200:
                     print("{0}: Unsuccessful status code! Error {1}".format(uid,response.text))
+                    exit(1)
         if not(cardIndexRestApiURL is None):
             cardIndexURL = "{0}".format(cardIndexRestApiURL)
             print("{0}: Sending a card to {1} for indexing".format(uid, cardIndexURL))
@@ -118,6 +125,7 @@ async def work():
             print("{0}: Got card indexing status code {1}".format(uid,response.status_code))
             if response.status_code != 200:
                     print("{0}: Unsuccessful status code! Error {1}".format(uid,response.text))
+                    exit(2)
         imageIdx = 0
         print("{0}: {1} photos to put".format(uid,len(job['annotated_images'])))
         for annotatedImage in job['annotated_images']:
@@ -135,6 +143,7 @@ async def work():
             print("{0}: Got image put status code {1}".format(uid,response.status_code))
             if response.status_code != 200:
                 print("{0}: Unsuccessful status code! Error {1}".format(uid,response.text))
+                exit(3)
             
             imageIdx+=1
 
@@ -146,6 +155,7 @@ async def work():
             print("{0}: Got features put status code {1}".format(uid,response.status_code))
             if response.status_code != 200:
                 print("{0}: Unsuccessful status code! Error {1}".format(uid,response.text))
+                exit(4)
             
         print("{0}: Job is done. Committing".format(uid))
         worker.Commit()

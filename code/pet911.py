@@ -5,7 +5,7 @@ import base64
 
 def GetPetCard(dirPath):
     cardPath = os.path.join(dirPath,"card.json")
-    print("Pasing {0}".format(cardPath))
+    #print("Pasing {0}".format(cardPath))
     if not os.path.exists(cardPath):
         raise "Can't find card.json in {0}".format(dirPath)
     with open(cardPath, 'r') as cardfile:

@@ -40,7 +40,7 @@ spec:
               topologyKey: "kubernetes.io/hostname"
       containers:
       - name: rest-api
-        image: lostpetinitiative/kafka-rest-api:0.1
+        image: lostpetinitiative/kafka-rest-api:0.1.2
         resources:
           limits:
             memory: "128Mi"
@@ -116,7 +116,7 @@ spec:
           limits:
             #memory: "3072Mi"
             memory: "2048Mi"
-            cpu: "2"
+            cpu: "5"
         # ports:
         # - containerPort: <Port>
         env:
@@ -143,7 +143,7 @@ spec:
     spec:
       containers:
       - name: worker
-        image: lostpetinitiative/processed-cards-persister:1.1.1
+        image: lostpetinitiative/processed-cards-persister:1.1.3
         resources:
           requests:
             memory: "64Mi"
@@ -182,11 +182,11 @@ spec:
         image: lostpetinitiative/pet-feature-extractor:1.1.1
         resources:
           requests:
-            memory: "2048Mi"
+            memory: "1128Mi"
             cpu: "25m"
           limits:
             #memory: "3072Mi"
-            memory: "2048Mi"
+            memory: "1280Mi"
             cpu: "1"
         env:
         - name: KAFKA_URL
@@ -219,11 +219,11 @@ spec:
         image: lostpetinitiative/pet-feature-extractor:1.1.1
         resources:
           requests:
-            memory: "2048Mi"
+            memory: "1128Mi"
             cpu: "25m"
           limits:
             #memory: "3072Mi"
-            memory: "2048Mi"
+            memory: "1280Mi"
             cpu: "1"
         env:
         - name: KAFKA_URL
