@@ -1,2 +1,2 @@
-Flask == 1.*
+Quart == 0.13.*
 kafka-python==2.*
