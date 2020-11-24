@@ -1,0 +1,31 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kafka-rest-proxy-processed-cards
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: kafka-rest-proxy-processed-cards
+  template:
+    metadata:
+      labels:
+        app: kafka-rest-proxy-processed-cards
+    spec:
+      containers:
+      - name: proxy
+        image: lostpetinitiative/kafka-rest-proxy:0.2
+        env:
+         - name: KAFKA_URL
+           value: kafka-cluster:9092
+         - name: TOPIC_NAME
+           value: kashtanka_cards_with_features
+         - name: REST_URL
+           value: http://10.0.4.211:5000
+        resources:
+          requests:
+            memory: "64Mi"
+            cpu: "50m"
+          limits:
+            memory: "228Mi"
+            cpu: "500m"

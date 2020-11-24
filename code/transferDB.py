@@ -35,6 +35,9 @@ cardDirs = cardDirs[already_transferred:]
 print("{0} cards to transfer".format(len(cardDirs)))
 for cardPath in tqdm(cardDirs, ascii=True, total=len(cardDirs)):
     card = pet911.GetPetCard(cardPath)
+    if card is None:
+        print(f"Card {cardPath} failed to be parsed. Skipping")
+        continue
     uid = card['uid']
     response = requests.post(args.destination, json = card)    
     if response.status_code != 201:

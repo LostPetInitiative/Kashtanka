@@ -22,6 +22,7 @@ def GetPetCard(dirPath):
             photoPath = os.path.join(dirPath,"{0}.png".format(photo['id']))
             imageType = "png"
         if not os.path.exists(photoPath):
+            continue
             raise "The photo {0} is not on disk".format(photo['id'])
         with open(photoPath, 'rb') as photoFile:
             photo = photoFile.read()
@@ -36,7 +37,8 @@ def GetPetCard(dirPath):
     elif pet['animal'] == "1":
         petKind = "dog"
     else:
-        raise "unknown pet type"
+        print(f"unknown pet type: {pet['animal']}. Returning none")
+        return None
 
     if pet['sex'] == "2":
         petSex = "male"
@@ -62,7 +64,9 @@ def GetPetCard(dirPath):
     elif pet['type'] == "1":
         cardType = "lost"
     else:
-        raise "unknown pet.type {0}".format(pet['type'])
+        print(f"Unexpected card type: {pet['type']}. Skipping")
+        return None
+        #raise "unknown pet.type {0}".format(pet['type'])
 
     contactInfo = {
         "Comment": pet['description'],
