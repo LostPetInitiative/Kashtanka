@@ -25,11 +25,15 @@
   color: #61dafb;
 }
 
-.животное {
-  border: solid;
+.animalCard {
+  border: solid lightgrey;
   border-width: 0.1em;
   border-radius: 0.5em;
   padding: 1em;
+  text-align: left;
+  font-size: medium;
+  background: linear-gradient(120deg, rgb(150 150 150 / 1), rgb(110 110 110 / 1));
+  box-shadow: 1px 1px 10px 0px lightgrey;
 }
 
 .кошка {
@@ -38,4 +42,25 @@
 
 .собака {
   border-color: #590209;
+}
+
+.cardHeader {
+  font-size: larger;
+  margin-bottom: 1em;
+}
+
+.foundCardHeader {
+  text-align: right;
+}
+
+.lostCardHeader {
+  text-align: left;
+}
+
+.cardItemHeader {
+  font-size: small;
+}
+
+.animalGender {
+  font-size: x-small;
 }
