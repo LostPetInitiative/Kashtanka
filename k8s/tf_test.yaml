@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: tftest
+spec:
+  containers:
+  - name: tftest
+    image: lostpetinitiative/tensorflow-2-no-avx-cpu:2.3.0
+    imagePullPolicy: IfNotPresent
+    command: [ "/bin/bash", "-c", "--" ]
+    args: [ "while true; do sleep 30; done;" ]
+  nodeName: k8s-charlie

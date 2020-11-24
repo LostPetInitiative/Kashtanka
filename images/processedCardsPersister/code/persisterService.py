@@ -37,7 +37,7 @@ async def work():
     while True:        
         job = worker.GetNextJob(5000)
         #print("Got job {0}".format(job))
-        uid = job["UID"]
+        uid = job["uid"]
         print("{0}: Starting to process the job".format(uid))
         
         splitted = uid.split("_")
@@ -52,43 +52,47 @@ async def work():
                 print("{0}: Extracted features {1}. Feature vector of {2} elements".format(uid, featuresIdent, len(features)))
                 feature_vectors.append((featuresIdent, features))
         print("{0}: {1} feature vectors detected".format(uid, len(feature_vectors)))
+
+        def copyIfSet(srcDict,destDict, key, newKey = None):
+            if (key in srcDict) and (not(srcDict[key] is None)):
+                if newKey is None:
+                    destDict[key] = srcDict[key]
+                else:
+                    destDict[newKey] = srcDict[key]
+
+        cardCreationTimeStr = datetime.datetime.utcnow().isoformat()[0:-7]+"Z"
+
+        # snake_case to PascalCase
+        cassasndaCardJson = { 'CardCreationTime' : cardCreationTimeStr }
+        copyIfSet(job, cassasndaCardJson, 'card_type', 'CardType')
+        copyIfSet(job, cassasndaCardJson, 'contact_info', 'ContactInfo')
+        copyIfSet(job, cassasndaCardJson, 'event_time', 'EventTime')
+        copyIfSet(job, cassasndaCardJson, 'event_time_provenance', 'EventTimeProvenance')
+        copyIfSet(job, cassasndaCardJson, 'location', 'Location')
+        copyIfSet(job, cassasndaCardJson, "animal", 'Animal')
+        copyIfSet(job, cassasndaCardJson, "animal_sex", 'AnimalSex')
+        copyIfSet(job, cassasndaCardJson, "provenance_url", 'ProvenanceURL')
         
-
-        # deep coping
-        cardJson = copy.deepcopy(job)
-        # then clearing not needed fields
-        cardJson.pop('UID', None)
-        cardJson.pop('images', None)
-        cardJson.pop('annotatedImages', None)
-        cardJson.pop('detectedPetImages', None)
-        cardJson.pop('detectedPetScores', None)
-        cardJson.pop('detectedPetRotations', None)
-
-        solrCardJson = dict()
-
-        # then setting additional fields
-        cardJson["PetType"] = job["pet"]
-        cardJson["CardCreationTime"] = datetime.datetime.utcnow().isoformat()[0:-7]+"Z"
-        cardJson["ProvenanceURL"] = 'https://pet911.ru/%D0%9A%D1%80%D0%B0%D1%81%D0%BD%D0%BE%D0%B4%D0%B0%D1%80/%D0%BD%D0%B0%D0%B9%D0%B4%D0%B5%D0%BD%D0%B0/%D0%BA%D0%BE%D1%88%D0%BA%D0%B0/{0}'.format(local_id)
-
         # solr card schema transforming
-        solrCardJson["id"] = "{0}/{1}".format(namespace,local_id)
-        if "Location" in cardJson:
-            location = cardJson["Location"]
+        solrCardJson = {
+            "id":  "{0}/{1}".format(namespace,local_id)
+        }
+        if "location" in job:
+            location = job["location"]
             if "Address" in location:
                 solrCardJson["address"] = location["Address"]
             if "Lat" in location and "Lon" in location:
                 solrCardJson["location"] = "{0}, {1}".format(location["Lat"],location["Lon"])
             if "CoordsProvenance" in location:
                 solrCardJson["location_provenance"] = location["CoordsProvenance"]
-        if "pet" in job:
-            solrCardJson["animal"] = job["pet"].capitalize()
-        if "Sex" in job:
-            solrCardJson["sex"] = job["Sex"].capitalize()
-        if "CardType" in job:
-            solrCardJson["card_type"] = job["CardType"].capitalize()
-        if "ContactInfo" in cardJson:
-            contactInfo = cardJson["ContactInfo"]
+        if "animal" in job:
+            solrCardJson["animal"] = job["animal"].capitalize()
+        if "animal_sex" in job:
+            solrCardJson["sex"] = job["animal_sex"].capitalize()
+        if "card_type" in job:
+            solrCardJson["card_type"] = job["card_type"].capitalize()
+        if "contact_info" in job:
+            contactInfo = job["contact_info"]
             if "Comment" in contactInfo:
                 solrCardJson["contact_info_comment"] = contactInfo["Comment"]
             if "Tel" in contactInfo:
@@ -97,22 +101,23 @@ async def work():
                 solrCardJson["contact_info_email"] = contactInfo["Email"]
             if "Name" in contactInfo:
                 solrCardJson["contact_info_name"] = contactInfo["Name"]
-        if "EventTime" in cardJson:
-            solrCardJson["event_time"] = cardJson["EventTime"],
-        if "EventTimeProvenance" in cardJson:
-            solrCardJson["event_time_provenance"] = cardJson["EventTimeProvenance"]
-        if "CardCreationTime" in cardJson:
-            solrCardJson["card_creation_time"] = cardJson["CardCreationTime"]
+        if "event_time" in job:
+            solrCardJson["event_time"] = job["event_time"],
+        if "event_time_provenance" in job:
+            solrCardJson["event_time_provenance"] = job["event_time_provenance"]
+        if "CardCreationTime" in cassasndaCardJson:
+            solrCardJson["card_creation_time"] = cassasndaCardJson["CardCreationTime"]
         for (featuresIdent,vector) in feature_vectors:
             solrCardJson["features_{0}".format(featuresIdent)] = ", ".join(["{0}".format(x) for x in vector])
 
         if not(cardStorageRestApiURL is None):
             cardURL = "{0}/PetCards/{1}/{2}/".format(cardStorageRestApiURL,namespace,local_id)
             print("{0}: Putting a card to {1}".format(uid, cardURL))
-            response = requests.put(cardURL, json = cardJson)
+            response = requests.put(cardURL, json = cassasndaCardJson)
             print("{0}: Got card put status code {1}".format(uid,response.status_code))
             if response.status_code != 200:
                     print("{0}: Unsuccessful status code! Error {1}".format(uid,response.text))
+                    exit(1)
         if not(cardIndexRestApiURL is None):
             cardIndexURL = "{0}".format(cardIndexRestApiURL)
             print("{0}: Sending a card to {1} for indexing".format(uid, cardIndexURL))
@@ -120,15 +125,16 @@ async def work():
             print("{0}: Got card indexing status code {1}".format(uid,response.status_code))
             if response.status_code != 200:
                     print("{0}: Unsuccessful status code! Error {1}".format(uid,response.text))
+                    exit(2)
         imageIdx = 0
-        print("{0}: {1} photos to put".format(uid,len(job['annotatedImages'])))
-        for annotatedImage in job['annotatedImages']:
+        print("{0}: {1} photos to put".format(uid,len(job['annotated_images'])))
+        for annotatedImage in job['annotated_images']:
             photoJson = {
                 "AnnotatedImage": annotatedImage["data"],
                 "AnnotatedImageType": "jpg", # our services always produce jpg
-                "ExtractedImage": job['detectedPetImages'][imageIdx]["data"],
-                "DetectionConfidence": float(job['detectedPetScores'][imageIdx]),
-                "DetectionRotation": job['detectedPetRotations'][imageIdx]
+                "ExtractedImage": job['detected_pet_images'][imageIdx]["data"],
+                "DetectionConfidence": float(job['detected_pet_scores'][imageIdx]),
+                "DetectionRotation": job['detected_pet_rotations'][imageIdx]
             }
             #print(json.dumps(photoJson))
             imageURL = "{0}/PetPhotos/{1}/{2}/{3}".format(cardStorageRestApiURL, namespace, local_id, imageIdx+1)
@@ -137,6 +143,7 @@ async def work():
             print("{0}: Got image put status code {1}".format(uid,response.status_code))
             if response.status_code != 200:
                 print("{0}: Unsuccessful status code! Error {1}".format(uid,response.text))
+                exit(3)
             
             imageIdx+=1
 
@@ -148,6 +155,7 @@ async def work():
             print("{0}: Got features put status code {1}".format(uid,response.status_code))
             if response.status_code != 200:
                 print("{0}: Unsuccessful status code! Error {1}".format(uid,response.text))
+                exit(4)
             
         print("{0}: Job is done. Committing".format(uid))
         worker.Commit()

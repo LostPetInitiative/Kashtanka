@@ -3,7 +3,6 @@ import kafkaJobQueue
 import shutil
 import os
 import base64
-import asyncio
 import imagehash
 from skimage import io
 from PIL import Image
@@ -20,13 +19,12 @@ resultQueue = kafkaJobQueue.JobQueueProducer(kafkaUrl, outputQueueName, appName)
 workdir = '/tmp'
 hashSize = 8
 hashSimilarityThreshold = 4
-
-async def work():
+def work():
     print("Service started. Pooling for a job")
     while True:        
         job = worker.GetNextJob(5000)
         #print("Got job {0}".format(job))
-        uid = job["UID"]
+        uid = job["uid"]
         print("{0}: Starting to process the job".format(uid))
         images = job['images']
         print("{0}: Extracting {1} images".format(uid, len(images)))
@@ -46,11 +44,8 @@ async def work():
                 with open(imageFilePath, "wb") as file1:             
                     file1.write(imageData)
                 try:
-                    if imageFilePath.endswith(".png"):
-                        imNumpy = io.imread(imageFilePath,plugin='imread')
-                    else:
-                        imNumpy = io.imread(imageFilePath)
-                
+                    imNumpy = io.imread(imageFilePath)
+                    
                     im = Image.fromarray(imNumpy)
                     a_hash = imagehash.average_hash(im, hash_size=hashSize)
                     p_hash = imagehash.phash(im, hash_size=hashSize)
@@ -91,11 +86,11 @@ async def work():
             print("{0}: Found {1} distinct images".format(uid, hashesCount))
 
             job['images'] = distinctImages
-            await resultQueue.Enqueue(uid, job)
+            resultQueue.EnqueueSync(uid, job)
             print("{0}: Posted result in output queue".format(uid))
             worker.Commit()
             print("{0}: Commited".format(uid))
         finally:
             shutil.rmtree(jobPath)
 
-asyncio.run(work(),debug=False)
+work()

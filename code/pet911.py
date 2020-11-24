@@ -5,7 +5,7 @@ import base64
 
 def GetPetCard(dirPath):
     cardPath = os.path.join(dirPath,"card.json")
-    print("Pasing {0}".format(cardPath))
+    #print("Pasing {0}".format(cardPath))
     if not os.path.exists(cardPath):
         raise "Can't find card.json in {0}".format(dirPath)
     with open(cardPath, 'r') as cardfile:
@@ -80,17 +80,18 @@ def GetPetCard(dirPath):
             contactInfo['Email'].append(author['email'])
 
     result = {
-        'UID': "pet911ru_{0}".format(pet['art']),
-        'pet': petKind,
-        'Location': location,
-        'EventTime': eventTime,
-        'EventTimeProvenance': "Указано на сайте pet911.ru",
-        'CardType': cardType,
-        'ContactInfo': contactInfo,
-        'images': images
+        'uid': "pet911ru_{0}".format(pet['art']),
+        'animal': petKind,
+        'location': location,
+        'event_time': eventTime,
+        'event_time_provenance': "Указано на сайте pet911.ru",
+        'card_type': cardType,
+        'contact_info': contactInfo,
+        'images': images,
+        'provenance_url': 'https://pet911.ru/%D0%9A%D1%80%D0%B0%D1%81%D0%BD%D0%BE%D0%B4%D0%B0%D1%80/%D0%BD%D0%B0%D0%B9%D0%B4%D0%B5%D0%BD%D0%B0/%D0%BA%D0%BE%D1%88%D0%BA%D0%B0/{0}'.format(pet['art'])
     }
     if not(petSex is None):
-        result['Sex'] = petSex
+        result['animal_sex'] = petSex
 
     return result
     
