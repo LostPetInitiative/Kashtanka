@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Net;
+using System.Threading;
 using System.Threading.Tasks;
 using Cassandra;
 using Cassandra.Mapping;
@@ -11,9 +12,11 @@ namespace CassandraAPI.Storage
 {
     public class CassandraStorage : ICardStorage, IPhotoStorage
     {
-        private readonly ICluster cluster;
-        private readonly ISession session;
+        private ICluster cluster;
+        private ISession session;
+
         private readonly string keyspace;
+        private readonly string[] contactPoints;
 
         public static IEnumerable<IPEndPoint> EndpointFromString(string str)
         {
@@ -34,81 +37,99 @@ namespace CassandraAPI.Storage
 
         }
 
-        private readonly PreparedStatement insertPetCardStatement;
-        private readonly PreparedStatement deletePetCardStatement;
-        private readonly PreparedStatement getPetCardStatement;
+        private PreparedStatement insertPetCardStatement;
+        private PreparedStatement deletePetCardStatement;
+        private PreparedStatement getPetCardStatement;
 
-        private readonly PreparedStatement deleteSpecificPetImageStatement;
-        private readonly PreparedStatement deleteAllPetImagesStatement;
-        private readonly PreparedStatement getAllPetImagesStatementIncBin;
-        private readonly PreparedStatement getAllPetImagesStatement;
-        private readonly PreparedStatement getParticularPetImageStatement;
-        private readonly PreparedStatement addPetImageStatement;
+        private PreparedStatement deleteSpecificPetImageStatement;
+        private PreparedStatement deleteAllPetImagesStatement;
+        private PreparedStatement getAllPetImagesStatementIncBin;
+        private PreparedStatement getAllPetImagesStatement;
+        private PreparedStatement getParticularPetImageStatement;
+        private PreparedStatement addPetImageStatement;
+
+        private bool connected = false;
+        private SemaphoreSlim initSemaphore = new SemaphoreSlim(1);
 
         public CassandraStorage(string keyspace, params string[] contactPoints)
         {
             this.keyspace = keyspace;
-
-            bool connected = false;
-
-            do
-            {
-                try
-                {
-                    this.cluster = Cluster.Builder()
-                             .AddContactPoints(contactPoints.SelectMany(EndpointFromString))
-                             .WithApplicationName("RestAPI")
-                             .WithMaxProtocolVersion(ProtocolVersion.V4)
-                             .WithCompression(CompressionType.LZ4)
-                             .Build();
-                }
-                catch (Cassandra.NoHostAvailableException ex)
-                {
-                    string errors = string.Join(";", ex.Errors.Select(kvp => $"{kvp.Key}: {kvp.Value}"));
-                    Trace.TraceError($"Failed to connect to the cluster: {errors}");
-                    throw;
-                }
-
-                this.session = cluster.Connect(this.keyspace);
-
-                Trace.TraceInformation($"Binary protocol version: {this.session.BinaryProtocolVersion}");
-                if (this.session.BinaryProtocolVersion != (int)Cassandra.ProtocolVersion.V4)
-                {
-                    Trace.TraceError($"Can't establish V4 connection to the cluster. Shutting down the connection...");
-                    this.cluster.Shutdown(5000);
-                }
-                else
-                    connected = true;
-            }
-            while (!connected);
-
-            this.getPetCardStatement = session.Prepare("SELECT * FROM cards_by_id WHERE namespace = ? AND local_id = ?");
-            this.insertPetCardStatement = session.Prepare("INSERT INTO cards_by_id (namespace, local_id, provenance_url, pet_type, card_type, event_time,card_creation_time, event_location, contact_info) values (?,?,?,?,?,?,?,?,?)");
-            this.deletePetCardStatement = session.Prepare("DELETE FROM cards_by_id WHERE namespace = ? AND local_id = ?");
-
-            this.deleteSpecificPetImageStatement = session.Prepare("DELETE FROM images_by_card_id WHERE namespace = ? AND local_id = ? AND image_num = ?");
-            this.deleteAllPetImagesStatement = session.Prepare("DELETE FROM images_by_card_id WHERE namespace = ? AND local_id = ?");
-            this.getAllPetImagesStatementIncBin = session.Prepare("SELECT * FROM images_by_card_id WHERE namespace = ? AND local_id = ?");
-            this.getAllPetImagesStatement = session.Prepare("SELECT namespace,local_id,image_num,detection_confidence,detection_rotation FROM images_by_card_id WHERE namespace = ? AND local_id = ?");
-            this.getParticularPetImageStatement = session.Prepare("SELECT * FROM images_by_card_id WHERE namespace = ? AND local_id = ? AND image_num = ?");
-            this.addPetImageStatement = session.Prepare("INSERT INTO images_by_card_id (namespace, local_id, image_num, annotated_image, annotated_image_type, extracted_pet_image, detection_confidence, detection_rotation) values (?,?,?,?,?,?,?,?)");
-
-            this.session.UserDefinedTypes.Define(UdtMap.For<Location>("location")
-                .Map(v => v.Address, "address")
-                .Map(v => v.CoordsProvenance, "coords_provenance")
-                .Map(v => v.Lat, "lat")
-                .Map(v => v.Lon, "lon"));
-            this.session.UserDefinedTypes.Define(UdtMap.For<ContactInfo>("contact_info")
-                .Map(v => v.Name, "name")
-                .Map(v => v.Comment, "comment")
-                .Map(v => v.Email, "email")
-                .Map(v => v.Tel, "tel")
-                .Map(v => v.Website, "website"));
+            this.contactPoints = contactPoints;
         }
 
-        public static sbyte EncodePetType(string petType)
+        private async Task EnsureConnectionInitialized()
         {
-            return petType switch
+            await initSemaphore.WaitAsync();
+            try
+            {
+                if (connected)
+                    return;
+
+                do
+                {
+                    try
+                    {
+                        this.cluster = Cluster.Builder()
+                                 .AddContactPoints(contactPoints)
+                                 .WithApplicationName("RestAPI")
+                                 .WithMaxProtocolVersion(ProtocolVersion.V4)
+                                 .WithCompression(CompressionType.LZ4)
+                                 .Build();
+                    }
+                    catch (Cassandra.NoHostAvailableException ex)
+                    {
+                        string errors = string.Join(";", ex.Errors.Select(kvp => $"{kvp.Key}: {kvp.Value}"));
+                        Trace.TraceError($"Failed to connect to the cluster: {errors}");
+                        throw;
+                    }
+
+                    this.session = await cluster.ConnectAsync(this.keyspace);
+
+                    Trace.TraceInformation($"Binary protocol version: {this.session.BinaryProtocolVersion}");
+                    if (this.session.BinaryProtocolVersion != (int)Cassandra.ProtocolVersion.V4)
+                    {
+                        Trace.TraceError($"Can't establish V4 connection to the cluster. Shutting down the connection...");
+                        this.cluster.Shutdown(5000);
+                    }
+                    else
+                        connected = true;
+                }
+                while (!connected);
+
+                this.getPetCardStatement = session.Prepare("SELECT * FROM cards_by_id WHERE namespace = ? AND local_id = ?");
+                this.insertPetCardStatement = session.Prepare("INSERT INTO cards_by_id (namespace, local_id, provenance_url, animal, animal_sex, card_type, event_time,card_creation_time, event_location, contact_info) values (?,?,?,?,?,?,?,?,?,?)");
+                this.deletePetCardStatement = session.Prepare("DELETE FROM cards_by_id WHERE namespace = ? AND local_id = ?");
+
+                this.deleteSpecificPetImageStatement = session.Prepare("DELETE FROM images_by_card_id WHERE namespace = ? AND local_id = ? AND image_num = ?");
+                this.deleteAllPetImagesStatement = session.Prepare("DELETE FROM images_by_card_id WHERE namespace = ? AND local_id = ?");
+                this.getAllPetImagesStatementIncBin = session.Prepare("SELECT * FROM images_by_card_id WHERE namespace = ? AND local_id = ?");
+                this.getAllPetImagesStatement = session.Prepare("SELECT namespace,local_id,image_num,detection_confidence,detection_rotation FROM images_by_card_id WHERE namespace = ? AND local_id = ?");
+                this.getParticularPetImageStatement = session.Prepare("SELECT * FROM images_by_card_id WHERE namespace = ? AND local_id = ? AND image_num = ?");
+                this.addPetImageStatement = session.Prepare("INSERT INTO images_by_card_id (namespace, local_id, image_num, annotated_image, annotated_image_type, extracted_pet_image, detection_confidence, detection_rotation) values (?,?,?,?,?,?,?,?)");
+
+                this.session.UserDefinedTypes.Define(UdtMap.For<Location>("location")
+                    .Map(v => v.Address, "address")
+                    .Map(v => v.CoordsProvenance, "coords_provenance")
+                    .Map(v => v.Lat, "lat")
+                    .Map(v => v.Lon, "lon"));
+                this.session.UserDefinedTypes.Define(UdtMap.For<ContactInfo>("contact_info")
+                    .Map(v => v.Name, "name")
+                    .Map(v => v.Comment, "comment")
+                    .Map(v => v.Email, "email")
+                    .Map(v => v.Tel, "tel")
+                    .Map(v => v.Website, "website"));
+
+                this.connected = true;
+            }
+            finally
+            {
+                initSemaphore.Release();
+            }
+        }
+
+        public static sbyte EncodeAnimal(string animal)
+        {
+            return animal switch
             {
                 "cat" => 1,
                 "dog" => 2,
@@ -116,12 +137,32 @@ namespace CassandraAPI.Storage
             };
         }
 
-        public static string DecodePetType(sbyte code)
+        public static string DecodeAnimal(sbyte code)
         {
             return code switch
             {
                 1 => "cat",
                 2 => "dog",
+                _ => "unknown"
+            };
+        }
+
+        public static sbyte EncodePetSex(string petSex)
+        {
+            return petSex switch
+            {
+                "female" => 1,
+                "male" => 2,
+                _ => 0,
+            };
+        }
+
+        public static string DecodePetSex(sbyte code)
+        {
+            return code switch
+            {
+                1 => "female",
+                2 => "male",
                 _ => "unknown"
             };
         }
@@ -148,25 +189,28 @@ namespace CassandraAPI.Storage
 
         public async Task<bool> SetPetCardAsync(string ns, string localID, PetCard card)
         {
+            await EnsureConnectionInitialized();
             /*
             namespace text,
-	        local_id text,
-	        provenance_url text,
-	        pet_type tinyint,
-	        card_type tinyint,
-	        event_time tuple<timestamp,text>, -- time moment + provenance
-	        card_creation_time timestamp,
-	        event_location location,
-	        contact_info frozen<contact_info>, -- frozen as contact info contains collections
-	        features map<text,frozen<list<double>>>
-            
+            local_id text,
+            provenance_url text,
+            animal tinyint,
+            animal_sex tinyint,
+            card_type tinyint,
+            event_time tuple<timestamp,text>, -- time moment + provenance
+            card_creation_time timestamp,
+            event_location location,
+            contact_info frozen<contact_info>, -- frozen as contact info contains collections
+            features map<text,frozen<list<double>>>
+
             */
 
             var statement = this.insertPetCardStatement.Bind(
                 ns,
                 localID,
                 card.ProvenanceURL,
-                EncodePetType(card.PetType),
+                EncodeAnimal(card.Animal),
+                EncodePetSex(card.AnimalSex),
                 EncodeCardType(card.CardType),
                 Tuple.Create(card.EventTime, card.EventTimeProvenance),
                 card.CardCreationTime,
@@ -181,6 +225,8 @@ namespace CassandraAPI.Storage
 
         public async Task<bool> AddPetPhotoAsync(string ns, string localID, int imageNum, PetPhoto photo)
         {
+            await EnsureConnectionInitialized();
+
             //namespace text,
             //local_id text,
             //image_num tinyint,
@@ -205,6 +251,8 @@ namespace CassandraAPI.Storage
 
         public async Task<bool> DeletePetCardAsync(string ns, string localID)
         {
+            await EnsureConnectionInitialized();
+
             var statement = this.deletePetCardStatement.Bind(ns, localID);
 
             await session.ExecuteAsync(statement);
@@ -214,6 +262,8 @@ namespace CassandraAPI.Storage
 
         public async Task<PetCard> GetPetCardAsync(string ns, string localID)
         {
+            await EnsureConnectionInitialized();
+
             var statement = this.getPetCardStatement.Bind(ns, localID);
             var rows = await session.ExecuteAsync(statement);
             Row extracted = rows.FirstOrDefault();
@@ -228,7 +278,8 @@ namespace CassandraAPI.Storage
                     EventTimeProvenance = et.Item2,
                     CardCreationTime = extracted.GetValue<DateTimeOffset>("card_creation_time"),
                     Location = extracted.GetValue<Location>("event_location"),
-                    PetType = DecodePetType(extracted.GetValue<sbyte>("pet_type")),
+                    Animal = DecodeAnimal(extracted.GetValue<sbyte>("animal")),
+                    AnimalSex = DecodePetSex(extracted.GetValue<sbyte>("animal_sex")),
                     ProvenanceURL = extracted.GetValue<string>("provenance_url"),
                     Features = extracted.GetValue<SortedDictionary<string, double[]>>("features")
                 };
@@ -262,6 +313,8 @@ namespace CassandraAPI.Storage
 
         public async IAsyncEnumerable<PetPhoto> GetPetPhotosAsync(string ns, string localID, bool includeBinData)
         {
+            await EnsureConnectionInitialized();
+
             BoundStatement statement =
                 includeBinData ?
                     this.getAllPetImagesStatementIncBin.Bind(ns, localID)
@@ -275,6 +328,8 @@ namespace CassandraAPI.Storage
 
         public async Task<bool> DeletePetPhoto(string ns, string localID, int photoNum = -1)
         {
+            await EnsureConnectionInitialized();
+
             BoundStatement statement = (photoNum == -1) ?
                 (this.deleteAllPetImagesStatement.Bind(ns, localID)) :
                 (this.deleteSpecificPetImageStatement.Bind(ns, localID, photoNum));
@@ -284,6 +339,8 @@ namespace CassandraAPI.Storage
 
         public async Task<PetPhoto> GetPetPhotoAsync(string ns, string localID, int imageNum)
         {
+            await EnsureConnectionInitialized();
+
             var statement = this.getParticularPetImageStatement.Bind(ns, localID, (sbyte)imageNum);
             var row = (await this.session.ExecuteAsync(statement)).FirstOrDefault();
             if (row != null)
@@ -299,6 +356,8 @@ namespace CassandraAPI.Storage
 
         public async Task<bool> SetFeatureVectorAsync(string ns, string localID, string featuredIdent, double[] features)
         {
+            await EnsureConnectionInitialized();
+
             var newDict = new Dictionary<string, IEnumerable<double>>();
             newDict.Add(featuredIdent, features);
             var statement = new SimpleStatement($"UPDATE cards_by_id SET features = features + ? WHERE namespace = ? AND local_id = ?",
