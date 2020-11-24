@@ -13,6 +13,10 @@ type Location = {
     lon: number;
 }
 
+interface FeaturesDict {
+    [key: string]: number[]
+}
+
 export type AnimalCard = {
     cardType : CardType;
     contactInfo : {
@@ -25,7 +29,5 @@ export type AnimalCard = {
     animalSex : Sex;
     photos : AnnotatedImage[];
     provenanceURL : string;
-    features : {
-        "exp_3_4" : number[]
-    }
+    features : FeaturesDict;
 }

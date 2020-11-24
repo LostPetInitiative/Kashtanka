@@ -45,7 +45,7 @@ function AnimalCard(props : {card: DataModel.AnimalCard}) {
             <div className="animalGender">{"(" + animalGenderString(card.animalSex) + ")"}</div>
             <div>
                 <div className="cardItemHeader">Когда?</div>
-                <div>{card.eventTime.toDateString()}</div>
+                <div>{new Date(card.eventTime).toLocaleString()}</div>
             </div>
             <div>
                 <div className="cardItemHeader">Где?</div>

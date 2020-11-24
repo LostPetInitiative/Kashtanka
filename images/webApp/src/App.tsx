@@ -1,35 +1,41 @@
 import * as React from "react";
 import './DataModel'
 import './App.css';
-import logo from './catndog.png';
-import {GetCard, GetPetCard} from "./CardStorage";
-import AnimalCard from "./AnimalCard";
-import { AnimalCard as AnimalCardDM} from "./DataModel";
-
+import CardByCardViewer from './CardByCard'
+import "./apiClients/RestApiCardStorage"
+import RestCardStorage from "./apiClients/RestApiCardStorage";
 
 /*------------------------------------------------------------------------------------------*/
 
+enum AppState {Landing, PairCompare}
+
 function App() {
-  var paramsString = window.location.search;
-  var searchParams = new URLSearchParams(paramsString);
-
-  var animalType = searchParams.has("animal") ? searchParams.get("animal") : "none";
-  var animal : string = !animalType ? "none" : animalType;  
-
-  const cardID = searchParams.has("cardID") ? searchParams.get("cardID") : "none";
-  const id : string = !cardID ? "none" : cardID;
-  const cardDomain = searchParams.has("cardDomain") ? searchParams.get("cardDomain") : "none";
-  const domain : string = !cardDomain ? "none" : cardDomain;
-
-  //const card : AnimalCardDM = animal != "" ? GetCard(animal)
   
-  const card = GetPetCard(id, domain);
+  const [state,setAppState] = React.useState(AppState.Landing)
 
   return (
-    <div className="App">
-      <header className="App-header">
-        <AnimalCard card={card}/>
-      </header>
+    <div>
+      <div id="appStateMenu">
+        <div onClick={() => setAppState(AppState.Landing)}>Intro</div>
+        <div onClick={() => setAppState(AppState.PairCompare)}>Сравнить 2 объявления</div>
+      </div>
+      <div className="AppModeViewer">
+        {
+          state === AppState.Landing &&
+            <div>
+              <p>Landing</p>
+            </div>
+        }
+        {
+           state === AppState.PairCompare &&
+           <div>
+             <CardByCardViewer cardStorage={new RestCardStorage("http://10.0.4.211:3000") } />
+           </div>
+        }
+        {/* <header className="App-header">
+          <AnimalCard card={card}/>
+        </header> */}
+      </div>
     </div>
   );
 }

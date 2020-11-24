@@ -277,7 +277,7 @@ spec:
               topologyKey: "kubernetes.io/hostname"
       containers:
       - name: rest-api
-        image: lostpetinitiative/cassandra-rest-api:1.1.5
+        image: lostpetinitiative/cassandra-rest-api:1.1.7
         resources:
           limits:
             memory: "128Mi"
