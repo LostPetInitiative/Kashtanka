@@ -1,9 +1,10 @@
 import * as React from "react";
 import './DataModel'
-import './App.css';
+import './App.scss';
 import CardByCardViewer from './CardByCard'
 import "./apiClients/RestApiCardStorage"
 import RestCardStorage from "./apiClients/RestApiCardStorage";
+import Landing from "./Landing";
 
 /*------------------------------------------------------------------------------------------*/
 
@@ -14,7 +15,13 @@ function App() {
   const [state,setAppState] = React.useState(AppState.Landing)
 
   return (
-    <div>
+    <div className="parentDiv">
+      <div id="headerCornerDiv">
+        <img id="headerLogo" src="./img/cat/1.jpg"></img>
+      </div>
+      <div id="headerDiv">
+        <div id="headerTextDiv">Каштанка</div>
+      </div>
       <div id="appStateMenu">
         <div onClick={() => setAppState(AppState.Landing)}>Intro</div>
         <div onClick={() => setAppState(AppState.PairCompare)}>Сравнить 2 объявления</div>
@@ -23,7 +30,7 @@ function App() {
         {
           state === AppState.Landing &&
             <div>
-              <p>Landing</p>
+              <Landing/>
             </div>
         }
         {
@@ -36,6 +43,7 @@ function App() {
           <AnimalCard card={card}/>
         </header> */}
       </div>
+      <div id="lowestDiv"></div>
     </div>
   );
 }
