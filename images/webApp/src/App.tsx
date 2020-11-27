@@ -1,7 +1,7 @@
 import * as React from "react";
 import './DataModel'
 import './App.scss';
-import CardByCardViewer from './CardByCard'
+import TwoCardsViewer from './TwoCards'
 import "./apiClients/RestApiCardStorage"
 import RestCardStorage from "./apiClients/RestApiCardStorage";
 import Landing from "./Landing";
@@ -36,7 +36,7 @@ function App() {
         {
            state === AppState.PairCompare &&
            <div>
-             <CardByCardViewer cardStorage={new RestCardStorage("http://10.0.4.211:3000") } />
+             <TwoCardsViewer cardStorage={new RestCardStorage("http://10.0.4.211:3000") } />
            </div>
         }
         {/* <header className="App-header">

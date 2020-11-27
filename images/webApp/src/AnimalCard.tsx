@@ -1,5 +1,5 @@
 import * as React from "react";
-
+import "./AnimalCard.css"
 import AnimalPhotos from "./AnimalPhotos";
 import * as DataModel from  "./DataModel";
 
@@ -38,22 +38,28 @@ function AnimalCard(props : {card: DataModel.AnimalCard}) {
         else return "";
     }
 
+    var commentStyle = {"margin":"16px"} as React.CSSProperties;
+    var cardStyle = {"max-width":"400px"} as React.CSSProperties;
+
     return (
-        <div className="animalCard">
+        <div style={cardStyle} className="animalCard">
             <div className={cardTypeClass(card.cardType) + " cardHeader"}>{cardTypeString(card.cardType)}</div>
             <div>{animalTypeString(card.animal)}</div>
             <div className="animalGender">{"(" + animalGenderString(card.animalSex) + ")"}</div>
+            <br/>
             <div>
                 <div className="cardItemHeader">Когда?</div>
-                <div>{new Date(card.eventTime).toLocaleString()}</div>
+                <div>{new Date(card.eventTime).toDateString()}</div>
             </div>
+            <br/>
             <div>
                 <div className="cardItemHeader">Где?</div>
-                <div className="cardCoordsNumbers">{card.location.lat + ", " + card.location.lon}</div>
+                <div className="cardCoordsNumbers">{card.location.address}</div>
             </div>
-            {/* <div>{card.color}</div>
-            <div>{card.size}</div> */}
+            <br/>
             <div><AnimalPhotos photos={card.photos} /></div>
+            <hr/>
+            <p style={commentStyle}>{card.contactInfo.comment}</p>
         </div>
     );
   }
