@@ -46,6 +46,9 @@ function App() {
           <div>
             <NavLink to="/board">Карточки совпадений</NavLink>
           </div>
+          <div>
+            <NavLink to="/faq">Вопросы/Ответы</NavLink>
+          </div>
         </div>
         <div className="AppModeViewer">
           <Switch>

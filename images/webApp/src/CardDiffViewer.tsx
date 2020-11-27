@@ -2,6 +2,7 @@ import * as React from "react";
 import * as Comp from "./computations"
 import * as DataModel from "./DataModel"
 import "./CardDiffViewer.css"
+import { features } from "process";
 
 function WarningMessage(props: { message: string }) {
     return <p className="attentionInfo">{props.message}</p>
@@ -25,6 +26,35 @@ function FeaturesVerticalBar(props: { features: number[] }) {
         </svg>
     )
 }
+
+function FeaturesDiffVerticalBar(props: { features1: number[], features2: number[] }) {
+    const features1 = props.features1;
+    const features2 = props.features2;
+    if(features1.length != features2.length)
+        return <p>features1.length != features2.length</p>;
+
+    const count = features1.length;
+    
+    const stripeLen = 4;
+    const stripeWidth = 20;
+    const stripes = features1.map((v1,idx) => {
+        const v2 = features2[idx]
+        const vDiff = v1 - v2 // in range -2 .. 2
+        const offset = idx * stripeLen;
+        const coercedDiff = Math.max(-1,Math.min(1,vDiff))
+        const brightness = ( (coercedDiff + 1.0) / 2.0 * 127.0 + 128).toFixed()
+        const stripeStyle = { "fill": "rgb(" + brightness + "," + brightness + "," + brightness + ")" } as React.CSSProperties;
+        return <rect width={stripeWidth} height={stripeLen} x='0' y={offset} style={stripeStyle} />
+    });
+    return (
+        <svg width={stripeWidth} height={count * stripeLen}>
+            <title>"Штрихкод" питомца - то, как система представляет признаки внешнего вида питомца. У одинаковых на вид питомцев будет одинаковый штрихкод.</title>
+            {stripes}
+        </svg>
+    )
+}
+
+
 
 /// Presents the difference between two cards
 function CardDiffViewer(props: { card1: DataModel.AnimalCard, card2: DataModel.AnimalCard }) {
@@ -95,8 +125,9 @@ function CardDiffViewer(props: { card1: DataModel.AnimalCard, card2: DataModel.A
                     <div style={flexDivStyle}>
                         <div>
                             <FeaturesVerticalBar features={feat1} />
-                            ---
-                            <FeaturesVerticalBar features={feat2} />     
+                            <FeaturesDiffVerticalBar features1={feat1} features2={feat2} />
+                            <FeaturesVerticalBar features={feat2} />
+                              
                         </div>
                         <div>
                             <p>Схожесть</p>
