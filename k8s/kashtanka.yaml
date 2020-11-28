@@ -116,7 +116,7 @@ spec:
           limits:
             #memory: "3072Mi"
             memory: "2048Mi"
-            cpu: "5"
+            cpu: "4"
         # ports:
         # - containerPort: <Port>
         env:
@@ -292,3 +292,72 @@ spec:
           value: kashtanka
         ports:
         - containerPort: 5000
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: pet911ru-raw-cards-pvc
+  namespace: kashtanka
+spec:
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: longhorn
+  resources:
+    requests:
+      storage: 20Gi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: crawler-pet911ru
+  namespace: kashtanka
+spec:
+  selector:
+    matchLabels:
+      app: crawler-pet911ru
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: crawler-pet911ru
+    spec:
+      containers:
+      - name: crawler
+        image: lostpetinitiative/crawler-pet911ru-agent:0.2
+        resources:
+          limits:
+            memory: "128Mi"
+            cpu: "200m"
+          requests:
+            memory: "64Mi"
+            cpu: "50m"
+        volumeMounts:
+          - mountPath: /db
+            name: db
+      - name: submitter
+        image: lostpetinitiative/crawler-pet911ru-pipeline-submitter:0.2
+        resources:
+          limits:
+            memory: "128Mi"
+            cpu: "200m"
+          requests:
+            memory: "64Mi"
+            cpu: "50m"
+        volumeMounts:
+          - mountPath: /db
+            name: db
+            readOnly: true
+        env:
+        - name: KAFKA_URL
+          value: kafka-cluster.default:9092
+        - name: OUTPUT_QUEUE
+          value: kashtanka_crawled_pet_cards
+        - name: DB_PATH
+          value: /db
+        ports:
+        - containerPort: 5001
+      volumes:
+        - name: db
+          persistentVolumeClaim:
+            claimName: pet911ru-raw-cards-pvc
