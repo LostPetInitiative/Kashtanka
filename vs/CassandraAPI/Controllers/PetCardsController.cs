@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using CassandraAPI.Storage;
+using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
@@ -21,6 +22,7 @@ namespace CassandraAPI.Controllers
         }
 
         // GET <PetCardsController>/pet911ru/rf123
+        [EnableCors]
         [HttpGet("{ns}/{localID}")]
         public async Task<ActionResult<PetCard>> Get(string ns, string localID)
         {
