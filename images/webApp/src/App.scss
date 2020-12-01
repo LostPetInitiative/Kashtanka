@@ -1,0 +1,135 @@
+.App {
+  text-align: center;
+}
+
+.App-logo {
+  height: 10vmin;
+  pointer-events: none;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+}
+
+.App-header {
+  background-color: #282c34;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-size: calc(10px + 2vmin);
+  color: white;
+}
+
+.App-link {
+  color: #61dafb;
+}
+
+.animalCard {
+  border: solid lightgrey;
+  border-width: 0.1em;
+  border-radius: 0.5em;
+  padding: 1em;
+  text-align: left;
+  font-size: medium;
+  background: linear-gradient(120deg, rgb(150, 150, 150), rgb(110, 110, 110));
+  box-shadow: 1px 1px 10px 0px lightgrey;
+}
+
+.кошка {
+  border-color: #A56828;
+}
+
+.собака {
+  border-color: #590209;
+}
+
+.cardHeader {
+  font-size: larger;
+  margin-bottom: 1em;
+}
+
+.foundCardHeader {
+  text-align: right;
+}
+
+.lostCardHeader {
+  text-align: left;
+}
+
+.cardItemHeader {
+  font-size: small;
+}
+
+.animalGender {
+  font-size: x-small;
+}
+
+$colorLight:#ffedca;
+$colorBasic:#260101;
+$colorEmphasisGreen: #898C37;
+$colorEmphasisOrange: #c34818;
+$colorDark: #0D0000;
+
+.parentDiv {
+  display: grid;
+  grid-template-columns: 15% auto 3%;
+  grid-template-rows: 10% auto 10%;
+  justify-items: stretch;
+  justify-content: stretch;
+  align-content: stretch;
+  height: 100vh;
+}
+
+#appStateMenu {
+  background: $colorDark;
+  grid-column-start: 1;
+  grid-column-end: 1;
+  grid-row-start: 2;
+  grid-row-end: 3;  
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+}
+
+#headerDiv {
+  background: $colorBasic;
+  color: $colorEmphasisOrange;
+  grid-column-start: 2;
+  grid-column-end: 3;
+  grid-row-start: 1;
+  grid-row-end: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: xxx-large;
+  font-weight: bolder;
+}
+
+#headerCornerDiv {
+  background: $colorBasic;  
+  color: $colorLight;
+  justify-content: stretch;
+  align-self: center;
+}
+
+.AppModeViewer {
+  grid-column-start: 2;
+  grid-column-end: 2;
+  grid-row-start: 2;
+  grid-row-end: 2;
+  background: $colorLight;
+  color: $colorDark
+}
+
+#lowestDiv {
+  grid-column-start: 1;
+  grid-column-end: 3;
+  grid-row-start: 3;
+  grid-row-end: 3;
+  background: $colorBasic;
+}
+
+#headerLogo {  
+  max-width: 100%;
+}

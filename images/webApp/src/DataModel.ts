@@ -23,8 +23,8 @@ export type AnimalCard = {
         comment : string;
     }
     animal : Animal;
-    eventTime : Date;
-    cardCreationTime: Date;
+    eventTime : string; // iso string
+    cardCreationTime: string; // iso string
     location: Location;
     animalSex : Sex;
     photos : AnnotatedImage[];
