@@ -5,7 +5,7 @@ VisualStudioVersion = 16.0.30225.117
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CassandraAPI", "CassandraAPI\CassandraAPI.csproj", "{D1898D05-F546-496F-86FE-D1A64B36B815}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SolrAPI", "SolrAPI\SolrAPI.csproj", "{3CCBF56A-A81A-47C2-AFF5-AD9B6BD99A43}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SolrAPI", "SolrAPI\SolrAPI.csproj", "{3CCBF56A-A81A-47C2-AFF5-AD9B6BD99A43}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

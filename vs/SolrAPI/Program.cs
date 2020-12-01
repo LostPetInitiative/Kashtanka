@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Hosting;
@@ -13,6 +14,8 @@ namespace SolrAPI
     {
         public static void Main(string[] args)
         {
+            Trace.Listeners.Add(new ConsoleTraceListener());
+
             CreateHostBuilder(args).Build().Run();
         }
 
