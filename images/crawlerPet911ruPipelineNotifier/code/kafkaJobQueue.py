@@ -79,7 +79,7 @@ class JobQueueProducer(JobQueue):
 
 class JobQueueWorker(JobQueue):
     '''Fetchs sobs as JSON serialized python dicts'''
-    def __init__(self, group_id, *args, **kwargs):
+    def __init__(self, group_id, max_permited_work_time_sec=300, *args, **kwargs):
         super(JobQueueWorker, self).__init__(*args, **kwargs)
 
         self.teardown = False
@@ -88,6 +88,8 @@ class JobQueueWorker(JobQueue):
             client_id = self.appName,
             group_id = group_id,
             key_deserializer = strDeserializer,
+            enable_auto_commit = False,
+            max_poll_interval_ms = max_permited_work_time_sec * 1000,
             value_deserializer = dictDeserializer)
 
     def GetNextJob(self, pollingIntervalMs = 1000):

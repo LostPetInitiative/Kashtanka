@@ -2,8 +2,10 @@ import * as React from "react";
 import './DataModel'
 import './App.scss';
 import TwoCardsViewer from './TwoCards'
+import CandidatesReview from './CandidatesReview'
 import "./apiClients/RestApiCardStorage"
 import RestCardStorage from "./apiClients/RestApiCardStorage";
+import SolrGatewaySearcher from "./apiClients/SolrGatewaySearch"
 import Landing from "./Landing";
 import MatchsBoard from "./MatchsBoard"
 import {
@@ -19,8 +21,21 @@ function SpecificPair() {
 
   return (
     <TwoCardsViewer
-      cardStorage={new RestCardStorage("http://10.0.4.211:3000")}
+      cardStorage={new RestCardStorage("http://10.0.3.211:3000")}
       ns1={ns1} id1={id1} ns2={ns2} id2={id2}
+    />
+  )
+}
+
+function SpecificCandidatesReview() {
+  const { ns, id} = useParams<{ ns: string, id: string}>();
+
+  return (
+    <CandidatesReview
+      cardStorage={new RestCardStorage("http://10.0.3.211:3000")}
+      ns={ns}
+      localID={id}
+      searcher={new SolrGatewaySearcher("http://10.0.3.211:3001")}
     />
   )
 }
@@ -44,6 +59,9 @@ function App() {
             <NavLink to="/pair/pet911ru/rl100268/pet911ru/rf231126">Сравнение</NavLink>
           </div>
           <div>
+            <NavLink to="/candidatesReview/pet911ru/rl100268">Обзор совпадений</NavLink>
+          </div>
+          <div>
             <NavLink to="/board">Карточки совпадений</NavLink>
           </div>
           <div>
@@ -53,6 +71,7 @@ function App() {
         <div className="AppModeViewer">
           <Switch>
             <Route path="/pair/:ns1/:id1/:ns2/:id2" children={<SpecificPair />} />
+            <Route path="/candidatesReview/:ns/:id" children={<SpecificCandidatesReview />} />
             <Route path="/board">
               <MatchsBoard />
             </Route>

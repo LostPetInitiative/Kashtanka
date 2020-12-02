@@ -108,7 +108,7 @@ spec:
     spec:
       containers:
       - name: worker
-        image: lostpetinitiative/pet-image-extractor-yolo4:1.1.1
+        image: lostpetinitiative/pet-image-extractor-yolo4:1.1.3
         resources:
           requests:
             memory: "2048Mi"
@@ -292,6 +292,76 @@ spec:
           value: kashtanka
         ports:
         - containerPort: 5000
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: search-gateway
+  namespace: kashtanka
+  labels:
+    app: search-gateway
+spec:
+  ports:
+  - port: 80
+    targetPort: 80
+    name: web
+  selector:
+    app: search-gateway
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: search-gateway
+  namespace: kashtanka
+spec:
+  selector:
+    matchLabels:
+      app: search-gateway
+  replicas: 2
+  template:
+    metadata:
+      labels:
+        app: search-gateway
+    spec:
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            - labelSelector:
+                matchExpressions:
+                  - key: "app"
+                    operator: In
+                    values:
+                    - search-gateway
+              topologyKey: "kubernetes.io/hostname"
+      containers:
+      - name: gateway
+        image: lostpetinitiative/search-api-gateway:0.1.7
+        resources:
+          limits:
+            memory: "128Mi"
+            cpu: "200m"
+          requests:
+            memory: "64Mi"
+            cpu: "50m"
+        env:
+        - name: SOLR_URL
+          value: http://solr.default
+        - name: COLLECTION_NAME
+          value: kashtankacards
+        - name: MAX_RETURN_COUNT
+          value: "100"
+        - name: LONG_TERM_SEARCH_RADIUS_KM
+          value: "20.0"
+        - name: SHORT_TERM_SEARCH_RADIUS_KM
+          value: "1000.0"
+        - name: SHORT_TERM_LENGTH_DAYS
+          value: "30"
+        - name: REVERSE_TIME_GAP_LENGTH_DAYS
+          value: "14"
+        - name: SIMILARITY_THRESHOLD
+          value: "0.95"
+        ports:
+        - containerPort: 80
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim

@@ -2,11 +2,9 @@ import * as React from "react";
 import "./apiClients/ICardStorage"
 import "./TwoCards.css"
 import ICardStorage from "./apiClients/ICardStorage";
-import CardViewer from "./AnimalCard"
 import CardDiffViewer from "./CardDiffViewer"
 import * as DataModel from "./DataModel"
 import AnimalCard from "./AnimalCard";
-import { stringify } from "querystring";
 
 type PropsType = {
     cardStorage: ICardStorage,
