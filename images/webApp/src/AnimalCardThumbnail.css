@@ -1,0 +1,16 @@
+.overlay-info-anchor {
+    position: relative;
+}
+
+.overlay-info {
+    position: absolute;
+}
+
+p.overlay-text-bold {
+    color: orangered;
+    font-weight: bold;
+}
+
+p.overlay-text {
+    color: orangered;
+}

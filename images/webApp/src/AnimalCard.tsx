@@ -39,7 +39,7 @@ function AnimalCard(props : {card: DataModel.AnimalCard}) {
     }
 
     var commentStyle = {"margin":"16px"} as React.CSSProperties;
-    var cardStyle = {"max-width":"400px"} as React.CSSProperties;
+    var cardStyle = {"max-width":"600px"} as React.CSSProperties;
 
     return (
         <div style={cardStyle} className="animalCard">

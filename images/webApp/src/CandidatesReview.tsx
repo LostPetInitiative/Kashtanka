@@ -4,6 +4,7 @@ import ICardStorage from "./apiClients/ICardStorage"
 import * as ISearch from "./apiClients/ISearch"
 import AnimalCard from "./AnimalCard"
 import * as Thumbnails from "./AnimalCardThumbnail"
+import "./CandidatesReview.css"
 
 type PropsType = {
     cardStorage: ICardStorage,
@@ -102,13 +103,14 @@ class CandidatesThumbnails extends React.Component<PropsType, StateType> {
         }
     }
 
-    getRelevantCards() {
+    getRelevantCards(refCard: DataModel.AnimalCard | null) {
         const that = this;
         const genPreview = (foundCard:ISearch.FoundCard) => {
             const arrayKey = foundCard.namespace+"/"+foundCard.id
             return (
                 <Thumbnails.AnimalCardThumbnailById
                     key={arrayKey}
+                    refCard={refCard}
                     cardStorage={that.props.cardStorage}
                     namespace={foundCard.namespace}
                     localID={foundCard.id}/>)
@@ -117,26 +119,28 @@ class CandidatesThumbnails extends React.Component<PropsType, StateType> {
         if (this.state.loadedRelevantCards === null) {
             return <p>Загрузка совпадений...</p>;
         } else {
-            const thumbnailsContainerStyle =
-            {'display':'flex',
-             'flex-wrap':'wrap'
-            } as React.CSSProperties;
             if(ISearch.IsResultSuccessful(this.state.loadedRelevantCards)) {
-                const previews = this.state.loadedRelevantCards.map(genPreview)
-                return <div style={thumbnailsContainerStyle}>{previews}</div>
+                var previews = this.state.loadedRelevantCards.map(genPreview)
+                if (previews.length===0)
+                    previews = [<p>Нет совпадений =(</p>]
+                return <div className="thumbnails-container">{previews}</div>
             }
         }
     }
 
     render() {
         const targetCard = this.getActiveCardViewer()
-        const releavantCards = this.getRelevantCards();
+        const releavantCards = this.getRelevantCards(this.state.loadedCard);
         return (
-                <div>
-                    <h3>Образец</h3>
-                    {targetCard}
-                    <p>Возможные совпадения</p>
-                    {releavantCards}
+                <div className="page">
+                    <div className="left-sub-page">
+                        <h3>Образец</h3>
+                        {targetCard}
+                    </div>
+                    <div>
+                        <p>Возможные совпадения</p>
+                        {releavantCards}
+                    </div>
                 </div>
                 )
     }
