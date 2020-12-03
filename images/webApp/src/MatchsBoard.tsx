@@ -10,4 +10,4 @@ function MatchBoard(props : {}) {
     );
 }
 
-export default MatchBoard;
+export default MatchBoard;  

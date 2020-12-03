@@ -18,13 +18,15 @@ interface FeaturesDict {
 }
 
 export type AnimalCard = {
-    cardType : CardType;
+    namespace: string,
+    id: string,
+    cardType : CardType;    
     contactInfo : {
         comment : string;
     }
     animal : Animal;
-    eventTime : string; // iso string
-    cardCreationTime: string; // iso string
+    eventTime : Date;
+    cardCreationTime: Date;
     location: Location;
     animalSex : Sex;
     photos : AnnotatedImage[];

@@ -26,18 +26,29 @@ namespace CassandraAPI
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddCors(options =>
+            {
+                options.AddDefaultPolicy(
+                    builder =>
+                    {
+                        builder.WithOrigins("http://localhost:3000");
+                    });
+            });
+
             services.AddControllers();
+
 
             string cassandra_addrs = Environment.GetEnvironmentVariable("CASSANDRA_ADDRS");
             string keyspace = Environment.GetEnvironmentVariable("KEYSPACE");
-            if (cassandra_addrs == null || keyspace ==null)
+            if (cassandra_addrs == null || keyspace == null)
             {
                 Trace.TraceWarning("CASSANDRA_ADDRS or KEYSPACE env var is not found. Thus using test memory storage instead Cassandra");
                 var storage = new MemoryTestStorage();
                 services.AddSingleton(typeof(ICardStorage), storage);
                 services.AddSingleton(typeof(IPhotoStorage), storage);
             }
-            else {
+            else
+            {
                 var contactPoints = cassandra_addrs.Split(',', StringSplitOptions.RemoveEmptyEntries).Where(addr => !string.IsNullOrEmpty(addr)).ToArray();
                 Trace.TraceInformation($"Connecting to Cassandra contact points {cassandra_addrs} and keyspace {keyspace}");
                 var storage = new Storage.CassandraStorage(keyspace, contactPoints);
@@ -51,6 +62,7 @@ namespace CassandraAPI
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
+            
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
@@ -58,7 +70,9 @@ namespace CassandraAPI
 
             app.UseRouting();
 
-            //app.UseAuthorization();
+            app.UseCors();
+
+            app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>
             {

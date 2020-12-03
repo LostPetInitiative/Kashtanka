@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using CassandraAPI.Storage;
+using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
@@ -20,6 +21,7 @@ namespace CassandraAPI.Controllers
             this.storage = storage;
         }
 
+        [EnableCors]
         [HttpGet("{ns}/{localID}/{imNum}/annotated")]
         public async Task<IActionResult> GetAnnotatedImage(string ns, string localID, int imNum) {
             try
@@ -52,6 +54,7 @@ namespace CassandraAPI.Controllers
 
         // GET: <PetPhotoController>/pet911ru/rf123
         [HttpGet("{ns}/{localID}")]
+        [EnableCors]
         public async IAsyncEnumerable<JsonPoco.PetPhoto> GetAll(string ns, string localID, [FromQuery] bool includeBinData=false)
         {
             Trace.TraceInformation($"Getting photos for {ns}/{localID}");

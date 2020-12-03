@@ -44,11 +44,6 @@ function AnimalCard(props : {card: DataModel.AnimalCard}) {
         else return "";
     }
 
-    function dateTimeString(dTString: string) {
-        return new Date(dTString).toLocaleDateString();
-    }
-
-    //var commentStyle = {"margin":"16px"} as React.CSSProperties; // style={commentStyle}
     var cardStyle = {"max-width":"400px"} as React.CSSProperties;
 
     return (
@@ -59,7 +54,7 @@ function AnimalCard(props : {card: DataModel.AnimalCard}) {
                 <CarouselImgViewer imgSrcArray={card.photos}></CarouselImgViewer>
             </div>
             <div className={"cardInfo " + cardTypeClass(card.cardType)}>
-                <div className="cardDate" title="Когда?"> {dateTimeString(card.eventTime)} </div>
+                <div className="cardDate" title="Когда?"> {card.eventTime.toLocaleDateString()} </div>
                 <div className="cardCoordsNumbers" title="Где?"> {card.location.address} </div>
             </div>
             <div className={"cardComment " + cardTypeClass(card.cardType)}>

@@ -1,0 +1,50 @@
+@import "App";
+
+.thumbnails-container {
+    display: flex;
+    flex-wrap: wrap;
+  }
+
+$thumbnail-card-size: 200px;
+
+.clickable {
+  cursor: pointer;
+}
+
+.thumbnails-container .thumbnail-container {
+  width: $thumbnail-card-size;
+  height: $thumbnail-card-size;
+  border: gray 1px;
+  padding: 8px;
+  margin: 4px;
+  background-color: $colorBasic;
+  cursor: pointer;
+}
+
+.thumbnails-container .thumbnail-container.accent {
+  background-color: $colorEmphasisOrange;
+}
+
+.thumbnails-container .thumbnail-container img {
+    max-height:100%;
+    max-width: 100%;    
+    align-self: center;
+  }
+
+
+.overlay-info-anchor {
+    position: relative;
+}
+
+.overlay-info {
+    position: absolute;
+}
+
+p.overlay-text-bold {
+    color: orangered;
+    font-weight: bold;
+}
+
+p.overlay-text {
+    color: orangered;
+}

@@ -1,5 +1,6 @@
 import * as React from "react";
 import * as Comp from "./computations"
+import * as Utils from "./Utils"
 import * as DataModel from "./DataModel"
 import "./CardDiffViewer.css"
 import { features } from "process";
@@ -65,24 +66,11 @@ function CardDiffViewer(props: { card1: DataModel.AnimalCard, card2: DataModel.A
         card1.location.lon,
         card2.location.lat,
         card2.location.lon);
-    const geoDistStr = (geoDistKM < 1.0) ?
-        ((geoDistKM * 1000.0).toFixed(0) + " метров")
-        : (geoDistKM.toFixed(0) + " км")
+    const geoDistStr = Utils.getGeoDiffString(geoDistKM)
 
     const timeDiffMs = Math.abs(new Date(card1.eventTime).getTime() - new Date(card2.eventTime).getTime());
-
-    var timeDiffStr: string;
-    const oneDay = 24 * 60 * 60 * 1000;
-    const oneMonth = 30 * oneDay;
-    const oneYear = 12 * oneMonth;
-    if (timeDiffMs > oneYear) {
-        timeDiffStr = (timeDiffMs / oneYear).toFixed(1) + " лет"
-    } else if (timeDiffMs > oneMonth) {
-        timeDiffStr = (timeDiffMs / oneMonth).toFixed() + " месяцев"
-    } else {
-        timeDiffStr = (timeDiffMs / oneDay).toFixed() + " дней"
-    }
-
+    const timeDiffStr = Utils.getTimeDiffString(timeDiffMs)
+    
     function getSexWarning() {
         if
             ((card1.animalSex != card2.animalSex) &&
@@ -102,7 +90,7 @@ function CardDiffViewer(props: { card1: DataModel.AnimalCard, card2: DataModel.A
             const lostCard = card1.cardType === DataModel.CardType.Lost ? card1 : card2;
             const foundCard = card1.cardType === DataModel.CardType.Lost ? card2 : card1;
             if (lostCard.eventTime > foundCard.eventTime) {
-                return <WarningMessage message="Объявление о потере размещено после объявления о находке!" />
+                return <WarningMessage message="Время находки предшествует времени потери!" />
             }
         }
         return false;

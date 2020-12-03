@@ -1,14 +1,15 @@
 import * as React from "react";
-import "./"
-import * as DataModel from "./DataModel"
+import "./Landing.scss"
 
 function Landing(props : {}) {
+    React.useEffect(() => {
+        document.title = "Каштанка - автоматический поиск потерянных и найденных домашних животных"
+    })
+
     return (
         <div>
-            <p>Landing</p>
-            <div>
-                <img width="30" src='https://raw.githubusercontent.com/kubernetes/kubernetes/master/logo/logo.svg'/>
-            </div>
+            <h1>Каштанка</h1>
+            <p>Некоммерческая система искусственного интеллекта для поиска потерявшихся домашних животных.</p>
         </div>
     );
 }
