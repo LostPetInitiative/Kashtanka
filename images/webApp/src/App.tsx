@@ -1,10 +1,9 @@
 import * as React from "react";
 import './DataModel'
 import './App.scss';
-import TwoCardsViewer from './TwoCards'
 import CandidatesReview from './CandidatesReview'
 import "./apiClients/RestApiCardStorage"
-import RestCardStorage from "./apiClients/RestApiCardStorage";
+import * as RestCardStorage from "./apiClients/RestApiCardStorage";
 import SolrGatewaySearcher from "./apiClients/SolrGatewaySearch"
 import Landing from "./Landing";
 import MatchsBoard from "./MatchsBoard"
@@ -20,22 +19,19 @@ function SpecificPair() {
   const { ns1, id1, ns2, id2 } = useParams<{ ns1: string, id1: string, ns2: string, id2: string }>();
 
   return (
-    <TwoCardsViewer
-      cardStorage={new RestCardStorage("http://10.0.3.211:3000")}
-      ns1={ns1} id1={id1} ns2={ns2} id2={id2}
-    />
+    <p>Gone</p>
   )
 }
 
 function SpecificCandidatesReview() {
   const { ns, id} = useParams<{ ns: string, id: string}>();
-
+  const fullMainID = ns+"/"+id
   return (
     <CandidatesReview
-      cardStorage={new RestCardStorage("http://10.0.3.211:3000")}
-      ns={ns}
-      localID={id}
+      cardStorage={new RestCardStorage.CardStorage("http://10.0.3.211:3000")}
       searcher={new SolrGatewaySearcher("http://10.0.3.211:3001")}
+      mainCardFullID={fullMainID}
+      candCardFullID=""
     />
   )
 }
