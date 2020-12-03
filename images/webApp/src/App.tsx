@@ -1,10 +1,10 @@
-import * as React from "react";
+import * as React from "react"
 import './DataModel'
-import './App.scss';
+import './App.scss'
 import TwoCardsViewer from './TwoCards'
 import "./apiClients/RestApiCardStorage"
-import RestCardStorage from "./apiClients/RestApiCardStorage";
-import Landing from "./Landing";
+import RestCardStorage from "./apiClients/RestApiCardStorage"
+import Landing from "./Landing"
 import MatchsBoard from "./MatchsBoard"
 import {
   HashRouter as Router,
@@ -19,7 +19,7 @@ function SpecificPair() {
 
   return (
     <TwoCardsViewer
-      cardStorage={new RestCardStorage("http://10.0.4.211:3000")}
+      cardStorage={new RestCardStorage("http://10.0.3.211:3000")}
       ns1={ns1} id1={id1} ns2={ns2} id2={id2}
     />
   )
@@ -31,7 +31,7 @@ function App() {
     <Router>
       <div className="parentDiv">
         <div id="headerCornerDiv">
-          <img id="headerLogo" src="./img/cat/1.jpg"></img>
+          <img id="headerLogo" src="./img/Usha.jpeg"></img>
         </div>
         <div id="headerDiv">
           <div id="headerTextDiv">Каштанка</div>
