@@ -184,17 +184,18 @@ export class CandidatesThumbnails
                         if (ISearch.IsResultSuccessful(relevantSearchRes)) {
                             console.log("Got relevant cards for " + requestedFullID)
                             const relevantCards = relevantSearchRes as ISearch.FoundCard[]
-                            const stateUpdate = { loadedRelevantCards: relevantCards };
+                            this.setState({ loadedRelevantCards: relevantCards })
 
                             // trying to set proper selected relevant card by looking for the desired card
                             if (this.props.selectedCardFullID !== null) {
                                 const foundIdx = relevantCards.findIndex(v => v.namespace + "/" + v.id === this.props.selectedCardFullID)
                                 if (foundIdx !== -1) {
-                                    (stateUpdate as CandidatesThumbnailsStateType).currentSelectionIdx = foundIdx
+                                    const doNotifyNewSelection = foundIdx !== this.state.currentSelectionIdx
+                                    this.setState({currentSelectionIdx : foundIdx})
+                                } else {
+                                    this.setState({currentSelectionIdx : NaN})
                                 }
                             }
-
-                            this.setState(stateUpdate)
                         } else {
                             console.error("Failed to get relevant cards: " + relevantSearchRes.ErrorMessage)
                         }
@@ -211,7 +212,7 @@ export class CandidatesThumbnails
         this.checkLoadedData()
     }
 
-    handleClickOnThumbnail(fullID: string, e: React.MouseEvent) {
+    handleThumbnailSelection(fullID: string, e: (React.MouseEvent | null)) {
         if (this.props.selectionChanged !== null) {
             this.props.selectionChanged(fullID)
         }
@@ -230,7 +231,7 @@ export class CandidatesThumbnails
         const genPreview = ([foundCard, isAccent]: [ISearch.FoundCard, boolean]) => {
             const arrayKey = foundCard.namespace + "/" + foundCard.id
             return (
-                <div onClick={(e) => this.handleClickOnThumbnail(arrayKey, e)}>
+                <div onClick={(e) => this.handleThumbnailSelection(arrayKey, e)}>
                     <AnimalCardThumbnailById
                         key={arrayKey}
                         refCard={refCard}

@@ -18,7 +18,7 @@ export function TwoCardsViewer(props: PropsType) {
         if (card === "loading") {
             return <p>Загрузка...</p>;
         } else if (card === "unassigned") {
-            return <p>Карточка не выбрана.</p>;
+            return <p>Карточка не выбрана. Выберите карточку из списка снизу.</p>;
         } else {
             return <AnimalCard card={card} />
         }

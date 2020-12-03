@@ -90,7 +90,7 @@ function CardDiffViewer(props: { card1: DataModel.AnimalCard, card2: DataModel.A
             const lostCard = card1.cardType === DataModel.CardType.Lost ? card1 : card2;
             const foundCard = card1.cardType === DataModel.CardType.Lost ? card2 : card1;
             if (lostCard.eventTime > foundCard.eventTime) {
-                return <WarningMessage message="Объявление о потере размещено после объявления о находке!" />
+                return <WarningMessage message="Время находки предшествует времени потери!" />
             }
         }
         return false;

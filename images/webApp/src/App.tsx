@@ -6,6 +6,7 @@ import "./apiClients/RestApiCardStorage"
 import * as RestCardStorage from "./apiClients/RestApiCardStorage";
 import SolrGatewaySearcher from "./apiClients/SolrGatewaySearch"
 import Landing from "./Landing";
+import About from "./About";
 import MatchsBoard from "./MatchsBoard"
 import {
   HashRouter as Router,
@@ -15,15 +16,6 @@ import {
   useParams,
   useHistory
 } from "react-router-dom";
-
-function SpecificPair() {
-  const { ns1, id1, ns2, id2 } = useParams<{ ns1: string, id1: string, ns2: string, id2: string }>();
-
-  return (
-    <p>Gone</p>
-  )
-}
-
 
 
 function SpecificCandidatesReview() {
@@ -53,18 +45,14 @@ function App() {
     <Router>
       <div className="parentDiv">
         <div id="headerCornerDiv">
+        <NavLink to="/">
           <img id="headerLogo" src="./img/cat/1.jpg"></img>
+        </NavLink>
         </div>
         <div id="headerDiv">
           <div id="headerTextDiv">Каштанка</div>
         </div>
         <div id="appStateMenu">
-          <div>
-            <NavLink to="/">Каштанка</NavLink>
-          </div>
-          <div>
-            <NavLink to="/pair/pet911ru/rl100268/pet911ru/rf231126">Сравнение</NavLink>
-          </div>
           <div>
             <NavLink to="/candidatesReview/pet911ru/rl100268">Обзор совпадений</NavLink>
           </div>
@@ -72,16 +60,18 @@ function App() {
             <NavLink to="/board">Карточки совпадений</NavLink>
           </div>
           <div>
-            <NavLink to="/faq">Вопросы/Ответы</NavLink>
+            <NavLink to="/about">Вопросы/Ответы</NavLink>
           </div>
         </div>
         <div className="AppModeViewer">
           <Switch>
-            <Route path="/pair/:ns1/:id1/:ns2/:id2" children={<SpecificPair />} />
             <Route path="/candidatesReview/:ns1/:id1/:ns2/:id2" children={<SpecificCandidatesReview />} />
             <Route path="/candidatesReview/:ns1/:id1" children={<SpecificCandidatesReview />} />
             <Route path="/board">
               <MatchsBoard />
+            </Route>
+            <Route path="/about">
+              <About />
             </Route>
             <Route path="/">
               <Landing />
