@@ -12,7 +12,8 @@ import {
   Switch,
   Route,
   NavLink,
-  useParams
+  useParams,
+  useHistory
 } from "react-router-dom";
 
 function SpecificPair() {
@@ -23,15 +24,25 @@ function SpecificPair() {
   )
 }
 
+
+
 function SpecificCandidatesReview() {
-  const { ns, id} = useParams<{ ns: string, id: string}>();
-  const fullMainID = ns+"/"+id
+  const { ns1, id1, ns2, id2} = useParams<{ ns1: string, id1: string,  ns2: string, id2: string}>();
+  const fullMainID = ns1+"/"+id1
+  const condFullID = ((ns2===undefined) || (id2===undefined)) ? "" : (ns2+"/"+id2)
+
+  const history = useHistory()
+  function NavigateToSpecificCandidate(candFullID:string) {
+    history.push("/candidatesReview/"+ns1+"/"+id1+"/"+candFullID)
+  }
+
   return (
     <CandidatesReview
       cardStorage={new RestCardStorage.CardStorage("http://10.0.3.211:3000")}
       searcher={new SolrGatewaySearcher("http://10.0.3.211:3001")}
       mainCardFullID={fullMainID}
-      candCardFullID=""
+      candCardFullID={condFullID}
+      candCardFullIDChanged={(e) => NavigateToSpecificCandidate(e)}
     />
   )
 }
@@ -67,7 +78,8 @@ function App() {
         <div className="AppModeViewer">
           <Switch>
             <Route path="/pair/:ns1/:id1/:ns2/:id2" children={<SpecificPair />} />
-            <Route path="/candidatesReview/:ns/:id" children={<SpecificCandidatesReview />} />
+            <Route path="/candidatesReview/:ns1/:id1/:ns2/:id2" children={<SpecificCandidatesReview />} />
+            <Route path="/candidatesReview/:ns1/:id1" children={<SpecificCandidatesReview />} />
             <Route path="/board">
               <MatchsBoard />
             </Route>

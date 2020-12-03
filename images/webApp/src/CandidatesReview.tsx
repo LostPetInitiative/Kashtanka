@@ -11,7 +11,8 @@ type PropsType = {
     cardStorage: ICardStorage,
     searcher: ISearch.ISearch,
     mainCardFullID: string,
-    candCardFullID: string
+    candCardFullID: string,
+    candCardFullIDChanged: (newCandCardFullID: string) => void
 }
 type StateType = {
     shownMainFullID: string,
@@ -21,7 +22,7 @@ type StateType = {
 }
 
 class CandidatesReview extends React.Component<PropsType, StateType> {
-    constructor(props:PropsType) {
+    constructor(props: PropsType) {
         super(props)
 
         this.state = {
@@ -33,40 +34,44 @@ class CandidatesReview extends React.Component<PropsType, StateType> {
     }
 
     checkLoadedData() {
-        if(this.state.shownMainFullID !== this.props.mainCardFullID) {
+        if (this.state.shownMainFullID !== this.props.mainCardFullID) {
             this.setState({
                 shownMainFullID: this.props.mainCardFullID,
                 shownMainCard: null
             })
-            const that = this;
-            console.log("Fetching main card "+this.props.mainCardFullID)
-            this.props.cardStorage.GetPetCardByFullID(this.props.mainCardFullID).then(card => {
-                const downloadedCardId = card.namespace + "/"+ card.id
-                if(that.state.shownMainFullID === downloadedCardId) {
-                    console.log("Got main card "+this.props.mainCardFullID)
-                    this.setState({shownMainCard: card})
-                } else {
-                    console.log("Got stale request main card "+this.props.mainCardFullID+". Ignoring")
-                }
-            });
+            if (this.props.mainCardFullID !== "") {
+                const that = this;
+                console.log("Fetching main card " + this.props.mainCardFullID)
+                this.props.cardStorage.GetPetCardByFullID(this.props.mainCardFullID).then(card => {
+                    const downloadedCardId = card.namespace + "/" + card.id
+                    if (that.state.shownMainFullID === downloadedCardId) {
+                        console.log("Got main card " + this.props.mainCardFullID)
+                        this.setState({ shownMainCard: card })
+                    } else {
+                        console.log("Got stale request main card " + this.props.mainCardFullID + ". Ignoring")
+                    }
+                });
+            }
         }
 
-        if(this.state.shownCandFullID !== this.props.candCardFullID) {
+        if (this.state.shownCandFullID !== this.props.candCardFullID) {
             this.setState({
                 shownCandFullID: this.props.candCardFullID,
                 shownCandCard: null
             })
-            const that = this;
-            console.log("Fetching cand card "+this.props.candCardFullID)
-            this.props.cardStorage.GetPetCardByFullID(this.props.candCardFullID).then(card => {
-                const downloadedCardId = card.namespace + "/"+ card.id
-                if(that.state.shownCandFullID === downloadedCardId) {
-                    console.log("Got cand card "+this.props.candCardFullID)
-                    this.setState({shownCandCard: card})
-                } else {
-                    console.log("Got stale request cand card "+this.props.candCardFullID+". Ignoring")
-                }
-            });
+            if (this.props.candCardFullID !== "") {
+                const that = this;
+                console.log("Fetching cand card " + this.props.candCardFullID)
+                this.props.cardStorage.GetPetCardByFullID(this.props.candCardFullID).then(card => {
+                    const downloadedCardId = card.namespace + "/" + card.id
+                    if (that.state.shownCandFullID === downloadedCardId) {
+                        console.log("Got cand card " + this.props.candCardFullID)
+                        this.setState({ shownCandCard: card })
+                    } else {
+                        console.log("Got stale request cand card " + this.props.candCardFullID + ". Ignoring")
+                    }
+                });
+            }
         }
     }
 
@@ -85,25 +90,23 @@ class CandidatesReview extends React.Component<PropsType, StateType> {
         // while the main card is not loaded we do not know whether it is Lost or Found card
         // thus we don't know whether it is at left or right pard
         // so both parts are marked as Loading
-        if(this.state.shownMainCard !== null) {
+        if (this.state.shownMainCard !== null) {
             const card = this.state.shownMainCard
-            
+
             const isLostCard = card.cardType === DataModel.CardType.Found
-            if(isLostCard) {
+            if (isLostCard) {
                 // Found cards are presented at the left part
                 leftCardAssignment = card
                 if (this.state.shownCandCard !== null) {
                     rightCardAssignment = this.state.shownCandCard
-                } else if (this.state.shownCandFullID == "")
-                {
+                } else if (this.state.shownCandFullID == "") {
                     rightCardAssignment = "unassigned"
                 }
             } else {
                 rightCardAssignment = card
                 if (this.state.shownCandCard !== null) {
                     leftCardAssignment = this.state.shownCandCard
-                } else if (this.state.shownCandFullID == "")
-                {
+                } else if (this.state.shownCandFullID == "") {
                     leftCardAssignment = "unassigned"
                 }
             }
@@ -111,22 +114,29 @@ class CandidatesReview extends React.Component<PropsType, StateType> {
 
         return (
             <div className="upper-screen">
-                <TwoCards.TwoCardsViewer leftCard={leftCardAssignment} rightCard={rightCardAssignment}  />
+                <TwoCards.TwoCardsViewer leftCard={leftCardAssignment} rightCard={rightCardAssignment} />
             </div>
         )
     }
 
-    renderLowerScreen(){
+    handleSelectionChanged(newCandFullID: string) {
+        // passing up the event to the parent
+        if (this.props.candCardFullIDChanged !== null) {
+            this.props.candCardFullIDChanged(newCandFullID)
+        }
+    }
+
+    renderLowerScreen() {
         const mainCard = (this.state.shownMainCard !== null) ? this.state.shownMainCard : null;
         return (
             <div>
                 <Thumbnails.CandidatesThumbnails
                     referenceCard={mainCard}
                     selectedCardFullID={this.state.shownCandFullID}
-                    selectionChanged= {v => console.log("selection changed to "+v)}
+                    selectionChanged={(newFullID) => this.handleSelectionChanged(newFullID)}
                     searcher={this.props.searcher}
                     cardStorage={this.props.cardStorage}
-                    />
+                />
             </div>
         )
     }

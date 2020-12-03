@@ -122,12 +122,12 @@ type CandidatesThumbnailsStateType = {
 type CandidatesThumbnailsPropsType = {
     referenceCard: DataModel.AnimalCard | null
     selectedCardFullID: string,
-    selectionChanged: (newSelection: DataModel.AnimalCard | null) => void,
+    selectionChanged: (newSelectionFullID: string) => void,
     searcher: ISearch.ISearch,
     cardStorage: ICardStorage
 }
 
-function capitalize(str: string) : string {
+function capitalize(str: string): string {
     if (str.length === 0)
         return str
     else {
@@ -135,11 +135,11 @@ function capitalize(str: string) : string {
     }
 }
 
-function marshalAnimal(animal : DataModel.Animal) : ISearch.Animal {
+function marshalAnimal(animal: DataModel.Animal): ISearch.Animal {
     return capitalize(animal as string) as ISearch.Animal;
 }
 
-function marshalEventType(t : DataModel.CardType) : ISearch.EventType {
+function marshalEventType(t: DataModel.CardType): ISearch.EventType {
     return capitalize(t as string) as ISearch.EventType;
 }
 
@@ -172,7 +172,7 @@ export class CandidatesThumbnails
             if (this.props.referenceCard !== null) {
                 // initiating background load
                 console.log("Initiating download of relevant cards for " + requestedFullID)
-            
+
                 const card = this.props.referenceCard
                 const featuresIdent = Object.keys(card.features)[0]
                 this.props.searcher.GetRelevantCards(card.location.lat, card.location.lon,
@@ -184,12 +184,12 @@ export class CandidatesThumbnails
                         if (ISearch.IsResultSuccessful(relevantSearchRes)) {
                             console.log("Got relevant cards for " + requestedFullID)
                             const relevantCards = relevantSearchRes as ISearch.FoundCard[]
-                            const stateUpdate  = { loadedRelevantCards: relevantCards };
-                            
+                            const stateUpdate = { loadedRelevantCards: relevantCards };
+
                             // trying to set proper selected relevant card by looking for the desired card
-                            if(this.props.selectedCardFullID !== null) {
-                                const foundIdx = relevantCards.findIndex(v => v.namespace+"/"+v.id === this.props.selectedCardFullID)
-                                if(foundIdx !== -1) {
+                            if (this.props.selectedCardFullID !== null) {
+                                const foundIdx = relevantCards.findIndex(v => v.namespace + "/" + v.id === this.props.selectedCardFullID)
+                                if (foundIdx !== -1) {
                                     (stateUpdate as CandidatesThumbnailsStateType).currentSelectionIdx = foundIdx
                                 }
                             }
@@ -211,18 +211,34 @@ export class CandidatesThumbnails
         this.checkLoadedData()
     }
 
+    handleClickOnThumbnail(fullID: string, e: React.MouseEvent) {
+        if (this.props.selectionChanged !== null) {
+            this.props.selectionChanged(fullID)
+        }
+        if (this.state.loadedRelevantCards !== null) {
+            if (ISearch.IsResultSuccessful(this.state.loadedRelevantCards)) {
+                const foundIdx = this.state.loadedRelevantCards.findIndex(card => (card.namespace + "/" + card.id) === fullID)
+                if (foundIdx !== -1) {
+                    this.setState({ currentSelectionIdx: foundIdx })
+                }
+            }
+        }
+    }
+
     getRelevantCards(refCard: DataModel.AnimalCard | null) {
         const that = this;
         const genPreview = ([foundCard, isAccent]: [ISearch.FoundCard, boolean]) => {
             const arrayKey = foundCard.namespace + "/" + foundCard.id
             return (
-                <AnimalCardThumbnailById
-                    key={arrayKey}
-                    refCard={refCard}
-                    isAccented={isAccent}
-                    cardStorage={that.props.cardStorage}
-                    namespace={foundCard.namespace}
-                    localID={foundCard.id} />)
+                <div onClick={(e) => this.handleClickOnThumbnail(arrayKey, e)}>
+                    <AnimalCardThumbnailById
+                        key={arrayKey}
+                        refCard={refCard}
+                        isAccented={isAccent}
+                        cardStorage={that.props.cardStorage}
+                        namespace={foundCard.namespace}
+                        localID={foundCard.id} />
+                </div>)
         }
 
         if (this.state.loadedRelevantCards === null) {
@@ -239,13 +255,13 @@ export class CandidatesThumbnails
     }
 
     render() {
-        if(this.props.referenceCard !== null) {
+        if (this.props.referenceCard !== null) {
             const releavantCards = this.getRelevantCards(this.props.referenceCard);
             return (
                 <div className="page">
-                        <p>Возможные совпадения</p>
-                        {releavantCards}
-                    </div>
+                    <p>Возможные совпадения</p>
+                    {releavantCards}
+                </div>
             )
         } else {
             return <p>Загрузка...</p>
