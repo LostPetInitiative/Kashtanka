@@ -413,6 +413,48 @@ spec:
         - containerPort: 80
 ---
 apiVersion: v1
+kind: Service
+metadata:
+  name: web-app
+  namespace: kashtanka
+  labels:
+    app: web-app
+spec:
+  ports:
+  - port: 80
+    targetPort: 3000
+    name: web
+  selector:
+    app: web-app
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: web-app
+  namespace: kashtanka
+spec:
+  selector:
+    matchLabels:
+      app: web-app
+  template:
+    metadata:
+      labels:
+        app: web-app
+    spec:
+      containers:
+      - name: web-server
+        image: lostpetinitiative/kashtanka-web-app:0.1.0
+        resources:
+          limits:
+            memory: "128Mi"
+            cpu: "200m"
+          requests:
+            memory: "64Mi"
+            cpu: "50m"
+        ports:
+        - containerPort: 3000
+---
+apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
   name: pet911ru-raw-cards-pvc

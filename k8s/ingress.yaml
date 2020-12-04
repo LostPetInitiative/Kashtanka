@@ -1,0 +1,60 @@
+
+apiVersion: traefik.containo.us/v1alpha1
+kind: Middleware
+metadata:
+  name: demo-access-auth
+  namespace: kashtanka
+spec:
+  basicAuth:
+    secret: demo-access-creds
+    namespace: kashtanka
+---
+apiVersion: traefik.containo.us/v1alpha1
+kind: Middleware
+metadata:
+  name: strip-api-prefixes
+  namespace: kashtanka
+spec:
+  stripPrefix:
+    prefixes:
+      - /api/storage
+      - /api/search
+---
+apiVersion: traefik.containo.us/v1alpha1
+kind: IngressRoute
+metadata:
+  name: ingressroutetls
+  namespace: kashtanka
+spec:
+  entryPoints:
+    - websecure
+  routes:
+  # main web app
+  - match: Host(`kashtanka.pet`)
+    kind: Rule
+    middlewares:
+    - name: demo-access-auth
+    services:
+    - name: web-app
+      namespace: kashtanka
+      port: 80
+  # storage rest api
+  - match: Host(`kashtanka.pet`) && PathPrefix(`/api/storage`)
+    kind: Rule
+    middlewares:
+    - name: demo-access-auth
+    - name: strip-api-prefixes
+    services:
+    - name: cassandra-rest-api
+      port: 80
+  # solr gateway rest api
+  - match: Host(`kashtanka.pet`) && PathPrefix(`/api/search`)
+    kind: Rule
+    middlewares:
+    - name:  demo-access-auth
+    - name: strip-api-prefixes
+    services:
+    - name: search-gateway
+      port: 80
+  tls:
+    certResolver: letsencrypt

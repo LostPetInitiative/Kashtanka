@@ -28,10 +28,22 @@ function SpecificCandidatesReview() {
     history.push("/candidatesReview/"+ns1+"/"+id1+"/"+candFullID)
   }
 
+  const development = false
+
+  var cardStorageURL:string
+  var solrGatewayURL:string
+  if(development) {
+    cardStorageURL = "http://10.0.3.211:3000"
+    solrGatewayURL = "http://10.0.3.211:3001"
+  } else {
+    cardStorageURL = "api/storage"
+    solrGatewayURL = "api/search"
+  }
+
   return (
     <CandidatesReview
-      cardStorage={new RestCardStorage.CardStorage("http://10.0.3.211:3000")}
-      searcher={new SolrGatewaySearcher("http://10.0.3.211:3001")}
+      cardStorage={new RestCardStorage.CardStorage(cardStorageURL)}
+      searcher={new SolrGatewaySearcher(solrGatewayURL)}
       mainCardFullID={fullMainID}
       candCardFullID={condFullID}
       candCardFullIDChanged={(e) => NavigateToSpecificCandidate(e)}
