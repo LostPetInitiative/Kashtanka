@@ -21,6 +21,22 @@ spec:
       - /api/search
 ---
 apiVersion: traefik.containo.us/v1alpha1
+kind: Middleware
+metadata:
+  name: development-cors
+  namespace: kashtanka
+spec:
+  headers:
+    accessControlAllowMethods:
+      - "GET"
+      - "OPTIONS"
+      - "POST"
+    accessControlAllowOriginList:
+      - "http://localhost:3000"
+    accessControlMaxAge: 100
+    addVaryHeader: true
+---
+apiVersion: traefik.containo.us/v1alpha1
 kind: IngressRoute
 metadata:
   name: ingressroutetls
@@ -44,6 +60,7 @@ spec:
     middlewares:
     - name: demo-access-auth
     - name: strip-api-prefixes
+    - name: development-cors
     services:
     - name: cassandra-rest-api
       port: 80
@@ -53,6 +70,7 @@ spec:
     middlewares:
     - name:  demo-access-auth
     - name: strip-api-prefixes
+    - name: development-cors
     services:
     - name: search-gateway
       port: 80
