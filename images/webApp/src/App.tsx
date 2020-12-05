@@ -28,13 +28,15 @@ function SpecificCandidatesReview() {
     history.push("/candidatesReview/"+ns1+"/"+id1+"/"+candFullID)
   }
 
-  const development = false
+  const development = true
 
   var cardStorageURL:string
   var solrGatewayURL:string
   if(development) {
     cardStorageURL = "http://10.0.3.211:3000"
     solrGatewayURL = "http://10.0.3.211:3001"
+    // cardStorageURL = "https://kashtanka.pet/api/storage"
+    // solrGatewayURL = "https://kashtanka.pet/api/search"
   } else {
     cardStorageURL = "api/storage"
     solrGatewayURL = "api/search"
