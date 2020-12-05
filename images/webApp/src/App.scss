@@ -7,25 +7,8 @@ $colorDark: #0D0000;
 @media (prefers-reduced-motion: no-preference) {
 }
 
-.animalCard {
-  background: linear-gradient(120deg, $colorBasic, $colorDark);
-  border: solid $colorEmphasisGreen;
-  border-width: 0.1em;
-  border-radius: 0.5em;
-  box-shadow: 1px 1px 10px 0px $colorEmphasisGreen;
-  color: $colorLight;
-  font-size: medium;
-  padding: 1em;
-  text-align: left;
-}
-
 .animalGender {
   font-size: x-small;
-}
-
-.animalTypeImg {
-  max-width: 30px;
-  max-height: 30px;
 }
 
 .App {

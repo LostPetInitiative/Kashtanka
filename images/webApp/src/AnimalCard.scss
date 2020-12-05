@@ -1,6 +1,15 @@
 @import './App';
 
 .animalCard {
+  background: linear-gradient(120deg, $colorBasic, $colorDark);
+  border: solid $colorEmphasisGreen;
+  border-width: 0.1em;
+  border-radius: 0.5em;
+  box-shadow: 1px 1px 10px 0px $colorEmphasisGreen;
+  color: $colorLight;
+  font-size: medium;
+  padding: 1em;
+  text-align: left;
   position: relative;
 }
 
@@ -17,6 +26,11 @@
 
 .animalType.rightOriented {
   left: 0;
+}
+
+.animalTypeImg {
+  max-width: 35px;
+  max-height: 35px;
 }
 
 .cardHeader {
