@@ -235,6 +235,55 @@ spec:
         - name: ANIMAL_TYPE
           value: cat
 ---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: trello-found-cards-creator
+  namespace: kashtanka
+spec:
+  selector:
+    matchLabels:
+      app: trello-found-cards-creator
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: trello-found-cards-creator
+    spec:
+      containers:
+      - name: worker
+        image: lostpetinitiative/trello-found-card-creator:0.1.0
+        resources:
+          requests:
+            memory: "64Mi"
+            cpu: "25m"
+          limits:
+            memory: "128Mi"
+            cpu: "250m"
+        env:
+        - name: KAFKA_URL
+          value: kafka-cluster.default:9092
+        - name: INPUT_QUEUE
+          value: kashtanka_cards_with_features
+        - name: TRELLO_LIST
+          value: 5fc9266403ad5778d7508dcb
+        - name: TRELLO_KEY
+          valueFrom:
+            secretKeyRef:
+              name: trello-ai-creds
+              key: key
+        - name: TRELLO_TOKEN
+          valueFrom:
+            secretKeyRef:
+              name: trello-ai-creds
+              key: token
+        - name: TRELLO_APP_MEMBER_ID
+          valueFrom:
+            secretKeyRef:
+              name: trello-ai-creds
+              key: member
+---
 apiVersion: v1
 kind: Service
 metadata:
@@ -353,7 +402,7 @@ spec:
         - name: LONG_TERM_SEARCH_RADIUS_KM
           value: "20.0"
         - name: SHORT_TERM_SEARCH_RADIUS_KM
-          value: "1000.0"
+          value: "200.0"
         - name: SHORT_TERM_LENGTH_DAYS
           value: "30"
         - name: REVERSE_TIME_GAP_LENGTH_DAYS
@@ -362,6 +411,48 @@ spec:
           value: "0.95"
         ports:
         - containerPort: 80
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: web-app
+  namespace: kashtanka
+  labels:
+    app: web-app
+spec:
+  ports:
+  - port: 80
+    targetPort: 3000
+    name: web
+  selector:
+    app: web-app
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: web-app
+  namespace: kashtanka
+spec:
+  selector:
+    matchLabels:
+      app: web-app
+  template:
+    metadata:
+      labels:
+        app: web-app
+    spec:
+      containers:
+      - name: web-server
+        image: lostpetinitiative/kashtanka-web-app:0.1.0
+        resources:
+          limits:
+            memory: "128Mi"
+            cpu: "200m"
+          requests:
+            memory: "64Mi"
+            cpu: "50m"
+        ports:
+        - containerPort: 3000
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim
