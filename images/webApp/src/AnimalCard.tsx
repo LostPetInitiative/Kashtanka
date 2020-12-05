@@ -12,10 +12,10 @@ function AnimalCard(props : {card: DataModel.AnimalCard}) {
             return <img src="./img/dog/dogFaceWhite.png" className="animalTypeImg"/>;
         else if(animalType == DataModel.Animal.Cat) {
             if(animalGender == DataModel.Sex.Female)
-                return <img src="./img/cat/pinkCat.png" className="animalTypeImg"/>;
+                return <img src="./img/cat/female.svg" className="animalTypeImg"/>;
             else if(animalGender == DataModel.Sex.Male)
-                return <img src="./img/cat/blueCat.png" className="animalTypeImg"/>;
-            return  <img src="./img/cat/catFaceWhite.png" className="animalTypeImg"/>;
+                return <img src="./img/cat/male.svg" className="animalTypeImg"/>;
+            return  <img src="./img/cat/cat.svg" className="animalTypeImg"/>;
         }
         else return "Животное";
     }
