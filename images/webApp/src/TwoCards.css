@@ -1,11 +1,6 @@
 div.gridContainer {
-    /* display: grid;
-    grid-template-columns: 50px 50px auto 50px 40px;
-    grid-template-rows: 25% 100px auto; */
-    display: flex;
-    flex-direction: row;
-    justify-content: space-around;
-    align-items: flex-start;
+    display: grid;
+    grid-template-columns: 50% auto 50%;
 }
 
 div.gridItem {
