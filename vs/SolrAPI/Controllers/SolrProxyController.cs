@@ -41,17 +41,42 @@ namespace SolrAPI.Controllers
     public class SolrProxyController : ControllerBase
     {
         private readonly string solrStreamingExpressionsURL;
+        private readonly string solrSelectExpressionsURL;
         private readonly ISolrSearchConfig searchConfig;
 
         public SolrProxyController(ISolrSearchConfig solrAddress)
         {
             this.searchConfig = solrAddress;
             this.solrStreamingExpressionsURL = $"{solrAddress.SolrAddress}/solr/{solrAddress.CollectionName}/stream";
+            this.solrSelectExpressionsURL = $"{solrAddress.SolrAddress}/solr/{solrAddress.CollectionName}/select";
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="requestID">How to identify the request in logs</param>
+        /// <param name="requstURL"></param>
+        /// <param name="response">Where to write proxied data</param>
+        /// <returns></returns>
+        private static async Task ProxyHttpGet(string requestID, string requstURL, HttpResponse response) {
+            WebClient wc = new WebClient();
+            Trace.TraceInformation($"{requestID}: Issung request {requstURL}.");
+            var responseData = await wc.DownloadDataTaskAsync(requstURL);
+            Trace.TraceInformation($"{requestID}: Got reply of {responseData.Length} bytes from Solr, transmitting.");
+
+            response.StatusCode = 200;
+            response.ContentType = "application/json";
+            response.ContentLength = responseData.Length;
+            await response.StartAsync();
+            await response.BodyWriter.WriteAsync(responseData);
+            await response.BodyWriter.FlushAsync();
+            await response.BodyWriter.CompleteAsync();
+            await response.CompleteAsync();
         }
 
         [EnableCors]
-        [HttpGet("MatchedCards")]
-        public async Task<ActionResult> GetMatches([FromBody]GetMatchesRequest request)
+        [HttpPost("MatchedCardsSearch")]
+        public async Task MatchedCardsSearch([FromBody]GetMatchesRequest request)
         {
             string requestHash = ((uint)request.GetHashCode()).ToString("X8");
             Trace.TraceInformation($"{requestHash}: Got request.");
@@ -103,20 +128,60 @@ namespace SolrAPI.Controllers
                 
 
                 string finalURL = $"{this.solrStreamingExpressionsURL}?expr={HttpUtility.UrlEncode(solrFindLostRequest)}";
+                await ProxyHttpGet(requestHash, finalURL, Response);
 
-                WebClient wc = new WebClient();
-                //Response.Headers.Add("Content-Type", "application/json");
-                
-                var response = await wc.DownloadStringTaskAsync(finalURL);
 
-                Trace.TraceInformation($"{requestHash}: Got reply from Solr, transmitting.");
-                return Ok(response);
-
+                Trace.TraceInformation($"{requestHash}: Transmitted successfully");
             }
             catch (Exception err)
             {
                 Trace.TraceError($"{requestHash}: Exception occurred {err}");
-                return StatusCode(500, err.ToString());
+                string errorMsg = err.ToString();
+                Response.StatusCode = 500;
+                Response.ContentLength = ASCIIEncoding.Unicode.GetByteCount(errorMsg);
+                await Response.WriteAsync(errorMsg);
+                await Response.CompleteAsync();
+            }
+        }
+
+        [EnableCors]
+        [HttpGet("LatestCards")]
+        public async Task LatestCards([FromQuery]int maxCardsCount=10, [FromQuery] string cardType=null) {
+            maxCardsCount = Math.Min(1000, maxCardsCount);
+
+            string typeConstraint = cardType?.ToLowerInvariant() switch
+            {
+                "lost" => "card_type:Lost",
+                "found" => "card_type:Found",
+                _ => string.Empty
+            };
+
+            Trace.TraceInformation($"Fetching no more than {maxCardsCount} latest cards (card type constraint: {typeConstraint})");
+
+            Dictionary<string, string> requestParams = new Dictionary<string, string>();
+            requestParams.Add("q","*:*");
+            requestParams.Add("df", "card_creation_time desc");
+            requestParams.Add("fl", "id");
+            requestParams.Add("rows", $"{maxCardsCount}");
+            if (!string.IsNullOrEmpty(typeConstraint)) {
+                requestParams.Add("fq", typeConstraint);
+            }
+
+            string queryStr =
+                string.Join('&', requestParams.Select(kvp => $"{HttpUtility.UrlEncode(kvp.Key)}={HttpUtility.UrlEncode(kvp.Value)}"));
+
+            string finalURL = $"{this.solrSelectExpressionsURL}?{queryStr}";
+            try {
+                await ProxyHttpGet("latest cards request", finalURL, Response);
+            }
+            catch (Exception err)
+            {
+                string errorMsg = $"Exception occurred during latest cards fetch: {err}";
+                Trace.TraceError(errorMsg);
+                Response.StatusCode = 500;
+                Response.ContentLength = ASCIIEncoding.Unicode.GetByteCount(errorMsg);
+                await Response.WriteAsync(errorMsg);
+                await Response.CompleteAsync();
             }
         }
     }

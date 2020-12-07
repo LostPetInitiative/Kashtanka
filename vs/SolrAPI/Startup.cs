@@ -31,6 +31,9 @@ namespace SolrAPI
                     builder =>
                     {
                         builder.WithOrigins("http://localhost:3000");
+                        //builder.WithHeaders("Accept: application/json", "Content-Type: application/json");
+                        builder.AllowAnyHeader();
+                        builder.AllowAnyMethod();
                     });
             });
 
