@@ -7,6 +7,7 @@ import * as RestCardStorage from "./apiClients/RestApiCardStorage";
 import SolrGatewaySearcher from "./apiClients/SolrGatewaySearch"
 import Landing from "./Landing";
 import About from "./About";
+import Faq from "./Faq"
 import MatchsBoard from "./MatchsBoard"
 import {
   HashRouter as Router,
@@ -56,19 +57,19 @@ function SpecificCandidatesReview() {
 function Menu() {
   return (
     <div id="appStateMenu">
-      <NavLink to="/board" activeClassName="activePage">
+      <NavLink to="/board" activeClassName="activePage" title="Доска карточек">
         <div className="menuItem">
           <img alt='Доска карточек' className="active" src='./img/menus/board_trello_logo_orange.png' />
           <img alt='Доска карточек' className="inactive" src='./img/menus/board_trello_logo_pale.png' />
         </div>
       </NavLink>
-      <NavLink to="/candidatesReview/pet911ru/rl100268" activeClassName="activePage">
+      <NavLink to="/candidatesReview/pet911ru/rl100268" activeClassName="activePage" title="Сравнение объявлений">
         <div className="menuItem">
           <img alt='Сравнение объявлений' className="active" src='./img/menus/compare_ab_orange.png' />
           <img alt='Сравнение объявлений' className="inactive" src='./img/menus/compare_ab_pale.png' />
         </div>
       </NavLink>
-      <NavLink to="/faq" activeClassName="activePage">
+      <NavLink to="/faq" activeClassName="activePage" title="Вопросы и ответы">
         <div className="menuItem">
           <img alt='Вопросы и ответы' className="active" src='./img/menus/questions_orange.png' />
           <img alt='Вопросы и ответы' className="inactive" src='./img/menus/questions_pale.png' />
@@ -98,6 +99,9 @@ function App() {
             <Route path="/candidatesReview/:ns1/:id1" children={<SpecificCandidatesReview />} />
             <Route path="/board">
               <MatchsBoard />
+            </Route>
+            <Route path="/faq">
+              <Faq />
             </Route>
             <Route path="/about">
               <About />

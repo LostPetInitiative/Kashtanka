@@ -59,8 +59,13 @@ $colorDark: #0D0000;
 #appStateMenu .menuItem {
   margin: 0px;
   padding: 2px;
-  border: 2px #ffffff00 solid;
+  border: 2px solid #ffffff00 ;
   width: calc(100% - 8px);
+}
+
+#appStateMenu .activePage .menuItem,
+#appStateMenu :hover .menuItem {
+  border-left: 2px solid $colorEmphasisOrange ;
 }
 
 #appStateMenu .menuItem img {
@@ -74,7 +79,6 @@ $colorDark: #0D0000;
 #appStateMenu .activePage .menuItem img.active {
   display: block;
 }
-
 
 #appStateMenu :not(.activePage) .menuItem img.inactive {
   display: block;
