@@ -2,7 +2,7 @@ import * as React from "react";
 import * as Comp from "./computations"
 import * as Utils from "./Utils"
 import * as DataModel from "./DataModel"
-import "./CardDiffViewer.css"
+import "./CardDiffViewer.scss"
 import { features } from "process";
 
 function WarningMessage(props: { message: string }) {
@@ -76,7 +76,7 @@ function CardDiffViewer(props: { card1: DataModel.AnimalCard, card2: DataModel.A
             ((card1.animalSex != card2.animalSex) &&
             (card1.animalSex != DataModel.Sex.Unknown) &&
             (card2.animalSex != DataModel.Sex.Unknown))
-            return <WarningMessage message="Животные, предположительно, разного пола!" />
+            return <img src="./img/genderDiffers.svg" alt="Животные, предположительно, разного пола!" title="Животные, предположительно, разного пола!" className="cardDiffGenderIcon"/>
         else return false;
     }
 
@@ -132,22 +132,17 @@ function CardDiffViewer(props: { card1: DataModel.AnimalCard, card2: DataModel.A
     }
 
     return (
-        <div>
-            <table>
-                <tbody>
-                    <tr>
-                        <td>Расстояние</td><td> ≈ {geoDistStr}</td>
-                    </tr>
-                    <tr>
-                        <td>Между событиями прошло</td><td> ≈ {timeDiffStr}</td>
-                    </tr>
-                </tbody>
-            </table>
+        <div className="cardDiffViewer">
+            <div className="cardDiffItems">
+                <img className="cardDiffIcons" src="./img/distanceS.svg" alt="Расстояние" title="Расстояние"/>{geoDistStr}
+            </div>
+            <div className="cardDiffItems">
+                <img className="cardDiffIcons" src="./img/distanceT.svg" alt="Между событиями прошло" title="Между событиями прошло"/>{timeDiffStr}
+            </div>
             {/* {getFeaturesDifferences()} */}
-
-            {getSexWarning()}
-            {getDifferentAnimalsWarning()}
-            {getLostAfterFoundWarning()}
+            <div className="cardDiffItems">{getSexWarning()}</div>
+            <div className="cardDiffItems">{getDifferentAnimalsWarning()}</div>
+            <div className="cardDiffItems">{getLostAfterFoundWarning()}</div>
         </div>
     )
 }
