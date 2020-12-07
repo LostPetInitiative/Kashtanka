@@ -24,7 +24,7 @@ namespace CassandraAPI.Controllers
         // GET <PetCardsController>/pet911ru/rf123
         [EnableCors]
         [HttpGet("{ns}/{localID}")]
-        public async Task<ActionResult<PetCard>> Get(string ns, string localID)
+        public async Task<ActionResult<PetCard>> Get(string ns, string localID, [FromQuery] bool includeSensitiveData = false)
         {
             try
             {
@@ -38,6 +38,21 @@ namespace CassandraAPI.Controllers
                 else
                 {
                     Trace.TraceInformation($"Successfully retrieved card for {ns}/{localID}");
+                    if (!includeSensitiveData)
+                    {
+                        Trace.TraceInformation($"Wiping out sensitive data for {ns}/{localID}");
+                        var contacts = result.ContactInfo;
+                        if (contacts != null) {
+                            contacts.Email = new string[0];
+                            contacts.Name = "";
+                            contacts.Tel = new string[0];
+                            contacts.Website = new string[0];
+                        }
+                    }
+                    else
+                    {
+                        Trace.TraceInformation($"Returning sensitive data to the client for {ns}/{localID}");
+                    }
                     return new ActionResult<PetCard>(result);
                 }
             }
