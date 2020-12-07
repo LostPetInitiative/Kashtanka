@@ -57,6 +57,11 @@ function SpecificCandidatesReview() {
 function Menu() {
   return (
     <div id="appStateMenu">
+      <div id="headerCornerDiv">
+        <NavLink to="/">
+          <img id="headerLogo" src="./img/cat/1.jpg"></img>
+        </NavLink>
+      </div>
       <NavLink to="/board" activeClassName="activePage">
         <div className="menuItem">
           <img alt='Доска карточек' className="active" src='./img/menus/board_trello_logo_orange.png' />
@@ -84,17 +89,6 @@ function App() {
   return (
     <Router>
       <div className="parentDiv">
-        <div id="headerCornerDiv">
-          <NavLink to="/">
-            <img id="headerLogo" src="./img/cat/1.jpg"></img>
-          </NavLink>
-              </div>
-        <div id="headerDiv">
-             <div id="headerTextDiv">Каштанка</div>
-        </div>
-        <div id="headerDiv">
-          <div id="headerTextDiv">Каштанка</div>
-        </div>
         <Menu />
         <div className="AppModeViewer">
           <Header display={false}/>
