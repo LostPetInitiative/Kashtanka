@@ -6,15 +6,16 @@ import "./apiClients/RestApiCardStorage"
 import * as RestCardStorage from "./apiClients/RestApiCardStorage";
 import SolrGatewaySearcher from "./apiClients/SolrGatewaySearch"
 import Landing from "./Landing";
-import About from "./About";
-import MatchBoard from "./MatchesBoard"
+import Faq from "./Faq"
+import MatchesBoard from "./MatchesBoard"
 import {
   HashRouter as Router,
   Switch,
   Route,
   NavLink,
   useParams,
-  useHistory
+  useHistory,
+  Redirect
 } from "react-router-dom";
 import Header from "./Header"
 
@@ -54,7 +55,14 @@ function SpecificCandidatesReview() {
   )
 }
 
+// function isCandidatesReviewActive(match:any,location:string) {
+//   if(!location) return false;
+//   return location.indexOf() === "";
+// }
+//isActive={isCandidatesReviewActive}
+
 function Menu() {
+  
   return (
     <div id="appStateMenu">
       <div id="headerCornerDiv">
@@ -68,13 +76,13 @@ function Menu() {
           <img alt='Доска карточек' className="inactive" src='./img/menus/board_trello_logo_pale.png' />
         </div>
       </NavLink>
-      <NavLink to="/candidatesReview/pet911ru/rl100268" activeClassName="activePage">
+      <NavLink  to="/candidatesReview/" activeClassName="activePage" title="Сравнение объявлений">
         <div className="menuItem">
           <img alt='Сравнение объявлений' className="active" src='./img/menus/compare_ab_orange.png' />
           <img alt='Сравнение объявлений' className="inactive" src='./img/menus/compare_ab_pale.png' />
         </div>
       </NavLink>
-      <NavLink to="/faq" activeClassName="activePage">
+      <NavLink to="/faq" activeClassName="activePage" title="Вопросы и ответы">
         <div className="menuItem">
           <img alt='Вопросы и ответы' className="active" src='./img/menus/questions_orange.png' />
           <img alt='Вопросы и ответы' className="inactive" src='./img/menus/questions_pale.png' />
@@ -91,15 +99,15 @@ function App() {
       <div className="parentDiv">
         <Menu />
         <div className="AppModeViewer">
-          <Header display={false}/>
           <Switch>
             <Route path="/candidatesReview/:ns1/:id1/:ns2/:id2" children={<SpecificCandidatesReview />} />
             <Route path="/candidatesReview/:ns1/:id1" children={<SpecificCandidatesReview />} />
+            <Redirect from='/candidatesReview' to="/candidatesReview/pet911ru/rf449512" />
             <Route path="/board">
-              <MatchBoard />
+              <MatchesBoard />
             </Route>
-            <Route path="/about">
-              <About />
+            <Route path="/faq">
+              <Faq />
             </Route>
             <Route path="/">
               <Landing />

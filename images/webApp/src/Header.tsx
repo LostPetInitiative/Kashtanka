@@ -1,9 +1,9 @@
 import * as React from "react";
 import './Header.scss';
 
-function Header(props: {display: boolean} ) {
+function Header(props: {} ) {
     return (
-        <div className={"headerDiv" + (!props.display ? " displayNone" : "")}>
+        <div className={"headerDiv"}>
             <div id="headerTextDiv">Каштанка</div>
         </div>
     );
