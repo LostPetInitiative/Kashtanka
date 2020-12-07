@@ -49,18 +49,16 @@ function AnimalCard(props : {card: DataModel.AnimalCard}) {
         else return "";
     }
 
-    var cardStyle = {"max-width":"400px"} as React.CSSProperties;
-
     return (
-        <div style={cardStyle} className="animalCard">
+        <div className="animalCard">
             <div className={"cardHeader " + cardTypeClass(card.cardType)}> {cardTypeString(card.cardType)} </div>
+            <div className={"cardInfo " + cardTypeClass(card.cardType)} title={animalGenderString(card.animalSex)}>
+                <div className="cardDate" title="Когда?"> {card.eventTime.toLocaleDateString()} </div>
+                <div className="cardCoordsNumbers" title="Где?"> {card.location.address} </div>
+            </div>
             <div className={"animalType " + cardTypeClass(card.cardType)}> {animalType(card.animal, card.animalSex)} </div>
             <div className={"cardImgViewer " + cardTypeClass(card.cardType)}>
                 <CarouselImgViewer imgSrcArray={card.photos}></CarouselImgViewer>
-            </div>
-            <div className={"cardInfo " + cardTypeClass(card.cardType)}>
-                <div className="cardDate" title="Когда?"> {card.eventTime.toLocaleDateString()} </div>
-                <div className="cardCoordsNumbers" title="Где?"> {card.location.address} </div>
             </div>
             <div className={"cardComment " + cardTypeClass(card.cardType)}>
                 <div className="cardItemHeader"> Комментарий </div>

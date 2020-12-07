@@ -38,8 +38,6 @@ $colorDark: #0D0000;
 .AppModeViewer {
   grid-column-start: 2;
   grid-column-end: 2;
-  grid-row-start: 2;
-  grid-row-end: 2;
   background: $colorLight;
   color: $colorDark
 }
@@ -48,8 +46,6 @@ $colorDark: #0D0000;
   background: $colorDark;
   grid-column-start: 1;
   grid-column-end: 1;
-  grid-row-start: 2;
-  grid-row-end: 3;  
   display: flex;
   flex-direction: column;
   align-items: stretch;
@@ -88,27 +84,11 @@ $colorDark: #0D0000;
   display: none;
 }
 
-
-
 .cardItemHeader {
   color: #898C37;
   font-size: small;
   font-weight: bold;
   margin-bottom: 0.3rem;
-}
-
-#headerDiv {
-  background: $colorBasic;
-  color: $colorEmphasisOrange;
-  grid-column-start: 2;
-  grid-column-end: 3;
-  grid-row-start: 1;
-  grid-row-end: 1;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  font-size: xxx-large;
-  font-weight: bolder;
 }
 
 #headerCornerDiv {
@@ -133,7 +113,7 @@ $colorDark: #0D0000;
 .parentDiv {
   display: grid;
   grid-template-columns: 48px auto;
-  grid-template-rows: 10% auto;
+  grid-template-rows: auto;
   justify-items: stretch;
   justify-content: stretch;
   align-content: stretch;

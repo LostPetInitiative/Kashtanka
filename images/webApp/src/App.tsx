@@ -8,7 +8,7 @@ import SolrGatewaySearcher from "./apiClients/SolrGatewaySearch"
 import Landing from "./Landing";
 import About from "./About";
 import Faq from "./Faq"
-import MatchsBoard from "./MatchsBoard"
+import MatchesBoard from "./MatchesBoard"
 import {
   HashRouter as Router,
   Switch,
@@ -17,6 +17,7 @@ import {
   useParams,
   useHistory
 } from "react-router-dom";
+import Header from "./Header"
 
 
 function SpecificCandidatesReview() {
@@ -57,7 +58,12 @@ function SpecificCandidatesReview() {
 function Menu() {
   return (
     <div id="appStateMenu">
-      <NavLink to="/board" activeClassName="activePage" title="Доска карточек">
+      <div id="headerCornerDiv">
+        <NavLink to="/">
+          <img id="headerLogo" src="./img/cat/1.jpg"></img>
+        </NavLink>
+      </div>
+      <NavLink to="/board" activeClassName="activePage">
         <div className="menuItem">
           <img alt='Доска карточек' className="active" src='./img/menus/board_trello_logo_orange.png' />
           <img alt='Доска карточек' className="inactive" src='./img/menus/board_trello_logo_pale.png' />
@@ -84,21 +90,14 @@ function App() {
   return (
     <Router>
       <div className="parentDiv">
-        <div id="headerCornerDiv">
-          <NavLink to="/">
-            <img id="headerLogo" src="./img/cat/1.jpg"></img>
-          </NavLink>
-        </div>
-        <div id="headerDiv">
-          <div id="headerTextDiv">Каштанка</div>
-        </div>
         <Menu />
         <div className="AppModeViewer">
+          <Header display={false} />
           <Switch>
             <Route path="/candidatesReview/:ns1/:id1/:ns2/:id2" children={<SpecificCandidatesReview />} />
             <Route path="/candidatesReview/:ns1/:id1" children={<SpecificCandidatesReview />} />
             <Route path="/board">
-              <MatchsBoard />
+              <MatchesBoard />
             </Route>
             <Route path="/faq">
               <Faq />

@@ -1,0 +1,15 @@
+@import './App';
+
+.headerDiv {
+    background: $colorBasic;
+    color: $colorEmphasisOrange;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: xxx-large;
+    font-weight: bolder;
+}
+  
+.displayNone {
+    display: none;
+}
