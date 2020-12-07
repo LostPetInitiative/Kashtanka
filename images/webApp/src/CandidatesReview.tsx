@@ -129,7 +129,7 @@ class CandidatesReview extends React.Component<PropsType, StateType> {
     renderLowerScreen() {
         const mainCard = (this.state.shownMainCard !== null) ? this.state.shownMainCard : null;
         return (
-            <div>
+            <div className="lower-screen">
                 <Thumbnails.CandidatesThumbnails
                     referenceCard={mainCard}
                     selectedCardFullID={this.state.shownCandFullID}
@@ -145,7 +145,7 @@ class CandidatesReview extends React.Component<PropsType, StateType> {
         const upperScreen = this.renderUpperScreen()
         const lowerScreen = this.renderLowerScreen()
         return (
-            <div>
+            <div className="CandidatesReview">
                 {upperScreen}
                 {lowerScreen}
             </div>

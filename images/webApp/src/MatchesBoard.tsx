@@ -1,7 +1,7 @@
 import * as React from "react";
 import "."
 import * as DataModel from "./DataModel"
-import "./MatchsBoard.scss"
+import "./MatchesBoard.scss"
 
 function MatchBoard(props: {}) {
     return (

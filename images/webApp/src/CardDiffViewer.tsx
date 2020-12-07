@@ -134,14 +134,16 @@ function CardDiffViewer(props: { card1: DataModel.AnimalCard, card2: DataModel.A
     return (
         <div>
             <table>
-                <tr>
-                    <td>Расстояние</td><td> ≈ {geoDistStr}</td>
-                </tr>
-                <tr>
-                    <td>Между событиями прошло</td><td> ≈ {timeDiffStr}</td>
-                </tr>
+                <tbody>
+                    <tr>
+                        <td>Расстояние</td><td> ≈ {geoDistStr}</td>
+                    </tr>
+                    <tr>
+                        <td>Между событиями прошло</td><td> ≈ {timeDiffStr}</td>
+                    </tr>
+                </tbody>
             </table>
-            {getFeaturesDifferences()}
+            {/* {getFeaturesDifferences()} */}
 
             {getSexWarning()}
             {getDifferentAnimalsWarning()}

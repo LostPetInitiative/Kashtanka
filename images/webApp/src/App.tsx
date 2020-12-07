@@ -7,7 +7,7 @@ import * as RestCardStorage from "./apiClients/RestApiCardStorage";
 import SolrGatewaySearcher from "./apiClients/SolrGatewaySearch"
 import Landing from "./Landing";
 import About from "./About";
-import MatchsBoard from "./MatchsBoard"
+import MatchBoard from "./MatchesBoard"
 import {
   HashRouter as Router,
   Switch,
@@ -16,6 +16,7 @@ import {
   useParams,
   useHistory
 } from "react-router-dom";
+import Header from "./Header"
 
 
 function SpecificCandidatesReview() {
@@ -33,8 +34,8 @@ function SpecificCandidatesReview() {
   var cardStorageURL:string
   var solrGatewayURL:string
   if(development) {
-    cardStorageURL = "http://10.0.3.211:3000"
-    solrGatewayURL = "http://10.0.3.211:3001"
+    cardStorageURL = "http://10.0.4.174:3000"
+    solrGatewayURL = "http://10.0.4.174:3001"
     // cardStorageURL = "https://kashtanka.pet/api/storage"
     // solrGatewayURL = "https://kashtanka.pet/api/search"
   } else {
@@ -63,9 +64,6 @@ function App() {
           <img id="headerLogo" src="./img/cat/1.jpg"></img>
         </NavLink>
         </div>
-        <div id="headerDiv">
-          <div id="headerTextDiv">Каштанка</div>
-        </div>
         <div id="appStateMenu">
           <div>
             <NavLink to="/candidatesReview/pet911ru/rl100268">Обзор совпадений</NavLink>
@@ -78,11 +76,12 @@ function App() {
           </div>
         </div>
         <div className="AppModeViewer">
+          <Header display={false}/>
           <Switch>
             <Route path="/candidatesReview/:ns1/:id1/:ns2/:id2" children={<SpecificCandidatesReview />} />
             <Route path="/candidatesReview/:ns1/:id1" children={<SpecificCandidatesReview />} />
             <Route path="/board">
-              <MatchsBoard />
+              <MatchBoard />
             </Route>
             <Route path="/about">
               <About />

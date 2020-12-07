@@ -62,20 +62,6 @@ $colorDark: #0D0000;
   margin-bottom: 0.3rem;
 }
 
-#headerDiv {
-  background: $colorBasic;
-  color: $colorEmphasisOrange;
-  grid-column-start: 2;
-  grid-column-end: 3;
-  grid-row-start: 1;
-  grid-row-end: 1;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  font-size: xxx-large;
-  font-weight: bolder;
-}
-
 #headerCornerDiv {
   background: $colorLight;
   color: $colorLight;

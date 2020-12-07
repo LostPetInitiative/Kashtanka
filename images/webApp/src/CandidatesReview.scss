@@ -11,3 +11,17 @@
 .right-sub-page {
   
 }
+
+.CandidatesReview {
+  display: grid;
+  grid-template-rows: 50% 50%;
+  max-height: 48rem;
+}
+
+.upper-screen {
+  min-height: 20rem;
+}
+
+.lower-screen {
+  min-height: 20rem;
+}

@@ -57,7 +57,7 @@ export function AnimalCardThumbnail(props: {
                 </div>
             </div>
             { card.photos.length > 0 &&
-                <img src={card.photos[0].srcUrl} />
+                <img src={card.photos[0].srcUrl} alt="Фото"/>
             }
             { card.photos.length === 0 &&
                 <p>Нет фото</p>
@@ -91,7 +91,7 @@ export class AnimalCardThumbnailById
 
     checkLoadedCard() {
         const neededFullID = this.props.namespace + "/" + this.props.localID;
-        if (this.state.loadedFullID != neededFullID) {
+        if (this.state.loadedFullID !== neededFullID) {
             // resetting and initiating background load
             this.setState({ loadedFullID: neededFullID, loadedCard: null })
             this.props.cardStorage.GetPetCard(this.props.namespace, this.props.localID).then(card => {
@@ -104,7 +104,7 @@ export class AnimalCardThumbnailById
     componentDidUpdate() { this.checkLoadedCard() }
 
     render() {
-        if (this.state.loadedCard != null) {
+        if (this.state.loadedCard !== null) {
             return <AnimalCardThumbnail card={this.state.loadedCard} refCard={this.props.refCard} isAccent={this.props.isAccented} />
         } else {
             return <p>Загрузка</p>
@@ -190,7 +190,7 @@ export class CandidatesThumbnails
                             if (this.props.selectedCardFullID !== null) {
                                 const foundIdx = relevantCards.findIndex(v => v.namespace + "/" + v.id === this.props.selectedCardFullID)
                                 if (foundIdx !== -1) {
-                                    const doNotifyNewSelection = foundIdx !== this.state.currentSelectionIdx
+                                    //const doNotifyNewSelection = foundIdx !== this.state.currentSelectionIdx
                                     this.setState({currentSelectionIdx : foundIdx})
                                 } else {
                                     this.setState({currentSelectionIdx : NaN})
@@ -231,7 +231,7 @@ export class CandidatesThumbnails
         const genPreview = ([foundCard, isAccent]: [ISearch.FoundCard, boolean]) => {
             const arrayKey = foundCard.namespace + "/" + foundCard.id
             return (
-                <div onClick={(e) => this.handleThumbnailSelection(arrayKey, e)}>
+                <div onClick={(e) => this.handleThumbnailSelection(arrayKey, e)} key={arrayKey}>
                     <AnimalCardThumbnailById
                         key={arrayKey}
                         refCard={refCard}

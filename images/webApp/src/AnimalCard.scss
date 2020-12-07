@@ -8,9 +8,12 @@
   box-shadow: 1px 1px 10px 0px $colorEmphasisGreen;
   color: $colorLight;
   font-size: medium;
-  padding: 1em;
+  padding: 0.5rem;
   text-align: left;
   position: relative;
+  max-width: 400px;
+  min-width: 220px;
+  min-height: 20rem;
 }
 
 .animalType {
@@ -52,6 +55,9 @@
 .cardInfo {
   display: flex;
   align-items: center;
+  font-size: small;
+  color: $colorEmphasisGreen;
+  margin: 0.2rem;
 }
 
 .cardInfo.leftOriented {
