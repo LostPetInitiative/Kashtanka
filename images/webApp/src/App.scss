@@ -53,7 +53,38 @@ $colorDark: #0D0000;
   display: flex;
   flex-direction: column;
   align-items: stretch;
+  width: 100%;
 }
+
+#appStateMenu .menuItem {
+  margin: 0px;
+  padding: 2px;
+  border: 2px #ffffff00 solid;
+  width: calc(100% - 8px);
+}
+
+#appStateMenu .menuItem img {
+  width: 100%;
+}
+
+#appStateMenu :not(.activePage) .menuItem img.active {
+  display: none;
+}
+
+#appStateMenu .activePage .menuItem img.active {
+  display: block;
+}
+
+
+#appStateMenu :not(.activePage) .menuItem img.inactive {
+  display: block;
+}
+
+#appStateMenu .activePage .menuItem img.inactive {
+  display: none;
+}
+
+
 
 .cardItemHeader {
   color: #898C37;
@@ -83,8 +114,8 @@ $colorDark: #0D0000;
 
 .parentDiv {
   display: grid;
-  grid-template-columns: 15% auto 3%;
-  grid-template-rows: 10% auto 10%;
+  grid-template-columns: 48px auto;
+  grid-template-rows: 10% auto;
   justify-items: stretch;
   justify-content: stretch;
   align-content: stretch;
