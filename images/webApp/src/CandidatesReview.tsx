@@ -34,6 +34,8 @@ class CandidatesReview extends React.Component<PropsType, StateType> {
     }
 
     checkLoadedData() {
+        document.title = "Каштанка - автоматический поиск потерянных и найденных домашних животных - Сравнение объявлений"
+
         if (this.state.shownMainFullID !== this.props.mainCardFullID) {
             this.setState({
                 shownMainFullID: this.props.mainCardFullID,
