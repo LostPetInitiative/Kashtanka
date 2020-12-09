@@ -1,5 +1,6 @@
+import { stringify } from "querystring";
 import { EndOfFileToken } from "typescript";
-import * as ISearch  from "./ISearch";
+import * as ISearch from "./ISearch";
 
 type FoundCard = {
     id: string,
@@ -12,12 +13,12 @@ type EndOfStreamMarker = {
 }
 
 type SolrSuccessfulStream = {
-    "result-set" : {
+    "result-set": {
         "docs": (FoundCard | EndOfStreamMarker)[]
     }
 }
 
-function isEndOfTheStream(elem:FoundCard | EndOfStreamMarker): elem is EndOfStreamMarker {
+function isEndOfTheStream(elem: FoundCard | EndOfStreamMarker): elem is EndOfStreamMarker {
     return (<EndOfStreamMarker>elem).EOF !== undefined;
 }
 
@@ -32,16 +33,71 @@ type GatewayRequest = {
 }
 
 class SolrGatewaySearch implements ISearch.ISearch {
-    private gatewayAddr: string;
-    private matchedCardsSearchURL : string;
+    private readonly gatewayAddr: string;
+    private readonly matchedCardsSearchURL: string;
+    private readonly latestCardsSearchURL: string;
 
     constructor(gatewayAddr: string) {
         this.gatewayAddr = gatewayAddr;
-        this.matchedCardsSearchURL = gatewayAddr +"/MatchedCardsSearch";
+        this.matchedCardsSearchURL = gatewayAddr + "/MatchedCardsSearch";
+        this.latestCardsSearchURL = gatewayAddr + "/latestCards"
     }
 
-    async GetRelevantCards(lat: number, lon: number, animal: ISearch.Animal, eventType: ISearch.EventType, EventTime: Date, featuresIdent: string, features: number[]): Promise<ISearch.SearchResult> {
-        var gatewayRequest:GatewayRequest = {
+    async GetLatestCards(maxCardNumber: number, cardType: ISearch.LatestCardSearchType): Promise<ISearch.FoundCard[]> {
+        const requestParams: {
+            [key: string]: string;
+        } = {}
+
+        switch (cardType) {
+            case ISearch.LatestCardSearchType.Found: requestParams["cardType"] = "Found"; break;
+            case ISearch.LatestCardSearchType.Lost: requestParams["cardType"] = "Lost"; break;
+            default: break;
+        }
+        if (maxCardNumber) {
+            requestParams["maxCardsCount"] = maxCardNumber.toFixed(0);
+        }
+
+        const queryParamsArray: string[] = []
+
+        for (let key in requestParams) {
+            let value = requestParams[key];
+            queryParamsArray.push(key + "=" + value)
+        }
+        const query = queryParamsArray.join("&")
+
+        var queryStr: string = (query.length > 0) ? ("?" + query) : ""
+
+        const requstURL = this.latestCardsSearchURL + queryStr;
+
+        var fetchRes = await fetch(requstURL, {
+            headers: {
+                'Accept': 'application/json'
+            }
+        });
+        if (fetchRes.ok) {
+            const fetchedObj = await fetchRes.json();
+            const docs: {'id':string}[] = fetchedObj['response']['docs']
+
+            const parseId = (arg: {'id' : string}) => {
+                const split=arg.id.split('/')
+                const res: ISearch.FoundCard = {
+                    namespace: split[0],
+                    id: split[1]
+                }
+                return res;
+            }
+
+            return docs.map(parseId);
+        } else {
+            var errorMess = "Non successful error code " + fetchRes.status + " for fetching latest cards: " + fetchRes.statusText;
+            console.error(errorMess)
+            return [];
+        }
+
+    }
+
+    async GetRelevantCards(lat: number, lon: number, animal: ISearch.Animal, eventType: ISearch.EventType, EventTime: Date, featuresIdent: string, features: number[]): Promise<ISearch.SimilarSearchResult> {
+        var gatewayRequest: GatewayRequest = {
             Lat: lat,
             Lon: lon,
             Animal: animal,
@@ -51,20 +107,21 @@ class SolrGatewaySearch implements ISearch.ISearch {
             Features: features
         }
         var fetchRes = await fetch(this.matchedCardsSearchURL, {
-            method:"POST",
+            method: "POST",
             headers: {
                 'Accept': 'application/json',
                 'Content-Type': 'application/json'
-              },
-            body: JSON.stringify(gatewayRequest)})
-        if(fetchRes.ok) {
-            const parsed:SolrSuccessfulStream = await fetchRes.json()
-            const result:ISearch.FoundCard[] = []
+            },
+            body: JSON.stringify(gatewayRequest)
+        })
+        if (fetchRes.ok) {
+            const parsed: SolrSuccessfulStream = await fetchRes.json()
+            const result: ISearch.FoundSimilarCard[] = []
             var i = 0;
             const docs = parsed["result-set"].docs;
-            while((i<docs.length)) {
+            while ((i < docs.length)) {
                 var current = docs[i]
-                if(isEndOfTheStream(current)) {
+                if (isEndOfTheStream(current)) {
                     break;
                 } else {
                     const parts = current.id.split('/')
@@ -74,13 +131,13 @@ class SolrGatewaySearch implements ISearch.ISearch {
                         similarity: current.similarity
                     });
                 }
-                i++;          
+                i++;
             }
             return result;
         } else {
-            var errorMess = "Non successful error code "+fetchRes.status+" for fetching relevant cards: "+fetchRes.statusText;
+            var errorMess = "Non successful error code " + fetchRes.status + " for fetching relevant cards: " + fetchRes.statusText;
             console.error(errorMess)
-            return {ErrorMessage: errorMess}
+            return { ErrorMessage: errorMess }
         }
     }
 }

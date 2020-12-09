@@ -384,7 +384,7 @@ spec:
               topologyKey: "kubernetes.io/hostname"
       containers:
       - name: gateway
-        image: lostpetinitiative/search-api-gateway:0.1.7
+        image: lostpetinitiative/search-api-gateway:0.2.1
         resources:
           limits:
             memory: "128Mi"

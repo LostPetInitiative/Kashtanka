@@ -115,7 +115,7 @@ export class AnimalCardThumbnailById
 
 type CandidatesThumbnailsStateType = {
     shownReferenceCardId: string,
-    loadedRelevantCards: ISearch.SearchResult | null,
+    loadedRelevantCards: ISearch.SimilarSearchResult | null,
     currentSelectionIdx: number
 }
 
@@ -181,9 +181,9 @@ export class CandidatesThumbnails
                     card.eventTime,
                     featuresIdent,
                     card.features[featuresIdent]).then(relevantSearchRes => {
-                        if (ISearch.IsResultSuccessful(relevantSearchRes)) {
+                        if (ISearch.IsSimilarResultSuccessful(relevantSearchRes)) {
                             console.log("Got relevant cards for " + requestedFullID)
-                            const relevantCards = relevantSearchRes as ISearch.FoundCard[]
+                            const relevantCards = relevantSearchRes as ISearch.FoundSimilarCard[]
                             this.setState({ loadedRelevantCards: relevantCards })
 
                             // trying to set proper selected relevant card by looking for the desired card
@@ -217,7 +217,7 @@ export class CandidatesThumbnails
             this.props.selectionChanged(fullID)
         }
         if (this.state.loadedRelevantCards !== null) {
-            if (ISearch.IsResultSuccessful(this.state.loadedRelevantCards)) {
+            if (ISearch.IsSimilarResultSuccessful(this.state.loadedRelevantCards)) {
                 const foundIdx = this.state.loadedRelevantCards.findIndex(card => (card.namespace + "/" + card.id) === fullID)
                 if (foundIdx !== -1) {
                     this.setState({ currentSelectionIdx: foundIdx })
@@ -228,7 +228,7 @@ export class CandidatesThumbnails
 
     getRelevantCards(refCard: DataModel.AnimalCard | null) {
         const that = this;
-        const genPreview = ([foundCard, isAccent]: [ISearch.FoundCard, boolean]) => {
+        const genPreview = ([foundCard, isAccent]: [ISearch.FoundSimilarCard, boolean]) => {
             const arrayKey = foundCard.namespace + "/" + foundCard.id
             return (
                 <div onClick={(e) => this.handleThumbnailSelection(arrayKey, e)} key={arrayKey}>
@@ -245,9 +245,9 @@ export class CandidatesThumbnails
         if (this.state.loadedRelevantCards === null) {
             return <p>Загрузка совпадений...</p>;
         } else {
-            if (ISearch.IsResultSuccessful(this.state.loadedRelevantCards)) {
+            if (ISearch.IsSimilarResultSuccessful(this.state.loadedRelevantCards)) {
                 const selectedIdx = this.state.currentSelectionIdx % this.state.loadedRelevantCards.length
-                var previews = this.state.loadedRelevantCards.map((card, idx) => [card, (idx === selectedIdx)] as [ISearch.FoundCard, boolean]).map(genPreview)
+                var previews = this.state.loadedRelevantCards.map((card, idx) => [card, (idx === selectedIdx)] as [ISearch.FoundSimilarCard, boolean]).map(genPreview)
                 if (previews.length === 0)
                     previews = [<p>Нет совпадений =(</p>]
                 return <div className="thumbnails-container">{previews}</div>

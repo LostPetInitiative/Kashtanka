@@ -55,7 +55,7 @@ spec:
       namespace: kashtanka
       port: 80
   # storage rest api
-  - match: Host(`kashtanka.pet`) && PathPrefix(`/api/storage`)
+  - match: Host(`kashtanka.pet`) && PathPrefix(`/api/storage`) && Method(`GET`)
     kind: Rule
     middlewares:
     - name: demo-access-auth
@@ -65,7 +65,7 @@ spec:
     - name: cassandra-rest-api
       port: 80
   # solr gateway rest api
-  - match: Host(`kashtanka.pet`) && PathPrefix(`/api/search`)
+  - match: Host(`kashtanka.pet`) && PathPrefix(`/api/search`) && Method(`GET`,`POST`)
     kind: Rule
     middlewares:
     - name:  demo-access-auth
