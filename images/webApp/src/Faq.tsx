@@ -3,6 +3,10 @@ import Header from "./Header"
 import "./Faq.scss"
 
 function Faq(props : {}) {
+    React.useEffect(() => {
+        document.title = "Каштанка - автоматический поиск потерянных и найденных домашних животных - Вопросы и ответы"
+    })
+
     return (
         <div>
             <Header />
