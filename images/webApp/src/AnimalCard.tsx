@@ -10,17 +10,17 @@ function AnimalCard(props : {card: DataModel.AnimalCard}) {
     function animalType(animalType: DataModel.Animal, animalGender: DataModel.Sex) {
         if(animalType == DataModel.Animal.Dog) {
             if(animalGender == DataModel.Sex.Female)
-                return <img src="./img/dog/female.svg" className="animalTypeImg"/>;
+                return <div className="iconAnimal iconDogF"/>;
             else if(animalGender == DataModel.Sex.Male)
-                return <img src="./img/dog/male2.svg" className="animalTypeImg"/>;
-            return  <img src="./img/dog/dog.svg" className="animalTypeImg"/>;
+                return <div className="iconAnimal iconDogM"/>;
+            return <div className="iconAnimal iconDog"/>;
         }
         else if(animalType == DataModel.Animal.Cat) {
             if(animalGender == DataModel.Sex.Female)
-                return <img src="./img/cat/female.svg" className="animalTypeImg"/>;
+                return <div className="iconAnimal iconCatF"/>;
             else if(animalGender == DataModel.Sex.Male)
-                return <img src="./img/cat/male.svg" className="animalTypeImg"/>;
-            return  <img src="./img/cat/cat.svg" className="animalTypeImg"/>;
+                return <div className="iconAnimal iconCatM"/>;
+            return  <div className="iconAnimal iconCat"/>;
         }
         else return "Животное";
     }
@@ -51,18 +51,22 @@ function AnimalCard(props : {card: DataModel.AnimalCard}) {
 
     return (
         <div className="animalCard">
-            <div className={"cardHeader " + cardTypeClass(card.cardType)}> {cardTypeString(card.cardType)} </div>
-            <div className={"cardInfo " + cardTypeClass(card.cardType)} title={animalGenderString(card.animalSex)}>
-                <div className="cardDate" title="Когда?"> {card.eventTime.toLocaleDateString()} </div>
-                <div className="cardCoordsNumbers" title="Где?"> {card.location.address} </div>
+            <div className="headerLine">
+                <div className={"cardHeader " + cardTypeClass(card.cardType)}> {cardTypeString(card.cardType)} </div>
+                <div className={"cardInfo " + cardTypeClass(card.cardType)} title={animalGenderString(card.animalSex)}>
+                    <div className="cardDate" title="Когда?"> {card.eventTime.toLocaleDateString()} </div>
+                    <div className="cardCoordsNumbers" title="Где?"> {card.location.address} </div>
+                </div>
+                <div className={"animalType " + cardTypeClass(card.cardType)}> {animalType(card.animal, card.animalSex)} </div>
             </div>
-            <div className={"animalType " + cardTypeClass(card.cardType)}> {animalType(card.animal, card.animalSex)} </div>
-            <div className={"cardImgViewer " + cardTypeClass(card.cardType)}>
-                <CarouselImgViewer imgSrcArray={card.photos}></CarouselImgViewer>
-            </div>
-            <div className={"cardComment " + cardTypeClass(card.cardType)}>
-                <div className="cardItemHeader"> Комментарий </div>
-                <div> {card.contactInfo.comment} </div>
+            <div className={"animalCardMain " + cardTypeClass(card.cardType)}>
+                <div className={"cardImgViewer " + cardTypeClass(card.cardType)}>
+                    <CarouselImgViewer imgSrcArray={card.photos}></CarouselImgViewer>
+                </div>
+                <div className={"cardComment " + cardTypeClass(card.cardType)}>
+                    <div className="cardItemHeader"> Комментарий </div>
+                    <div className="cardCommentText"> {card.contactInfo.comment} </div>
+                </div>
             </div>
         </div>
     );

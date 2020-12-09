@@ -14,14 +14,15 @@
 
 .CandidatesReview {
   display: grid;
-  grid-template-rows: 50% 50%;
+  grid-template-rows: 60% 40%;
   max-height: 48rem;
+  height: 100vh;
 }
 
 .upper-screen {
-  min-height: 20rem;
+  //min-height: 20rem;
 }
 
 .lower-screen {
-  min-height: 20rem;
+  margin: 0.5rem 0 0 0;
 }

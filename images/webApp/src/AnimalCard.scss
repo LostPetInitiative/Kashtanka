@@ -11,24 +11,27 @@
   padding: 0.5rem;
   text-align: left;
   position: relative;
-  max-width: 400px;
   min-width: 220px;
+  max-width: 400px;
   min-height: 20rem;
+  max-height: 60vh;
 }
 
 .animalType {
-  display: inline;
-  position: absolute;
-  top: 0;
-  margin: 0.3rem;
+  //display: inline;
+  //position: absolute;
+  //top: 0;
+  //margin: 0.3rem;
 }
 
 .animalType.leftOriented {
   right: 0;
+  order: 3;
 }
 
 .animalType.rightOriented {
   left: 0;
+  order: 1;
 }
 
 .animalTypeImg {
@@ -37,27 +40,30 @@
 }
 
 .cardHeader {
-  font-size: larger;
   color: $colorEmphasisOrange;
   font-weight: bold;
   font-size: x-large;
+  min-width: 125px;
 }
 
 .cardHeader.leftOriented {
-  text-align: left;
+  //text-align: left;
+  order: 1;
 }
 
 .cardHeader.rightOriented {
-  text-align: right;
-  margin-left: 2rem;
+  //margin-left: 2rem;
+  order: 3;
 }
 
 .cardInfo {
-  display: flex;
+  text-overflow: ellipsis;
+  display: inline-block;
   align-items: center;
   font-size: small;
   color: $colorEmphasisGreen;
-  margin: 0.2rem;
+  margin: 0 0.5rem 0 0.5rem;
+  order: 2;
 }
 
 .cardInfo.leftOriented {
@@ -69,7 +75,7 @@
 }
 
 .cardDate {
-  margin: 0 0.5rem;
+  //margin: 0 0.5rem;
 }
 
 .cardCoordsNumber {
@@ -77,9 +83,87 @@
 }
 
 .cardImgViewer.rightOriented {
-  float: left
+  grid-column: 1 / span 1;
+  padding-right: 0.5rem;
 }
 
 .cardImgViewer.leftOriented {
-  float: right
+  grid-column: 2 / span 1;
+  padding-right: 0.5rem;
+}
+
+.iconAnimal {
+  width: 41px;
+  height: 41px;
+  background-size: cover;
+}
+
+.iconDog {
+  background-image: url("./img/dog/dog.svg");
+  width: 48px;
+  height: 41px;
+}
+
+.iconDogF {
+  background-image: url("./img/dog/female.svg");
+  width: 40px;
+  height: 46px;
+}
+
+.iconDogM {
+  background-image: url("./img/dog/male.svg");
+}
+
+.iconCat {
+  background-image: url("./img/cat/cat.svg");
+}
+
+.iconCatF {
+  background-image: url("./img/cat/female.svg");
+}
+
+.iconCatM {
+  background-image: url("./img/cat/male.svg");
+}
+
+.iconAnimal:hover,
+.iconAnimal:focus {
+  fill: $colorEmphasisOrange;
+  stroke: $colorEmphasisGreen;
+}
+
+.headerLine {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.cardCommentText {
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+.cardComment.leftOriented {  
+  grid-column: 1 / span 1;
+  grid-row: 1;
+}
+
+.cardComment.rightOriented {  
+  grid-column: 2 / span 1;
+  grid-row: 1;
+}
+
+.animalCardMain {
+  display: grid;
+  column-gap: 0.5rem;
+  max-height: 60vh;
+  margin: 0.5rem 0 0 0;
+}
+
+.animalCardMain.leftOriented {
+  grid-template-columns: 40% 60%;
+}
+
+.animalCardMain.rightOriented {
+  grid-template-columns: 60% 40%;
 }
