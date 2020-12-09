@@ -1,0 +1,15 @@
+div.faq-page {
+    margin: 1em;
+}
+
+div.logos-container {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-evenly;   
+    flex-wrap: wrap; 
+}
+
+div.logos-container img {
+    max-height: 60px;
+    margin: 25px;
+}
