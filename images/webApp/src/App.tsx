@@ -128,7 +128,7 @@ function LandingWithLatestCards() {
   }
 
   return (
-    <div>
+    <div className="landing-container">
       <Landing />
       <LatestCards
         cardsToShow={5}

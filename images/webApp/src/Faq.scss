@@ -1,5 +1,9 @@
+//@import "Header.scss";
+
 div.faq-page {
     margin: 1em;
+    height: calc(100% - 1.5em);
+    overflow: hidden;
 }
 
 div.logos-container {
