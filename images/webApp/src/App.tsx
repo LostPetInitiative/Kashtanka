@@ -4,10 +4,11 @@ import './App.scss';
 import CandidatesReview from './CandidatesReview'
 import "./apiClients/RestApiCardStorage"
 import ICardStorage from "./apiClients/ICardStorage"
-import * as ISearch  from "./apiClients/ISearch"
+import * as ISearch from "./apiClients/ISearch"
 import * as RestCardStorage from "./apiClients/RestApiCardStorage";
 import SolrGatewaySearcher from "./apiClients/SolrGatewaySearch"
 import Landing from "./Landing";
+import LatestCards from "./LatestCardsPreview"
 import Faq from "./Faq"
 import MatchesBoard from "./MatchesBoard"
 import {
@@ -34,28 +35,28 @@ if (development) {
   solrGatewayURL = "api/search"
 }
 
-const cardStorage:ICardStorage = new RestCardStorage.CardStorage(cardStorageURL);
-const searchEngine:ISearch.ISearch = new SolrGatewaySearcher(solrGatewayURL)
+const cardStorage: ICardStorage = new RestCardStorage.CardStorage(cardStorageURL);
+const searchEngine: ISearch.ISearch = new SolrGatewaySearcher(solrGatewayURL)
 
 class LatestFoundCardCandidatesReview extends React.Component<{},
   {
-    'latestFoundCardID':([string,string] | null),    
+    'latestFoundCardID': ([string, string] | null),
   }> {
   constructor(props: {}) {
     super(props);
 
-    this.state = {latestFoundCardID : null}
+    this.state = { latestFoundCardID: null }
   }
 
   componentDidMount() {
-    searchEngine.GetLatestCards(1,ISearch.LatestCardSearchType.Found).then(cards => {
+    searchEngine.GetLatestCards(1, ISearch.LatestCardSearchType.Found).then(cards => {
       const latestCard = cards[0]
-      this.setState({latestFoundCardID: [latestCard.namespace,latestCard.id]})
+      this.setState({ latestFoundCardID: [latestCard.namespace, latestCard.id] })
     });
   }
 
   render() {
-    if(this.state.latestFoundCardID === null) {
+    if (this.state.latestFoundCardID === null) {
       return (
         <p>Поиск самого свежего объявления о находке...</p>
       )
@@ -63,7 +64,7 @@ class LatestFoundCardCandidatesReview extends React.Component<{},
       const ns1 = this.state.latestFoundCardID[0]
       const id1 = this.state.latestFoundCardID[1]
       const fullMainID = ns1 + "/" + id1
-      return <Redirect to={"/candidatesReview/"+fullMainID} />
+      return <Redirect to={"/candidatesReview/" + fullMainID} />
     }
   }
 }
@@ -120,7 +121,29 @@ function Menu() {
   )
 }
 
+function LandingWithLatestCards() {
+  const history = useHistory()
+  const navigateToSpecificCard = (fullID: string) => {
+    history.push("/candidatesReview/" + fullID)
+  }
+
+  return (
+    <div>
+      <Landing />
+      <LatestCards
+        cardsToShow={5}
+        cardsTypeToShow={ISearch.LatestCardSearchType.Found}
+        cardStorage={cardStorage}
+        searcher={searchEngine}
+        previewClicked={(e) => navigateToSpecificCard(e)}
+      />
+    </div>
+  )
+}
+
 function App() {
+
+
 
   return (
     <Router>
@@ -138,7 +161,7 @@ function App() {
               <Faq />
             </Route>
             <Route path="/">
-              <Landing />
+              <LandingWithLatestCards />
             </Route>
           </Switch>
         </div>
