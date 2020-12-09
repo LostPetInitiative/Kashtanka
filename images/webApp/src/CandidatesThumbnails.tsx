@@ -6,6 +6,7 @@ import * as Comp from "./computations"
 import * as Utils from "./Utils"
 import * as ISearch from "./apiClients/ISearch"
 import "./CandidatesThumbnails.scss"
+import { idText } from "typescript";
 
 export function AnimalCardThumbnail(props: {
     card: DataModel.AnimalCard,
@@ -25,11 +26,14 @@ export function AnimalCardThumbnail(props: {
 
     var timeString
     if (props.refCard !== null) {
-        const date1 = new Date(props.card.eventTime)
-        const date2 = new Date(props.refCard.eventTime)
+        const date1 = props.card.eventTime
+        const date2 = props.refCard.eventTime
         timeString = Utils.getTimeDiffString(Math.abs(date1.getTime() - date2.getTime()))
-    } else
-        timeString = new Date(props.card.eventTime).toLocaleString()
+    } else {
+        const now = new Date()
+        const diffMs = (now.getTime() - props.card.cardCreationTime.getTime())
+        timeString = Utils.getTimeDiffString(diffMs)+" назад"
+    }
 
     var simString = ""
     if (props.refCard !== null) {
@@ -51,7 +55,7 @@ export function AnimalCardThumbnail(props: {
         <div className={thumbnailContainerClassName}>
             <div className="overlay-info-anchor">
                 <div className="overlay-info">
-                    <p className="overlay-text-bold">{simString}</p>
+                    {/* <p className="overlay-text-bold">{simString}</p> */}
                     <p className="overlay-text">{timeString}</p>
                     <p className="overlay-text">{geoString}</p>
                 </div>
