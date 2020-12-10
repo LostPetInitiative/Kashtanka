@@ -43,7 +43,7 @@ class CarouselImgViewer extends React.Component<PropsType, StateType> {
     render() {
       return (
           <div className="carouselImgViewer">
-              <div className="carouselImgViewerMainPhoto">
+              <div className={`carouselImgViewerMainPhoto ${this.props.imgSrcArray.length > 1 ? "" : "onePhotoCard"}`}>
                   <img alt="Фото животного" src={this.props.imgSrcArray[this.state.selectedIndx].srcUrl} className="carouselImgViewerMainImg"/>
               </div>
               <div className={`carouselImgViewer2row ${this.props.imgSrcArray.length > 1 ? "" : "displayNone"}`}>

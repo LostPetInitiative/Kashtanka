@@ -1,12 +1,10 @@
 @import './App';
 
 .carouselImgViewer {
-    display: grid;
+    //display: grid;
     //grid-template-columns: 2rem auto 2rem;
     //grid-template-rows: auto auto 1rem;
-    grid-template-rows: 2fr 1fr;
-    grid-template-columns: auto;
-    height: calc(60vh - 1.2rem - 41px);
+    height: calc(60vh - 1.7rem - 41px);
   }
   
   .carouselImgViewerMainPhoto {
@@ -17,23 +15,25 @@
     min-width: 255px;
     align-items: center;
     display: flex;
-    height: calc((60vh - 1.2rem - 41px) * 2 / 3);
+    height: calc((60vh - 1.7rem - 41px) * 0.6);
   }
   
   .carouselImgViewerMainImg {
+    width: 100%;
     height: 100%;
+    object-fit: contain;
   }
 
   .carouselImgViewer2row {
     display: grid;
-    grid-template-rows: auto auto;
+    grid-template-rows: 90% 10%;
     grid-template-columns: 1rem auto 1rem;
-    grid-row: 2 / span 1;
+    height: calc((60vh - 1.7rem - 41px) * 0.4);
   }
   
   .carouselImgViewerGoLeft {
     grid-column: 1 / span 1;
-    grid-row: 1 / span 3;
+    grid-row: 1 / span 1;
     align-self: center;
     cursor: pointer;
   }
@@ -69,4 +69,6 @@
     color: $colorEmphasisGreen;
   }
   
-  
+  .carouselImgViewerMainPhoto.onePhotoCard {
+    height: calc(60vh - 1.7rem - 41px);
+  }
