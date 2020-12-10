@@ -11,6 +11,7 @@ import Landing from "./Landing";
 import LatestCards from "./LatestCardsPreview"
 import Faq from "./Faq"
 import MatchesBoard from "./MatchesBoard"
+import Tracker from "./MatomoTracker"
 import {
   HashRouter as Router,
   Switch,
@@ -142,11 +143,11 @@ function LandingWithLatestCards() {
 }
 
 function App() {
-
-
-
   return (
     <Router>
+      {(!development) &&
+        <Tracker trackerHostName={"matomo.grechka.family"} />
+      }
       <div className="parentDiv">
         <Menu />
         <div className="AppModeViewer">
