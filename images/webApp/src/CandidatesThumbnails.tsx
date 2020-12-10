@@ -259,12 +259,20 @@ export class CandidatesThumbnails
         }
     }
 
+    wheel(e:React.WheelEvent<HTMLDivElement>) {
+        const delta = Math.max(-1, Math.min(1, (e.deltaX || e.deltaY)))
+        e.currentTarget.scrollLeft += (delta * 50)
+        e.preventDefault()
+    }
+
     render() {
         if (this.props.referenceCard !== null) {
             const releavantCards = this.getRelevantCards(this.props.referenceCard);
             return (
-                <div className="page">
-                    <p>Возможные совпадения</p>
+                <div className="page" onWheel={e => this.wheel(e)}>
+                    <div className="title-container">
+                        <p>Возможные совпадения:</p>
+                    </div>
                     {releavantCards}
                 </div>
             )
