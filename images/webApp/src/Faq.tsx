@@ -8,9 +8,9 @@ function Faq(props : {}) {
     })
 
     return (
-        <div>
+        <div className="faq-page">
             <Header />
-            <div className="faq-page">
+            <div className="faq-text">
                 <h2>Как я могу стать волонтером?</h2>
                 <p className="answer">Волонотеры имеют доступ к управлению <a href='#/board'>карточками совпадений</a>.
                 Благодаря карточкам ясно, каким животным занимается какой волонтер.
