@@ -64,7 +64,7 @@ class LatestCardsPreview extends React.Component<PropsType, StateType> {
         if (this.state.foundCards === null) {
             return <p>Загружаю самые свежие объявления...</p>
         } else {
-            if (this.state.foundCards.length == 0) {
+            if (this.state.foundCards.length === 0) {
                 return <p>Не удалось загрузить свежие объявления</p>
             } else {
                 const cardToViewer = (card: ISearch.FoundCard, idx: number, array: ISearch.FoundCard[]) => {

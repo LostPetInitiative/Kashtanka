@@ -32,7 +32,7 @@ class CarouselImgViewer extends React.Component<PropsType, StateType> {
     carouselDots(total : number, selected : number) {
         const dotsArr: JSX.Element[] = [];
         for (let i = 0; i < total; i++) {
-            dotsArr.push(<div className={`carouselDot ${selected != i ? "" : "carouselSelectedDot"}`} onClick={() => this.selectIndex(total, i)} key={i.toString()}>▢</div>);
+            dotsArr.push(<div className={`carouselDot ${selected !== i ? "" : "carouselSelectedDot"}`} onClick={() => this.selectIndex(total, i)} key={i.toString()}>▢</div>);
         }
     
         return (
@@ -44,7 +44,7 @@ class CarouselImgViewer extends React.Component<PropsType, StateType> {
       return (
           <div className="carouselImgViewer">
               <div className="carouselImgViewerMainPhoto">
-                  <img src={this.props.imgSrcArray[this.state.selectedIndx].srcUrl} className="carouselImgViewerMainImg"/>
+                  <img alt="Фото животного" src={this.props.imgSrcArray[this.state.selectedIndx].srcUrl} className="carouselImgViewerMainImg"/>
               </div>
               <div className="carouselImgViewerGoLeft" onClick={() => this.decreaseIndex(this.props.imgSrcArray.length)}>⇦</div>
               <div className="carouselImgViewerMiniPhotos">

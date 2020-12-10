@@ -1,11 +1,6 @@
 import * as React from 'react'
 
 class Tracker extends React.Component<{trackerHostName:string},{}> {
-    constructor(props:{trackerHostName:string})
-    {
-        super(props)
-    }
-
     componentDidMount() {
         const script = document.createElement("script");
         script.innerHTML = `

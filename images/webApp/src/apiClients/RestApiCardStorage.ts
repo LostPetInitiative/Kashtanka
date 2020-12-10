@@ -46,7 +46,7 @@ export class CardStorage implements ICardStorage {
     GetPetCardByFullID(fullID: string): Promise<DataModel.AnimalCard> {
         const split = fullID.split('/')
         if (split.length !== 2)
-            throw "Can't find / in the full id " + fullID
+            throw new Error("Can't find / in the full id " + fullID)
         return this.GetPetCard(split[0], split[1])
     }
 
