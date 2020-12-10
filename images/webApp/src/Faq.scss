@@ -1,9 +1,13 @@
 //@import "Header.scss";
 
 div.faq-page {
+    height: 100vh;
+}
+
+div.faq-text {
     margin: 1em;
     height: calc(100% - 1.5em);
-    overflow: hidden;
+    overflow: auto;
 }
 
 div.logos-container {

@@ -2,6 +2,7 @@
 
 .page {
   display: flex;
+  overflow-x: auto;
 }
 
 .left-sub-page {
@@ -23,5 +24,7 @@
 }
 
 .lower-screen {
-  margin: 0.5rem 0 0 0;
+  //margin: 0.5rem 0 0 0;
+  height: 100%;
+  width: calc(100vw - 48px);
 }

@@ -119,9 +119,35 @@ $colorDark: #0D0000;
   justify-items: stretch;
   justify-content: stretch;
   align-content: stretch;
-  height: 100vh;
+  height: 100%;
+  overflow: hidden;
 }
 
 div.landing-container {
   height: 100%;
+}
+
+html, body, div.root {
+    height: 100%;
+}
+
+/* Works on Firefox */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: $colorEmphasisOrange $colorBasic;
+}
+
+/* Works on Chrome, Edge, and Safari */
+*::-webkit-scrollbar {
+  width: 12px;
+}
+
+*::-webkit-scrollbar-track {
+  background: orange;
+}
+
+*::-webkit-scrollbar-thumb {
+  background-color: $colorEmphasisOrange;
+  border-radius: 20px;
+  border: 3px solid $colorBasic;
 }
