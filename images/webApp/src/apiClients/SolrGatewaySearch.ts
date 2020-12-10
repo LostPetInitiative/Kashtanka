@@ -1,5 +1,3 @@
-import { stringify } from "querystring";
-import { EndOfFileToken } from "typescript";
 import * as ISearch from "./ISearch";
 
 type FoundCard = {
@@ -19,7 +17,7 @@ type SolrSuccessfulStream = {
 }
 
 function isEndOfTheStream(elem: FoundCard | EndOfStreamMarker): elem is EndOfStreamMarker {
-    return (<EndOfStreamMarker>elem).EOF !== undefined;
+    return (elem as EndOfStreamMarker).EOF !== undefined;
 }
 
 type GatewayRequest = {

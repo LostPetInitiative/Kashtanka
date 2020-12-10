@@ -21,7 +21,6 @@ import {
   useHistory,
   Redirect
 } from "react-router-dom";
-import Header from "./Header"
 
 const development = window.location.hostname === "localhost"
 var cardStorageURL: string
@@ -97,7 +96,7 @@ function Menu() {
     <div id="appStateMenu">
       <div id="headerCornerDiv">
         <NavLink to="/">
-          <img id="headerLogo" src="./img/cat/1.jpg"></img>
+          <img id="headerLogo" alt="Логотип Каштанки" src="./img/cat/1.jpg"></img>
         </NavLink>
       </div>
       <NavLink to="/board" activeClassName="activePage">

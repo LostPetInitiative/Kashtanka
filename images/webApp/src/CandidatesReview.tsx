@@ -2,7 +2,6 @@ import * as React from "react";
 import * as DataModel from "./DataModel"
 import ICardStorage from "./apiClients/ICardStorage"
 import * as ISearch from "./apiClients/ISearch"
-import AnimalCard from "./AnimalCard"
 import * as Thumbnails from "./CandidatesThumbnails"
 import * as TwoCards from "./TwoCards"
 import "./CandidatesReview.scss"
@@ -101,14 +100,14 @@ class CandidatesReview extends React.Component<PropsType, StateType> {
                 leftCardAssignment = card
                 if (this.state.shownCandCard !== null) {
                     rightCardAssignment = this.state.shownCandCard
-                } else if (this.state.shownCandFullID == "") {
+                } else if (this.state.shownCandFullID === "") {
                     rightCardAssignment = "unassigned"
                 }
             } else {
                 rightCardAssignment = card
                 if (this.state.shownCandCard !== null) {
                     leftCardAssignment = this.state.shownCandCard
-                } else if (this.state.shownCandFullID == "") {
+                } else if (this.state.shownCandFullID === "") {
                     leftCardAssignment = "unassigned"
                 }
             }

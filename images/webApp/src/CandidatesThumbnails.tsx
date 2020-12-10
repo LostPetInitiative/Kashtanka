@@ -6,7 +6,6 @@ import * as Comp from "./computations"
 import * as Utils from "./Utils"
 import * as ISearch from "./apiClients/ISearch"
 import "./CandidatesThumbnails.scss"
-import { idText } from "typescript";
 
 export function AnimalCardThumbnail(props: {
     card: DataModel.AnimalCard,
@@ -35,27 +34,11 @@ export function AnimalCardThumbnail(props: {
         timeString = Utils.getTimeDiffString(diffMs)+" назад"
     }
 
-    var simString = ""
-    if (props.refCard !== null) {
-        const featuresIdents1 = Object.keys(props.card.features)
-        const featuresIdents2 = Object.keys(props.card.features)
-
-        const featuresIdentsIntersection = featuresIdents1.filter(value => featuresIdents2.includes(value))
-        if (featuresIdentsIntersection.length > 0) {
-            const featuresIdent = featuresIdentsIntersection[0]
-            const feat1 = props.card.features[featuresIdent]
-            const feat2 = props.refCard.features[featuresIdent]
-            const cosSim = Comp.cosSimilarity(feat1, feat2)
-            simString = cosSim.toFixed(3)
-        }
-    }
-
     const thumbnailContainerClassName = "thumbnail-container" + (props.isAccent ? " accent" : "")
     return (
         <div className={thumbnailContainerClassName}>
             <div className="overlay-info-anchor">
                 <div className="overlay-info">
-                    {/* <p className="overlay-text-bold">{simString}</p> */}
                     <p className="overlay-text">{timeString}</p>
                     <p className="overlay-text">{geoString}</p>
                 </div>
@@ -259,12 +242,20 @@ export class CandidatesThumbnails
         }
     }
 
+    wheel(e:React.WheelEvent<HTMLDivElement>) {
+        const delta = Math.max(-1, Math.min(1, (e.deltaX || e.deltaY)))
+        e.currentTarget.scrollLeft += (delta * 50)
+        e.preventDefault()
+    }
+
     render() {
         if (this.props.referenceCard !== null) {
             const releavantCards = this.getRelevantCards(this.props.referenceCard);
             return (
-                <div className="page">
-                    <p>Возможные совпадения</p>
+                <div className="page" onWheel={e => this.wheel(e)}>
+                    <div className="title-container">
+                        <p>Возможные совпадения:</p>
+                    </div>
                     {releavantCards}
                 </div>
             )

@@ -3,7 +3,6 @@ import * as Comp from "./computations"
 import * as Utils from "./Utils"
 import * as DataModel from "./DataModel"
 import "./CardDiffViewer.scss"
-import { features } from "process";
 
 function WarningMessage(props: { message: string }) {
     return <p className="attentionInfo">{props.message}</p>
@@ -31,7 +30,7 @@ function FeaturesVerticalBar(props: { features: number[] }) {
 function FeaturesDiffVerticalBar(props: { features1: number[], features2: number[] }) {
     const features1 = props.features1;
     const features2 = props.features2;
-    if(features1.length != features2.length)
+    if(features1.length !== features2.length)
         return <p>features1.length != features2.length</p>;
 
     const count = features1.length;
@@ -73,20 +72,20 @@ function CardDiffViewer(props: { card1: DataModel.AnimalCard, card2: DataModel.A
     
     function getSexWarning() {
         if
-            ((card1.animalSex != card2.animalSex) &&
-            (card1.animalSex != DataModel.Sex.Unknown) &&
-            (card2.animalSex != DataModel.Sex.Unknown))
+            ((card1.animalSex !== card2.animalSex) &&
+            (card1.animalSex !== DataModel.Sex.Unknown) &&
+            (card2.animalSex !== DataModel.Sex.Unknown))
             return <img src="./img/genderDiffers.svg" alt="Животные, предположительно, разного пола!" title="Животные, предположительно, разного пола!" className="cardDiffGenderIcon"/>
         else return false;
     }
 
     function getDifferentAnimalsWarning() {
-        if (card1.animal != card2.animal)
+        if (card1.animal !== card2.animal)
             return <WarningMessage message="Животные разного вида!" />
     }
 
     function getLostAfterFoundWarning() {
-        if (card1.cardType != card2.cardType) {
+        if (card1.cardType !== card2.cardType) {
             const lostCard = card1.cardType === DataModel.CardType.Lost ? card1 : card2;
             const foundCard = card1.cardType === DataModel.CardType.Lost ? card2 : card1;
             if (lostCard.eventTime > foundCard.eventTime) {
@@ -97,7 +96,7 @@ function CardDiffViewer(props: { card1: DataModel.AnimalCard, card2: DataModel.A
     }
 
     function getFeaturesDifferences() {
-        if (card1.animal == card2.animal) {
+        if (card1.animal === card2.animal) {
             const featuresName = "exp_3_4"
             const feat1 = card1.features[featuresName]
             const feat2 = card2.features[featuresName]

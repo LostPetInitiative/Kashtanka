@@ -17,7 +17,7 @@ export function geodistance(lat1_deg:number, lon1_deg:number, lat2_deg:number, l
 
 export function cosSimilarity(x:number[], y:number[]) {
     if(x.length !== y.length) {
-        throw "vectors of different length";
+        throw new Error("vectors of different length");
     }
     const N = x.length;
     var pairwiseMulSum = 0;

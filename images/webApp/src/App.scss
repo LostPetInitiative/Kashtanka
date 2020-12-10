@@ -139,15 +139,16 @@ html, body, div.root {
 
 /* Works on Chrome, Edge, and Safari */
 *::-webkit-scrollbar {
-  width: 12px;
+  width: 6px;
+  height: 6px;
 }
 
 *::-webkit-scrollbar-track {
-  background: orange;
+  background: $colorBasic;
 }
 
 *::-webkit-scrollbar-thumb {
   background-color: $colorEmphasisOrange;
   border-radius: 20px;
-  border: 3px solid $colorBasic;
+  border: 3px solid $colorEmphasisOrange;
 }
