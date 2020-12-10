@@ -7,8 +7,7 @@ div.animalPhotosContainer {
 }
 
 .animalPhotosThumbnails {
-  width: auto;
-  max-height: 4rem;
+  max-width: calc((255px - 2em - 1.2rem) / 3);
   margin: 0.2rem;
 }
 

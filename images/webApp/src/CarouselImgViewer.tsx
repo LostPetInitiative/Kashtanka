@@ -46,7 +46,7 @@ class CarouselImgViewer extends React.Component<PropsType, StateType> {
               <div className="carouselImgViewerMainPhoto">
                   <img src={this.props.imgSrcArray[this.state.selectedIndx].srcUrl} className="carouselImgViewerMainImg"/>
               </div>
-              <div className="carouselImgViewer2row">
+              <div className={`carouselImgViewer2row ${this.props.imgSrcArray.length > 1 ? "" : "displayNone"}`}>
                 <div className="carouselImgViewerGoLeft" onClick={() => this.decreaseIndex(this.props.imgSrcArray.length)}>⇦</div>
                 <div className="carouselImgViewerMiniPhotos">
                     <AnimalPhotos photos={this.props.imgSrcArray} selectedInd={this.state.selectedIndx}/>
