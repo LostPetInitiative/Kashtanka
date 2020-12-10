@@ -46,13 +46,15 @@ class CarouselImgViewer extends React.Component<PropsType, StateType> {
               <div className="carouselImgViewerMainPhoto">
                   <img src={this.props.imgSrcArray[this.state.selectedIndx].srcUrl} className="carouselImgViewerMainImg"/>
               </div>
-              <div className="carouselImgViewerGoLeft" onClick={() => this.decreaseIndex(this.props.imgSrcArray.length)}>⇦</div>
-              <div className="carouselImgViewerMiniPhotos">
-                  <AnimalPhotos photos={this.props.imgSrcArray} selectedInd={this.state.selectedIndx}/>
-              </div>
-              <div className="carouselImgViewerGoRight" onClick={() => this.increaseIndex(this.props.imgSrcArray.length)}>⇨</div>
-              <div className="carouselImgViewerDots">
-                  {this.carouselDots(this.props.imgSrcArray.length, this.state.selectedIndx)}
+              <div className="carouselImgViewer2row">
+                <div className="carouselImgViewerGoLeft" onClick={() => this.decreaseIndex(this.props.imgSrcArray.length)}>⇦</div>
+                <div className="carouselImgViewerMiniPhotos">
+                    <AnimalPhotos photos={this.props.imgSrcArray} selectedInd={this.state.selectedIndx}/>
+                </div>
+                <div className="carouselImgViewerGoRight" onClick={() => this.increaseIndex(this.props.imgSrcArray.length)}>⇨</div>
+                <div className="carouselImgViewerDots">
+                    {this.carouselDots(this.props.imgSrcArray.length, this.state.selectedIndx)}
+                </div>
               </div>
           </div>
       )

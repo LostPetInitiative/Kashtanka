@@ -140,9 +140,11 @@ function CardDiffViewer(props: { card1: DataModel.AnimalCard, card2: DataModel.A
                 <img className="cardDiffIcons" src="./img/distanceT.svg" alt="Между событиями прошло" title="Между событиями прошло"/>{timeDiffStr}
             </div>
             {/* {getFeaturesDifferences()} */}
-            <div className="cardDiffItems">{getSexWarning()}</div>
-            <div className="cardDiffItems">{getDifferentAnimalsWarning()}</div>
-            <div className="cardDiffItems">{getLostAfterFoundWarning()}</div>
+            <div className="cardDiffWarnings">
+                <div className="cardDiffItems">{getSexWarning()}</div>
+                <div className="cardDiffItems">{getDifferentAnimalsWarning()}</div>
+                <div className="cardDiffItems">{getLostAfterFoundWarning()}</div>
+            </div>
         </div>
     )
 }

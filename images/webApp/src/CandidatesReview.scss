@@ -15,12 +15,11 @@
 .CandidatesReview {
   display: grid;
   grid-template-rows: 60% 40%;
-  max-height: 48rem;
   height: 100vh;
 }
 
 .upper-screen {
-  //min-height: 20rem;
+  height: 60vh;
 }
 
 .lower-screen {
