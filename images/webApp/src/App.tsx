@@ -3,7 +3,7 @@ import './DataModel'
 import './App.scss';
 import CandidatesReview from './CandidatesReview'
 import "./apiClients/RestApiCardStorage"
-import ICardStorage from "./apiClients/ICardStorage"
+import * as ICardStorage from "./apiClients/ICardStorage"
 import * as ISearch from "./apiClients/ISearch"
 import * as RestCardStorage from "./apiClients/RestApiCardStorage";
 import SolrGatewaySearcher from "./apiClients/SolrGatewaySearch"
@@ -35,7 +35,7 @@ if (development) {
   solrGatewayURL = "api/search"
 }
 
-const cardStorage: ICardStorage = new RestCardStorage.CardStorage(cardStorageURL);
+const cardStorage: ICardStorage.ICardStorage = new RestCardStorage.CardStorage(cardStorageURL);
 const searchEngine: ISearch.ISearch = new SolrGatewaySearcher(solrGatewayURL)
 
 class LatestFoundCardCandidatesReview extends React.Component<{},
