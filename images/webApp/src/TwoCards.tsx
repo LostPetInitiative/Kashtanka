@@ -5,7 +5,7 @@ import CardDiffViewer from "./CardDiffViewer"
 import * as DataModel from "./DataModel"
 import AnimalCard from "./AnimalCard";
 
-export type CardAssignment = DataModel.AnimalCard | "unassigned" | "loading"
+export type CardAssignment = DataModel.AnimalCard | "unassigned" | "loading" | "unexistent"
 
 type PropsType = {
     leftCard: CardAssignment,
@@ -14,12 +14,11 @@ type PropsType = {
 
 export function TwoCardsViewer(props: PropsType) {
     function getCardViewer(card: CardAssignment) {
-        if (card === "loading") {
-            return <p>Загрузка...</p>;
-        } else if (card === "unassigned") {
-            return <p>Карточка не выбрана. Выберите карточку из списка снизу.</p>;
-        } else {
-            return <AnimalCard card={card} />
+        switch(card) {
+            case "loading": return <p>Загрузка...</p>;
+            case "unassigned": return <p>Карточка не выбрана. Выберите карточку из списка снизу.</p>;
+            case "unexistent": return <p>Карточка не найдена.</p>
+            default: return <AnimalCard card={card} />
         }
     }
 

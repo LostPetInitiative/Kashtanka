@@ -1,14 +1,14 @@
 import * as React from "react"
 import * as ISearch from "./apiClients/ISearch"
 import { AnimalCardThumbnailById } from "./CandidatesThumbnails"
-import ICardsStorage from "./apiClients/ICardStorage"
+import * as ICardsStorage from "./apiClients/ICardStorage"
 import "./LatestCardsPreview.scss"
 
 type PropsType = {
     cardsToShow: number,
     cardsTypeToShow: ISearch.LatestCardSearchType,
     searcher: ISearch.ISearch,
-    cardStorage: ICardsStorage,
+    cardStorage: ICardsStorage.ICardStorage,
     previewClicked: (clickedFullID: string) => void,
 }
 

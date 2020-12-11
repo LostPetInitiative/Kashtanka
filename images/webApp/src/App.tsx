@@ -3,7 +3,7 @@ import './DataModel'
 import './App.scss';
 import CandidatesReview from './CandidatesReview'
 import "./apiClients/RestApiCardStorage"
-import ICardStorage from "./apiClients/ICardStorage"
+import * as ICardStorage from "./apiClients/ICardStorage"
 import * as ISearch from "./apiClients/ISearch"
 import * as RestCardStorage from "./apiClients/RestApiCardStorage";
 import SolrGatewaySearcher from "./apiClients/SolrGatewaySearch"
@@ -26,16 +26,16 @@ const development = window.location.hostname === "localhost"
 var cardStorageURL: string
 var solrGatewayURL: string
 if (development) {
-  cardStorageURL = "http://10.0.4.174:3000"
-  solrGatewayURL = "http://10.0.4.174:3001"
-  // cardStorageURL = "https://kashtanka.pet/api/storage"
-  // solrGatewayURL = "https://kashtanka.pet/api/search"
+  // cardStorageURL = "http://10.0.4.174:3000"
+  // solrGatewayURL = "http://10.0.4.174:3001"
+  cardStorageURL = "https://kashtanka.pet/api/storage"
+  solrGatewayURL = "https://kashtanka.pet/api/search"
 } else {
   cardStorageURL = "api/storage"
   solrGatewayURL = "api/search"
 }
 
-const cardStorage: ICardStorage = new RestCardStorage.CardStorage(cardStorageURL);
+const cardStorage: ICardStorage.ICardStorage = new RestCardStorage.CardStorage(cardStorageURL);
 const searchEngine: ISearch.ISearch = new SolrGatewaySearcher(solrGatewayURL)
 
 class LatestFoundCardCandidatesReview extends React.Component<{},

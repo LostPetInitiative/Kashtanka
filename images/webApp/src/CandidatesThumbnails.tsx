@@ -1,6 +1,6 @@
 import * as React from "react";
 import "./AnimalCard.scss"
-import ICardStorage from "./apiClients/ICardStorage"
+import * as ICardStorage from "./apiClients/ICardStorage"
 import * as DataModel from "./DataModel";
 import * as Comp from "./computations"
 import * as Utils from "./Utils"
@@ -54,7 +54,7 @@ export function AnimalCardThumbnail(props: {
 }
 
 type AnimalCardThumbnailByIdProps = {
-    cardStorage: ICardStorage,
+    cardStorage: ICardStorage.ICardStorage,
     refCard: DataModel.AnimalCard | null,
     isAccented: boolean,
     namespace: string,
@@ -63,7 +63,7 @@ type AnimalCardThumbnailByIdProps = {
 
 type AnimalCardThumbnailByIdState = {
     loadedFullID: string,
-    loadedCard: DataModel.AnimalCard | null
+    loadedCard: DataModel.AnimalCard | "Loading" | "Unexistent" | "NotSet"
 }
 
 export class AnimalCardThumbnailById
@@ -72,7 +72,7 @@ export class AnimalCardThumbnailById
         super(props)
         this.state = {
             loadedFullID: "",
-            loadedCard: null
+            loadedCard: "Loading"
         }
     }
 
@@ -80,9 +80,16 @@ export class AnimalCardThumbnailById
         const neededFullID = this.props.namespace + "/" + this.props.localID;
         if (this.state.loadedFullID !== neededFullID) {
             // resetting and initiating background load
-            this.setState({ loadedFullID: neededFullID, loadedCard: null })
-            this.props.cardStorage.GetPetCard(this.props.namespace, this.props.localID).then(card => {
-                this.setState({ loadedCard: card })
+            this.setState({
+                loadedFullID: neededFullID,
+                loadedCard: (neededFullID==="")?"NotSet":"Loading" })
+            this.props.cardStorage.GetPetCard(this.props.namespace, this.props.localID).then(result => {
+                if(ICardStorage.isUnexistentCardToken(result)) {
+                    this.setState({ loadedCard: "Unexistent" })
+                } else {
+                    const card = result
+                    this.setState({ loadedCard: card })
+                }
             });
         }
     }
@@ -91,10 +98,15 @@ export class AnimalCardThumbnailById
     componentDidUpdate() { this.checkLoadedCard() }
 
     render() {
-        if (this.state.loadedCard !== null) {
-            return <AnimalCardThumbnail card={this.state.loadedCard} refCard={this.props.refCard} isAccent={this.props.isAccented} />
-        } else {
-            return <p>Загрузка</p>
+        switch(this.state.loadedCard) {
+            case "Loading":
+                return <p>Загрузка...</p>
+            case "NotSet":
+                return <p>Не задано.</p>
+            case "Unexistent":
+                return <p>Карточка не найдена.</p>
+            default:
+                return <AnimalCardThumbnail card={this.state.loadedCard} refCard={this.props.refCard} isAccent={this.props.isAccented} />
         }
     }
 }
@@ -111,7 +123,7 @@ type CandidatesThumbnailsPropsType = {
     selectedCardFullID: string,
     selectionChanged: (newSelectionFullID: string) => void,
     searcher: ISearch.ISearch,
-    cardStorage: ICardStorage
+    cardStorage: ICardStorage.ICardStorage
 }
 
 function capitalize(str: string): string {
