@@ -48,6 +48,17 @@ function AnimalCard(props : {card: DataModel.AnimalCard}) {
         else return "";
     }
 
+    function cardSource(cardSource: string) {
+        switch (cardSource) {
+            case "pet911ru":
+                return <div>
+                    Переидти к объявлению | <img className="cardSourceImg" src="https://pet911.ru/favicon.ico" title="www.pet911.ru" alt="www.pet911.ru"/>
+                    </div>;
+            default:
+                return cardSource;
+        }
+    }
+
     return (
         <div className="animalCard">
             <div className="headerLine">
@@ -63,6 +74,11 @@ function AnimalCard(props : {card: DataModel.AnimalCard}) {
                     <CarouselImgViewer imgSrcArray={card.photos}></CarouselImgViewer>
                 </div>
                 <div className={"cardComment " + cardTypeClass(card.cardType)}>
+                    <div className={"linkToSource " + cardTypeClass(card.cardType)}>
+                        <div className="linkToSourceContainer">
+                            <a href={card.provenanceURL} target="_BLANK" rel="external">{cardSource(card.namespace)}<span className="linkToSourceSpan"></span></a>                         
+                        </div>
+                    </div>
                     <div className="cardItemHeader"> Комментарий </div>
                     <div className="cardCommentText"> {card.contactInfo.comment} </div>
                 </div>
