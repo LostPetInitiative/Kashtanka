@@ -3,7 +3,7 @@
 .animalCard {
   background: linear-gradient(120deg, $colorBasic, $colorDark);
   border: solid $colorEmphasisGreen;
-  border-width: 0.1em;
+  border-width: 0.1rem;
   border-radius: 0.5em;
   box-shadow: 1px 1px 10px 0px $colorEmphasisGreen;
   color: $colorLight;
@@ -11,17 +11,8 @@
   padding: 0.5rem;
   text-align: left;
   position: relative;
-  min-width: 220px;
-  max-width: 400px;
-  min-height: 20rem;
-  max-height: 60vh;
-}
-
-.animalType {
-  //display: inline;
-  //position: absolute;
-  //top: 0;
-  //margin: 0.3rem;
+  min-width: 425px;
+  height: calc(60vh - 1.2rem);
 }
 
 .animalType.leftOriented {
@@ -82,14 +73,17 @@
   text-align: end;
 }
 
+.cardImgViewer {
+  min-width: 255px;
+  height: calc(60vh - 1.7rem - 41px);
+}
+
 .cardImgViewer.rightOriented {
   grid-column: 1 / span 1;
-  padding-right: 0.5rem;
 }
 
 .cardImgViewer.leftOriented {
   grid-column: 2 / span 1;
-  padding-right: 0.5rem;
 }
 
 .iconAnimal {
@@ -101,17 +95,16 @@
 .iconDog {
   background-image: url("./img/dog/dog.svg");
   width: 48px;
-  height: 41px;
 }
 
 .iconDogF {
   background-image: url("./img/dog/female.svg");
-  width: 40px;
-  height: 46px;
+  width: 36px;
 }
 
 .iconDogM {
-  background-image: url("./img/dog/male.svg");
+  background-image: url("./img/dog/male.svg");  
+  width: 45px;
 }
 
 .iconCat {
@@ -120,10 +113,12 @@
 
 .iconCatF {
   background-image: url("./img/cat/female.svg");
+  width: 33px;
 }
 
 .iconCatM {
   background-image: url("./img/cat/male.svg");
+  width: 47px;
 }
 
 .iconAnimal:hover,
@@ -143,20 +138,23 @@
   overflow-y: auto;
 }
 
+.cardComment {
+  grid-row: 1;
+  min-width: 170px;
+  height: calc(60vh - 0.7rem - 41px);
+}
+
 .cardComment.leftOriented {  
   grid-column: 1 / span 1;
-  grid-row: 1;
 }
 
 .cardComment.rightOriented {  
   grid-column: 2 / span 1;
-  grid-row: 1;
 }
 
 .animalCardMain {
   display: grid;
-  column-gap: 0.5rem;
-  max-height: 60vh;
+  height: calc(60vh - 1.7rem - 41px);
   margin: 0.5rem 0 0 0;
 }
 

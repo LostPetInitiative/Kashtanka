@@ -43,16 +43,18 @@ class CarouselImgViewer extends React.Component<PropsType, StateType> {
     render() {
       return (
           <div className="carouselImgViewer">
-              <div className="carouselImgViewerMainPhoto">
+              <div className={`carouselImgViewerMainPhoto ${this.props.imgSrcArray.length > 1 ? "" : "onePhotoCard"}`}>
                   <img alt="Фото животного" src={this.props.imgSrcArray[this.state.selectedIndx].srcUrl} className="carouselImgViewerMainImg"/>
               </div>
-              <div className="carouselImgViewerGoLeft" onClick={() => this.decreaseIndex(this.props.imgSrcArray.length)}>⇦</div>
-              <div className="carouselImgViewerMiniPhotos">
-                  <AnimalPhotos photos={this.props.imgSrcArray} selectedInd={this.state.selectedIndx}/>
-              </div>
-              <div className="carouselImgViewerGoRight" onClick={() => this.increaseIndex(this.props.imgSrcArray.length)}>⇨</div>
-              <div className="carouselImgViewerDots">
-                  {this.carouselDots(this.props.imgSrcArray.length, this.state.selectedIndx)}
+              <div className={`carouselImgViewer2row ${this.props.imgSrcArray.length > 1 ? "" : "displayNone"}`}>
+                <div className="carouselImgViewerGoLeft" onClick={() => this.decreaseIndex(this.props.imgSrcArray.length)}>⇦</div>
+                <div className="carouselImgViewerMiniPhotos">
+                    <AnimalPhotos photos={this.props.imgSrcArray} selectedInd={this.state.selectedIndx}/>
+                </div>
+                <div className="carouselImgViewerGoRight" onClick={() => this.increaseIndex(this.props.imgSrcArray.length)}>⇨</div>
+                <div className="carouselImgViewerDots">
+                    {this.carouselDots(this.props.imgSrcArray.length, this.state.selectedIndx)}
+                </div>
               </div>
           </div>
       )
