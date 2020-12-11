@@ -166,15 +166,13 @@
   grid-template-columns: 60% 40%;
 }
 
-.linkToSource.leftOriented {
-  position: absolute;
-  bottom: 10px;
-}
-
-.linkToSource.rightOriented {
-  position: absolute;
-  bottom: 10px;
-  right: 10px;
+.linkToSource {
+  margin-bottom: 25px;
+  border: solid 1px $colorLight;
+  color: $colorLight;
+  display: inline-block;
+  border-radius: 5px;
+  padding: 0px 10px 3px 10px;
 }
 
 .linkToSourceContainer {
@@ -191,5 +189,14 @@
 }
 
 .cardSourceImg {
-  width: 80px;
+  max-width: 80px;
+  vertical-align: middle;
+}
+
+.linkToSourceInternalDiv {
+  color: $colorLight;
+}
+
+a:link {
+  text-decoration: none;
 }

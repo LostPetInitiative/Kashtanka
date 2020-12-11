@@ -49,14 +49,17 @@ function AnimalCard(props: { card: DataModel.AnimalCard }) {
     }
 
     function cardSource(cardSource: string) {
+        const intro: string = "Переидти к объявлению | ";
+        var url: string = "./img/logo.png";
+        var title: string = "";
+
         switch (cardSource) {
             case "pet911ru":
-                return <div>
-                    Переидти к объявлению | <img className="cardSourceImg" src="https://pet911.ru/favicon.ico" title="www.pet911.ru" alt="www.pet911.ru"/>
-                    </div>;
-            default:
-                return cardSource;
+                url = "https://pet911.ru/favicon.ico";
+                title = "pet911.ru";
         }
+        
+        return <div className="linkToSourceInternalDiv">{intro + "  "}<img className="cardSourceImg" src={url} title={title} alt={title}/>{"  " + title}</div>;
     }
 
     if (card.cardType) {
