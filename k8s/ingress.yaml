@@ -33,8 +33,10 @@ spec:
       - "POST"
     accessControlAllowOriginList:
       - "http://localhost:3000"
+    accessControlAllowHeaders:
+      - "Content-Type"
     accessControlMaxAge: 100
-    addVaryHeader: true
+    #addVaryHeader: true
 ---
 apiVersion: traefik.containo.us/v1alpha1
 kind: IngressRoute
@@ -45,6 +47,26 @@ spec:
   entryPoints:
     - websecure
   routes:
+  # storage rest api
+  - match: Host(`kashtanka.pet`) && PathPrefix(`/api/storage`) && Method(`GET`)
+    kind: Rule
+    middlewares:
+    #- name: demo-access-auth
+    - name: strip-api-prefixes
+    - name: development-cors
+    services:
+    - name: cassandra-rest-api
+      port: 80
+  # solr gateway rest api
+  - match: Host(`kashtanka.pet`) && PathPrefix(`/api/search`) && Method(`GET`,`POST`,`OPTIONS`)
+    kind: Rule
+    middlewares:
+    #- name:  demo-access-auth
+    - name: strip-api-prefixes
+    - name: development-cors
+    services:
+    - name: search-gateway
+      port: 80
   # main web app
   - match: Host(`kashtanka.pet`)
     kind: Rule
@@ -53,26 +75,6 @@ spec:
     services:
     - name: web-app
       namespace: kashtanka
-      port: 80
-  # storage rest api
-  - match: Host(`kashtanka.pet`) && PathPrefix(`/api/storage`) && Method(`GET`)
-    kind: Rule
-    middlewares:
-    - name: demo-access-auth
-    - name: strip-api-prefixes
-    - name: development-cors
-    services:
-    - name: cassandra-rest-api
-      port: 80
-  # solr gateway rest api
-  - match: Host(`kashtanka.pet`) && PathPrefix(`/api/search`) && Method(`GET`,`POST`)
-    kind: Rule
-    middlewares:
-    - name:  demo-access-auth
-    - name: strip-api-prefixes
-    - name: development-cors
-    services:
-    - name: search-gateway
       port: 80
   tls:
     certResolver: letsencrypt
