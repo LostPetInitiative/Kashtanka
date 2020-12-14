@@ -49,7 +49,7 @@ function AnimalCard(props: { card: DataModel.AnimalCard }) {
     }
 
     function cardSource(cardSource: string) {
-        const intro: string = "Переидти к объявлению | ";
+        const intro: string = "Переийти к объявлению | ";
         var url: string = "./img/logo.png";
         var title: string = "";
 
@@ -59,7 +59,7 @@ function AnimalCard(props: { card: DataModel.AnimalCard }) {
                 title = "pet911.ru";
         }
         
-        return <div className="linkToSourceInternalDiv">{intro + "  "}<img className="cardSourceImg" src={url} title={title} alt={title}/>{"  " + title}</div>;
+        return <div className="linkToSourceInternalDiv">{intro + "  "}<img className="cardSourceImg" src={url} title={title} alt={title}/>{" " + title}</div>;
     }
 
     if (card.cardType) {

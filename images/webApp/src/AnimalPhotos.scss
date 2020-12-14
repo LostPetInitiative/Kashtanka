@@ -8,9 +8,10 @@ div.animalPhotosContainer {
 }
 
 .animalPhotosThumbnails {
-  height: 93%;
+  height: 100%;
   min-width: 70px;
   margin: 3px;
+  object-fit: contain;
 }
 
 .animalPhotosThumbnails.selected {

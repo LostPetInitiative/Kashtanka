@@ -160,7 +160,7 @@ namespace SolrAPI.Controllers
 
             Dictionary<string, string> requestParams = new Dictionary<string, string>();
             requestParams.Add("q","*:*");
-            requestParams.Add("df", "card_creation_time desc");
+            requestParams.Add("sort", "card_creation_time desc");
             requestParams.Add("fl", "id");
             requestParams.Add("rows", $"{maxCardsCount}");
             if (!string.IsNullOrEmpty(typeConstraint)) {

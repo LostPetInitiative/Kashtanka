@@ -256,7 +256,7 @@ export class CandidatesThumbnails
 
     wheel(e:React.WheelEvent<HTMLDivElement>) {
         const delta = Math.max(-1, Math.min(1, (e.deltaX || e.deltaY)))
-        e.currentTarget.scrollLeft += (delta * 50)
+        e.currentTarget.scrollLeft += (delta * 35)
         e.preventDefault()
     }
 
