@@ -41,10 +41,12 @@ class CarouselImgViewer extends React.Component<PropsType, StateType> {
     }
   
     render() {
+        //const s : React.CSSProperties = {background: "red", width:"100%", height:"100%"}
       return (
           <div className="carouselImgViewer">
               <div className={`carouselImgViewerMainPhoto ${this.props.imgSrcArray.length > 1 ? "" : "onePhotoCard"}`}>
                   <img alt="Фото животного" src={this.props.imgSrcArray[this.state.selectedIndx].srcUrl} className="carouselImgViewerMainImg"/>
+                  {/* <div style={s}></div> */}
               </div>
               <div className={`carouselImgViewer2row ${this.props.imgSrcArray.length > 1 ? "" : "displayNone"}`}>
                 <div className="carouselImgViewerGoLeft" onClick={() => this.decreaseIndex(this.props.imgSrcArray.length)}>⇦</div>

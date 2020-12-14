@@ -4,7 +4,7 @@
     //display: grid;
     //grid-template-columns: 2rem auto 2rem;
     //grid-template-rows: auto auto 1rem;
-    height: calc(100% - 1.7rem - 41px);
+    height: calc(100vh - 240px - 5rem - 41px);
   }
   
   .carouselImgViewerMainPhoto {
@@ -15,7 +15,7 @@
     min-width: 255px;
     align-items: center;
     display: flex;
-    height: calc((100% - 1.7rem - 41px) * 0.7);
+    height: calc((100vh - 240px - 5rem - 41px) * 0.7);
   }
   
   .carouselImgViewerMainImg {
@@ -28,7 +28,7 @@
     display: grid;
     grid-template-rows: auto 13px;
     grid-template-columns: 13px auto 13px;
-    height: calc((100% - 1.7rem - 41px) * 0.3);
+    height: calc((100vh - 240px - 5rem - 41px) * 0.3);
   }
   
   .carouselImgViewerGoLeft {
@@ -73,5 +73,5 @@
   }
   
   .carouselImgViewerMainPhoto.onePhotoCard {
-    height: calc(100% - 1.7rem - 41px);
+    height: calc(100vh - 240px - 5rem - 41px);
   }

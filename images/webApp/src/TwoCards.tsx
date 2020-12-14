@@ -30,7 +30,7 @@ export function TwoCardsViewer(props: PropsType) {
     
         if (isAssignedCard(leftCard) && isAssignedCard(rightCard)) {
             return <CardDiffViewer card1={leftCard} card2={rightCard} />
-        } else return false;
+        } else return <div></div>;
     }
 
     const leftViewer = getCardViewer(props.leftCard);

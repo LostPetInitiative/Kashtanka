@@ -20,7 +20,7 @@
 }
 
 .upper-screen {
-  height: 100%;
+  height: calc(100vh - 240px);
 }
 
 .lower-screen {

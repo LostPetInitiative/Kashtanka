@@ -80,11 +80,15 @@ function AnimalCard(props: { card: DataModel.AnimalCard }) {
                     <div className={"cardComment " + cardTypeClass(card.cardType)}>
                         <div className={"linkToSource " + cardTypeClass(card.cardType)}>
                             <div className="linkToSourceContainer">
-                                <a href={card.provenanceURL} target="_BLANK" rel="external">{cardSource(card.namespace)}<span className="linkToSourceSpan"></span></a>                         
+                                <a href={card.provenanceURL} target="_BLANK" rel="external">
+                                    {cardSource(card.namespace)}
+                                    <span className="linkToSourceSpan"></span></a>                         
                             </div>
                         </div>
                         <div className="cardItemHeader"> Комментарий </div>
-                        <div className="cardCommentText"> {card.contactInfo.comment} </div>
+                        <div className="cardCommentText">
+                            <div>{card.contactInfo.comment}</div>
+                        </div>
                     </div>
                 </div>
             </div>

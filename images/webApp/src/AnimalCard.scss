@@ -13,7 +13,7 @@
   text-align: left;
   position: relative;
   min-width: 425px;
-  height: calc(100% - 4.5rem);
+  height: calc(100vh - 240px - 4.5rem);
 }
 
 .animalType.leftOriented {
@@ -76,7 +76,7 @@
 
 .cardImgViewer {
   min-width: 255px;
-  height: calc(60vh - 1.7rem - 41px);
+  height: calc(100vh - 240px - 5rem - 41px);
 }
 
 .cardImgViewer.rightOriented {
@@ -137,13 +137,13 @@
 .cardCommentText {
   max-height: 300px;
   overflow-y: auto;
-  height: calc(60vh - 1.7rem - 41px - 24px - 5rem)
+  height: calc(100vh - 240px - 5rem - 41px - 24px - 5rem)
 }
 
 .cardComment {
   grid-row: 1;
   min-width: 170px;
-  height: calc(60vh - 1.7rem - 41px /* Card heading */ - 24px /* double padding */);
+  height: calc(100vh - 240px - 5rem - 41px - 24px);
   padding: 12px;
 }
 
@@ -157,7 +157,7 @@
 
 .animalCardMain {
   display: grid;
-  height: calc(100% - 1.7rem - 41px);
+  height: calc(100vh - 240px - 5rem - 41px);
   margin: 0.5rem 0 0 0;
 }
 
