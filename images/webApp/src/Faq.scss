@@ -6,8 +6,17 @@ div.faq-page {
 
 div.faq-text {
     margin: 1em;
-    height: calc(100% - 2em /*for margin*/ - 1.5em /* for header */);
+    height: calc(100% - 2em /*for margin*/ - 1.5em /* for header */ - 3em);
     overflow: auto;
+}
+
+div.faq-text h2 {
+    margin-bottom: 0.5em;
+    margin-top: 0.5em;
+}
+
+div.faq-text p {
+    margin-left: 1em;
 }
 
 div.logos-container {
@@ -21,3 +30,4 @@ div.logos-container img {
     max-height: 60px;
     margin: 25px;
 }
+
