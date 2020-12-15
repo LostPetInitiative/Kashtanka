@@ -49,7 +49,7 @@ function AnimalCard(props: { card: DataModel.AnimalCard }) {
     }
 
     function cardSource(cardSource: string) {
-        const intro: string = "Переийти к объявлению | ";
+        const intro: string = "Перейти к объявлению | ";
         var url: string = "./img/logo.png";
         var title: string = "";
 
