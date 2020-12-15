@@ -124,7 +124,8 @@ $colorDark: #0D0000;
 }
 
 div.landing-container {
-  height: 100%;
+  height: calc(100vh - 5em);
+  overflow-y: auto;
 }
 
 html, body, div.root {

@@ -3,7 +3,7 @@ kind: Deployment
 metadata:
   name: kafka-rest-proxy-processed-cards
 spec:
-  replicas: 3
+  #replicas: 3
   selector:
     matchLabels:
       app: kafka-rest-proxy-processed-cards
@@ -14,12 +14,14 @@ spec:
     spec:
       containers:
       - name: proxy
-        image: lostpetinitiative/kafka-rest-proxy:0.2
+        image: lostpetinitiative/kafka-rest-proxy:0.4
         env:
          - name: KAFKA_URL
            value: kafka-cluster:9092
          - name: TOPIC_NAME
            value: kashtanka_cards_with_features
+         - name: OUT_TOPIC_NAME
+           value: kashtanka_cards_with_features_no_trello
          - name: REST_URL
            value: http://10.0.4.211:5000
         resources:

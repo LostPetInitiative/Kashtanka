@@ -10,6 +10,7 @@ import SolrGatewaySearcher from "./apiClients/SolrGatewaySearch"
 import Landing from "./Landing";
 import LatestCards from "./LatestCardsPreview"
 import Faq from "./Faq"
+import Header from "./Header"
 import MatchesBoard from "./MatchesBoard"
 import Tracker from "./MatomoTracker"
 import {
@@ -128,7 +129,10 @@ function LandingWithLatestCards() {
   }
 
   return (
+    <div>
+    <Header />
     <div className="landing-container">
+      
       <Landing />
       <LatestCards
         cardsToShow={5}
@@ -137,6 +141,7 @@ function LandingWithLatestCards() {
         searcher={searchEngine}
         previewClicked={(e) => navigateToSpecificCard(e)}
       />
+    </div>
     </div>
   )
 }

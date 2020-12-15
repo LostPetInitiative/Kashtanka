@@ -68,18 +68,13 @@ class JobQueueProducer(JobQueue):
             value_serializer = dictSerializer,
             compression_type = "gzip")
 
-    async def Enqueue(self, jobName, jobBody):
-        return self.producer.send(self.topicName, value=jobBody, key= jobName)
-
-    def EnqueueSync(self, jobName, jobBody):
-        # for python < 3.7
-        #loop = get_or_create_eventloop()
-        loop = asyncio.get_event_loop()
-        loop.run_until_complete(asyncio.wait([self.Enqueue(jobName, jobBody)]))
+    def Enqueue(self, jobName, jobBody):
+        self.producer.send(self.topicName, value=jobBody, key= jobName)
+        self.producer.flush()
 
 class JobQueueWorker(JobQueue):
     '''Fetchs sobs as JSON serialized python dicts'''
-    def __init__(self, group_id, *args, **kwargs):
+    def __init__(self, group_id, max_permited_work_time_sec=300, *args, **kwargs):
         super(JobQueueWorker, self).__init__(*args, **kwargs)
 
         self.teardown = False
@@ -88,6 +83,8 @@ class JobQueueWorker(JobQueue):
             client_id = self.appName,
             group_id = group_id,
             key_deserializer = strDeserializer,
+            enable_auto_commit = False,
+            max_poll_interval_ms = max_permited_work_time_sec * 1000,
             value_deserializer = dictDeserializer)
 
     def GetNextJob(self, pollingIntervalMs = 1000):

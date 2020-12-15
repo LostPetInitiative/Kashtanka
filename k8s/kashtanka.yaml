@@ -22,7 +22,7 @@ spec:
   selector:
     matchLabels:
       app: kafka-rest-api
-  replicas: 2
+  #replicas: 2
   template:
     metadata:
       labels:
@@ -40,7 +40,7 @@ spec:
               topologyKey: "kubernetes.io/hostname"
       containers:
       - name: rest-api
-        image: lostpetinitiative/kafka-rest-api:0.1.2
+        image: lostpetinitiative/kafka-rest-api:0.1.4
         resources:
           limits:
             memory: "128Mi"
@@ -156,6 +156,40 @@ spec:
           value: kafka-cluster.default:9092
         - name: INPUT_QUEUE
           value: kashtanka_cards_with_features
+        - name: CARD_STORAGE_REST_API_URL
+          value: http://cassandra-rest-api
+        - name: CARD_INDEX_REST_API_URL
+          value: http://solr.default/solr/kashtankacards/update/json/docs
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: processed-cards-persister2
+  namespace: kashtanka
+spec:
+  selector:
+    matchLabels:
+      app: processed-cards-persister2
+  template:
+    metadata:
+      labels:
+        app: processed-cards-persister2
+    spec:
+      containers:
+      - name: worker
+        image: lostpetinitiative/processed-cards-persister:1.1.3
+        resources:
+          requests:
+            memory: "64Mi"
+            cpu: "100m"
+          limits:
+            memory: "256Mi"
+            cpu: "200m"
+        env:
+        - name: KAFKA_URL
+          value: kafka-cluster.default:9092
+        - name: INPUT_QUEUE
+          value: kashtanka_cards_with_features_no_trello
         - name: CARD_STORAGE_REST_API_URL
           value: http://cassandra-rest-api
         - name: CARD_INDEX_REST_API_URL
@@ -308,7 +342,7 @@ spec:
   selector:
     matchLabels:
       app: cassandra-rest-api
-  replicas: 2
+  #replicas: 2
   template:
     metadata:
       labels:
@@ -485,7 +519,7 @@ spec:
     spec:
       containers:
       - name: crawler
-        image: lostpetinitiative/crawler-pet911ru-agent:0.2
+        image: lostpetinitiative/crawler-pet911ru-agent:0.3
         resources:
           limits:
             memory: "128Mi"

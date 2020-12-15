@@ -6,7 +6,7 @@ div.faq-page {
 
 div.faq-text {
     margin: 1em;
-    height: calc(100% - 2em /*for margin*/ - 1.5em /* for header */);
+    height: calc(100% - 2em /*for margin*/ - 1.5em /* for header */ - 3em);
     overflow: auto;
 }
 
