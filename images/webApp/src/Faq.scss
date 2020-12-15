@@ -10,6 +10,15 @@ div.faq-text {
     overflow: auto;
 }
 
+div.faq-text h2 {
+    margin-bottom: 0.5em;
+    margin-top: 0.5em;
+}
+
+div.faq-text p {
+    margin-left: 1em;
+}
+
 div.logos-container {
     display: flex;
     flex-direction: row;
@@ -21,3 +30,4 @@ div.logos-container img {
     max-height: 60px;
     margin: 25px;
 }
+
