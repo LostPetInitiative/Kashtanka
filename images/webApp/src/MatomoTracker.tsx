@@ -15,7 +15,13 @@ class Tracker extends React.Component<{trackerHostName:string},{}> {
             _paq.push(['setSiteId', '1']);
             var d=document, g=d.createElement('script'), s=d.getElementsByTagName('script')[0];
             g.type='text/javascript'; g.async=true; g.src=u+'matomo.js'; s.parentNode.insertBefore(g,s);
-            })();`
+            })();
+            window.addEventListener('hashchange', function() {
+                // SPA tracking
+                _paq.push(['setCustomUrl', '/' + window.location.hash.substr(1)]);
+                _paq.push(['setDocumentTitle', document.title]);
+                _paq.push(['trackPageView']);
+            });`
         script.async = true;
         document.body.appendChild(script);
     }
