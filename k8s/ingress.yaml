@@ -48,7 +48,7 @@ spec:
     - websecure
   routes:
   # storage rest api
-  - match: Host(`kashtanka.pet`) && PathPrefix(`/api/storage`) && Method(`GET`)
+  - match: (Host(`kashtanka.pet`) || Host(`beta.kashtanka.pet`)) && PathPrefix(`/api/storage`) && Method(`GET`)
     kind: Rule
     middlewares:
     #- name: demo-access-auth
@@ -58,7 +58,7 @@ spec:
     - name: cassandra-rest-api
       port: 80
   # solr gateway rest api
-  - match: Host(`kashtanka.pet`) && PathPrefix(`/api/search`) && Method(`GET`,`POST`,`OPTIONS`)
+  - match: (Host(`kashtanka.pet`) || Host(`beta.kashtanka.pet`)) && PathPrefix(`/api/search`) && Method(`GET`,`POST`,`OPTIONS`)
     kind: Rule
     middlewares:
     #- name:  demo-access-auth
@@ -67,11 +67,20 @@ spec:
     services:
     - name: search-gateway
       port: 80
+  # beta web app
+  - match: Host(`beta.kashtanka.pet`)
+    kind: Rule
+    middlewares:
+    #- name: demo-access-auth
+    services:
+    - name: beta-web-app
+      namespace: kashtanka
+      port: 80
   # main web app
   - match: Host(`kashtanka.pet`)
     kind: Rule
     middlewares:
-    - name: demo-access-auth
+    #- name: demo-access-auth
     services:
     - name: web-app
       namespace: kashtanka

@@ -477,7 +477,49 @@ spec:
     spec:
       containers:
       - name: web-server
-        image: lostpetinitiative/kashtanka-web-app:0.1.0
+        image: lostpetinitiative/kashtanka-web-app:0.2.1
+        resources:
+          limits:
+            memory: "128Mi"
+            cpu: "200m"
+          requests:
+            memory: "64Mi"
+            cpu: "50m"
+        ports:
+        - containerPort: 3000
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: beta-web-app
+  namespace: kashtanka
+  labels:
+    app: beta-web-app
+spec:
+  ports:
+  - port: 80
+    targetPort: 3000
+    name: web
+  selector:
+    app: beta-web-app
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: beta-web-app
+  namespace: kashtanka
+spec:
+  selector:
+    matchLabels:
+      app: beta-web-app
+  template:
+    metadata:
+      labels:
+        app: beta-web-app
+    spec:
+      containers:
+      - name: web-server
+        image: lostpetinitiative/kashtanka-web-app:0.2.1
         resources:
           limits:
             memory: "128Mi"
