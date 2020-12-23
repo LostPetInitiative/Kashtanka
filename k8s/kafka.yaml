@@ -122,10 +122,10 @@ spec:
            value: -Xms64M -Xmx128M
         resources:
           requests:
-            memory: "128Mi"
+            memory: "300Mi"
             cpu: "50m"
           limits:
-            memory: "320Mi"
+            memory: "512Mi"
             cpu: "500m"
         ports:
         - containerPort: 9000

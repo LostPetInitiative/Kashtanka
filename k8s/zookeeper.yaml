@@ -74,8 +74,8 @@ spec:
             memory: "128Mi"
             cpu: "0.01"
           limits:
-            memory: "192Mi"
-            cpu: "0.15"
+            memory: "256Mi"
+            cpu: "0.2"
         ports:
         - containerPort: 2181
           name: client
@@ -94,7 +94,7 @@ spec:
           --client_port=2181 \
           --election_port=3888 \
           --server_port=2888 \
-          --tick_time=2000 \
+          --tick_time=5000 \
           --init_limit=10 \
           --sync_limit=5 \
           --heap=128M \
