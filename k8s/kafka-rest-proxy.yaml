@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
       - name: proxy
-        image: lostpetinitiative/kafka-rest-proxy:0.4
+        image: lostpetinitiative/kafka-rest-proxy:0.5
         env:
          - name: KAFKA_URL
            value: kafka-cluster:9092

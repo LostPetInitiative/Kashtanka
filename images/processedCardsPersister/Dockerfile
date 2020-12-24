@@ -1,8 +1,13 @@
 FROM ubuntu
 
-RUN apt-get update && apt-get install --no-install-recommends --no-install-suggests -y python3.8 python3-pip && \
+RUN apt-get update && apt-get install --no-install-recommends --no-install-suggests -y wget python3.8 python3-pip && \
     rm -rf /var/lib/apt/lists/*
 WORKDIR /app
+
+RUN wget -v https://grechka.family/dmitry/sandbox/dist/kafka_job_scheduler-0.1.0-py3-none-any.whl && \
+    pip3 install kafka_job_scheduler-0.1.0-py3-none-any.whl && \
+    rm kafka_job_scheduler-0.1.0-py3-none-any.whl
+
 COPY requirements.txt /app/requirements.txt
 
 RUN pip3 install -r requirements.txt

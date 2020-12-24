@@ -1,5 +1,5 @@
 from quart import Quart, request
-import kafkaJobQueue
+import kafkajobs
 import pet911
 import os
 
@@ -11,7 +11,7 @@ app = Quart(__name__)
 
 counter = 1
 
-producer = kafkaJobQueue.JobQueueProducer(kafkaUrl, outputQueueName, "Crawler-pet911ru-pipeline-submitter")
+producer = kafkajobs.jobqueue.JobQueueProducer(kafkaUrl, outputQueueName, "Crawler-pet911ru-pipeline-submitter")
 
 @app.route('/', methods=['POST']) 
 async def post_message():
@@ -23,9 +23,9 @@ async def post_message():
     for cardId in data_json['cardIds']:
         cardDir = os.path.join(dbPAth,cardId)
         cardJson = pet911.GetPetCard(cardDir)
-        print("sending #{0}".format(counter))
-        await producer.Enqueue(str(counter), cardJson)
-        print("sent #{0}".format(counter))
+        print("sending #{0}\t({1})".format(counter, cardId))
+        producer.Enqueue(str(counter), cardJson)
+        print("sent #{0}\t({1})".format(counter, cardId))
         counter += 1
 
     

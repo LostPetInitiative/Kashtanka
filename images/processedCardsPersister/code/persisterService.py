@@ -1,6 +1,3 @@
-import kafkaJobQueue
-import npSerialization
-
 import copy
 
 import shutil
@@ -10,6 +7,8 @@ import asyncio
 import datetime
 import requests
 import json
+
+import kafkajobs
 
 kafkaUrl = os.environ['KAFKA_URL']
 inputQueueName = os.environ['INPUT_QUEUE']
@@ -30,7 +29,7 @@ else:
 
 appName = "processedCardsPersister"
 
-worker = kafkaJobQueue.JobQueueWorker(appName, kafkaBootstrapUrl=kafkaUrl, topicName=inputQueueName, appName=appName)
+worker = kafkajobs.jobqueue.JobQueueWorker(appName, kafkaBootstrapUrl=kafkaUrl, topicName=inputQueueName, appName=appName)
 
 async def work():
     print("Service started. Pooling for a job")
@@ -47,7 +46,7 @@ async def work():
         feature_vectors = list()
         for key in job:
             if key.endswith("_features"):
-                features = npSerialization.Base64strToNpArray(job[key]).tolist()
+                features = kafkajobs.serialization.base64strToNpArray(job[key]).tolist()
                 featuresIdent = key[0: -len("_features")]
                 print("{0}: Extracted features {1}. Feature vector of {2} elements".format(uid, featuresIdent, len(features)))
                 feature_vectors.append((featuresIdent, features))

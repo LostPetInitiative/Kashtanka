@@ -1,6 +1,6 @@
 from quart import Quart, request
 import threading
-import kafkaJobQueue
+import kafkajobs
 import os
 
 kafkaUrl = os.environ['KAFKA_URL']
@@ -20,7 +20,7 @@ async def post_message(topic_name):
     global counter
     with lock:
       if not(topic_name in kafkaTopicsCache):
-        kafkaTopicsCache[topic_name] = kafkaJobQueue.JobQueueProducer(kafkaUrl, topic_name, "KafkaRestAPI")
+        kafkaTopicsCache[topic_name] = kafkajobs.jobqueue.JobQueueProducer(kafkaUrl, topic_name, "KafkaRestAPI")
         print(f"Created producer for topic {topic_name}")
     
     producer = kafkaTopicsCache[topic_name]

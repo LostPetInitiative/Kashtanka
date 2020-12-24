@@ -1,5 +1,5 @@
 import sys
-import kafkaJobQueue
+import kafkajobs
 import requests
 import os
 
@@ -19,7 +19,7 @@ appName = "kafka_rest_proxy"
 postUrl = f"{destRestUrl}/{outTopicName}"
 
 def main():
-    consumer = kafkaJobQueue.JobQueueWorker(appName, kafkaBootstrapUrl=kafkaUrl, topicName=topicName, appName=appName)
+    consumer = kafkajobs.jobqueue.JobQueueWorker(appName, kafkaBootstrapUrl=kafkaUrl, topicName=topicName, appName=appName)
     counter = 0
     while True:
         json = consumer.GetNextJob()
