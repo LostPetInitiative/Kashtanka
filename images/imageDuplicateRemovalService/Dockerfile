@@ -5,9 +5,9 @@ RUN apt-get update && apt-get install --no-install-recommends --no-install-sugge
 
 WORKDIR /app
 
-RUN wget -v https://grechka.family/dmitry/sandbox/dist/kafka_job_scheduler-0.1.0-py3-none-any.whl && \
-    pip install kafka_job_scheduler-0.1.0-py3-none-any.whl && \
-    rm kafka_job_scheduler-0.1.0-py3-none-any.whl
+RUN wget -v https://grechka.family/dmitry/sandbox/dist/kafka_job_scheduler-0.1.1-py3-none-any.whl && \
+    pip install kafka_job_scheduler-0.1.1-py3-none-any.whl && \
+    rm kafka_job_scheduler-0.1.1-py3-none-any.whl
     
 COPY requirements.txt /app/requirements.txt
 

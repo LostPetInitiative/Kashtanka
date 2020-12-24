@@ -56,6 +56,7 @@ class JobQueueProducer(JobQueue):
             client_id = self.appName,
             key_serializer = strSerializer,
             value_serializer = dictSerializer,
+            max_request_size = 32*1024*1024,
             acks = "all",
             retries = 10,
             compression_type = "gzip")

@@ -2,15 +2,14 @@ from setuptools import setup,find_packages
 
 setup(
     name='kafka-job-scheduler',
-    version='0.1.0',    
+    version='0.1.1',    
     description='A job queue based on Apache Kafka',
     url='https://github.com/LostPetInitiative/Kashtanka/tree/main/code/kafka-job-queue',
     author='Dmitry Grechka',
     author_email='dmitry@kashtanka.pet',
     license='MIT',
     packages=find_packages(),
-    install_requires=['ImageHash==4.1.0',
-                      'scikit-image==0.17.2',
+    install_requires=[ 'scikit-image==0.17.2',
                       'Pillow==8.0.1',
                       'kafka-python==2.0.2',
                       'numpy==1.*',

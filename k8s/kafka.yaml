@@ -71,6 +71,8 @@ spec:
                         fieldPath: status.podIP
             - name: KAFKA_HEAP_OPTS
               value: -Xmx256M -Xms128M
+            - name: KAFKA_MESSAGE_MAX_BYTES
+              value: "33554432"
         ports:
         - containerPort: 9092
           name: plaintext                        
