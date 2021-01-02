@@ -108,7 +108,7 @@ spec:
     spec:
       containers:
       - name: worker
-        image: lostpetinitiative/pet-image-extractor-yolo4:1.1.5
+        image: lostpetinitiative/pet-image-extractor-yolo4:1.1.6
         resources:
           requests:
             memory: "2048Mi"
