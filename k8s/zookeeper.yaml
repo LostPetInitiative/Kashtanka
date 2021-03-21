@@ -64,14 +64,14 @@ spec:
                     operator: In
                     values:
                     - zk
-              topologyKey: "kubernetes.io/hostname"
+              topologyKey: "topology.kubernetes.io/zone"
       containers:
       - name: kubernetes-zookeeper
         imagePullPolicy: Always
         image: "k8s.gcr.io/kubernetes-zookeeper:1.0-3.4.10"
         resources:
           requests:
-            memory: "128Mi"
+            memory: "256Mi"
             cpu: "0.01"
           limits:
             memory: "256Mi"

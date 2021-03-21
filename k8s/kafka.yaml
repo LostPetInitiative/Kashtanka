@@ -50,7 +50,7 @@ spec:
                     operator: In
                     values:
                     - kafka
-              topologyKey: "kubernetes.io/hostname"
+              topologyKey: "topology.kubernetes.io/zone"
       containers:
       - name: kafka
         imagePullPolicy: Always
@@ -124,7 +124,7 @@ spec:
            value: -Xms64M -Xmx128M
         resources:
           requests:
-            memory: "300Mi"
+            memory: "512Mi"
             cpu: "50m"
           limits:
             memory: "512Mi"
