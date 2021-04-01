@@ -22,6 +22,10 @@ spec:
   selector:
     matchLabels:
       app: kafka-rest-api
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
   #replicas: 2
   template:
     metadata:
@@ -61,7 +65,9 @@ metadata:
   namespace: kashtanka
 spec:
   strategy:
-    type: Recreate
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
   selector:
     matchLabels:
       app: duplicate-image-remover
@@ -135,7 +141,9 @@ metadata:
 spec:
   selector:
     matchLabels:
-      app: processed-cards-persister  
+      app: processed-cards-persister
+  strategy:
+    type: Recreate
   template:
     metadata:
       labels:
@@ -343,6 +351,10 @@ spec:
   selector:
     matchLabels:
       app: cassandra-rest-api
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
   #replicas: 2
   template:
     metadata:
@@ -401,6 +413,10 @@ spec:
   selector:
     matchLabels:
       app: search-gateway
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
   #replicas: 2
   template:
     metadata:
@@ -471,6 +487,10 @@ spec:
   selector:
     matchLabels:
       app: web-app
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
   template:
     metadata:
       labels:
@@ -513,6 +533,10 @@ spec:
   selector:
     matchLabels:
       app: beta-web-app
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
   template:
     metadata:
       labels:
