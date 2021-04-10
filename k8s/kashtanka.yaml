@@ -579,7 +579,7 @@ spec:
       app: crawler-pet911ru
   strategy:
     type: Recreate
-  replicas: 0
+  #replicas: 0
   template:
     metadata:
       labels:

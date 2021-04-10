@@ -84,11 +84,11 @@ spec:
               - nodetool drain
         resources:
           limits:
-            cpu: "1"
-            memory: 1Gi
-          requests:
             cpu: "200m"
             memory: 1Gi
+          #requests:
+          #  cpu: "200m"
+          #  memory: 1Gi
         ports:
         - containerPort: 7000
           name: gossip

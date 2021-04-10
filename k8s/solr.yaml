@@ -55,12 +55,12 @@ spec:
         imagePullPolicy: Always
         image: "solr:8"
         resources:
-          requests:
-            memory: 1280Mi
-            cpu: "250m"
+          #requests:
+          #  memory: 1280Mi
+          #  cpu: "250m"
           limits:
             memory: 1280Mi
-            cpu: "1"
+            cpu: "400m"
         env:
             - name: ZK_HOST
               value: zk-0.zk-hs,zk-1.zk-hs,zk-2.zk-hs # solr monitors ZK cluster itself. this, not zk-cs
