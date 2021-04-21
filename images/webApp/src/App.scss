@@ -1,8 +1,4 @@
-$colorLight:#ffedca;
-$colorBasic:#260101;
-$colorEmphasisGreen: #898C37;
-$colorEmphasisOrange: #c34818;
-$colorDark: #0D0000;
+@import './ScssVariables.scss';
 
 @media (prefers-reduced-motion: no-preference) {
 }
@@ -84,13 +80,6 @@ $colorDark: #0D0000;
 
 #appStateMenu .activePage .menuItem img.inactive {
   display: none;
-}
-
-.cardItemHeader {
-  color: #898C37;
-  font-size: small;
-  font-weight: bold;
-  margin-bottom: 0.3rem;
 }
 
 #headerCornerDiv {

@@ -1,4 +1,26 @@
-@import './App';
+@import './ScssVariables.scss';
+
+/* iPads (landscape) ----------- */
+@media only screen 
+and (min-device-width : 768px) 
+and (max-device-width : 1024px) 
+and (orientation : landscape) {
+  div.animalPhotosContainer {
+    width: $animalCardWidth * 0.6 - 28px - $carouselImgViewerMiniPhotosOffset;
+  }
+
+  .animalPhotosThumbnails {
+    min-width: ($animalCardWidth * 0.6 - 28px - $carouselImgViewerMiniPhotosOffset - 20px) / 3;
+  }
+}
+
+/* Desktops and laptops ----------- */
+@media only screen 
+and (min-width : 1025px) {
+  .animalPhotosThumbnails {
+    min-width: 70px;
+  }
+}
 
 div.animalPhotosContainer {
     display:flex;
@@ -9,7 +31,6 @@ div.animalPhotosContainer {
 
 .animalPhotosThumbnails {
   height: 100%;
-  min-width: 70px;
   margin: 3px;
   object-fit: contain;
 }

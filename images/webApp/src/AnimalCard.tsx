@@ -86,7 +86,7 @@ function AnimalCard(props: { card: DataModel.AnimalCard }) {
                             </div>
                         </div>
                         <div className="cardItemHeader"> Комментарий </div>
-                        <div className="cardCommentText">
+                        <div className={"cardCommentText " + cardTypeClass(card.cardType)}>
                             <div>{card.contactInfo.comment}</div>
                         </div>
                     </div>

@@ -32,7 +32,12 @@ class CarouselImgViewer extends React.Component<PropsType, StateType> {
     carouselDots(total : number, selected : number) {
         const dotsArr: JSX.Element[] = [];
         for (let i = 0; i < total; i++) {
-            dotsArr.push(<div className={`carouselDot ${selected !== i ? "" : "carouselSelectedDot"}`} onClick={() => this.selectIndex(total, i)} key={i.toString()}>▢</div>);
+            if(selected !== i) {
+                dotsArr.push(<div className="carouselDot"  onClick={() => this.selectIndex(total, i)} key={i.toString()}>◇</div>);
+            }
+            else {
+                dotsArr.push(<div className="carouselDot carouselSelectedDot" onClick={() => this.selectIndex(total, i)} key={i.toString()}>◆</div>);
+            }
         }
     
         return (
@@ -51,7 +56,7 @@ class CarouselImgViewer extends React.Component<PropsType, StateType> {
               <div className={`carouselImgViewer2row ${this.props.imgSrcArray.length > 1 ? "" : "displayNone"}`}>
                 <div className="carouselImgViewerGoLeft" onClick={() => this.decreaseIndex(this.props.imgSrcArray.length)}>⇦</div>
                 <div className="carouselImgViewerMiniPhotos">
-                    <AnimalPhotos photos={this.props.imgSrcArray} selectedInd={this.state.selectedIndx}/>
+                    <AnimalPhotos photos={this.props.imgSrcArray} selectedInd={this.state.selectedIndx} selectionChanged={(i) => this.selectIndex(this.props.imgSrcArray.length, i)}/>
                 </div>
                 <div className="carouselImgViewerGoRight" onClick={() => this.increaseIndex(this.props.imgSrcArray.length)}>⇨</div>
                 <div className="carouselImgViewerDots">

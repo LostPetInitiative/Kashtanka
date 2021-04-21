@@ -1,4 +1,88 @@
-@import './App';
+@import './ScssVariables.scss';
+
+/* iPads (landscape) ----------- */
+@media only screen 
+and (min-device-width : 768px) 
+and (max-device-width : 1024px) 
+and (orientation : landscape) {
+
+  .animalCard {
+    width: $animalCardWidth;
+    height: $animalCardHeight;
+    padding: 10px;
+    margin: 10px;
+  }
+
+  .headerLine {
+    height: $animalCardHeaderHeight;
+  }
+
+  .animalCardMain {
+    width: $animalCardWidth;
+    height: $animalCardHeight - $animalCardHeaderHeight - 5px;
+    margin: 5px 0 0 0;
+  }
+
+  .cardImgViewer {
+    width: $animalCardWidth * 0.6;
+    height: $animalCardHeight - $animalCardHeaderHeight - 5px;
+  }
+
+  .cardComment {
+    width: $animalCardWidth * 0.4;
+    height: $animalCardHeight - $animalCardHeaderHeight - 5px;
+  }
+
+  .linkToSource {
+    width: $animalCardWidth * 0.4 - 22px;
+    font-size: small;
+  }
+
+  .cardCommentText {
+    width: $animalCardWidth * 0.4 - 10px;
+    height: $animalCardHeight - $animalCardHeaderHeight - 75px;
+  }
+
+  .cardCommentText.rightOriented {
+    float: right;
+  }
+}
+
+/* Desktops and laptops ----------- */
+@media only screen 
+and (min-width : 1025px) {
+  .animalCard {
+    min-width: 425px;
+    padding: 1rem;
+    margin: 1rem;
+    height: calc(100vh - 240px - 4.5rem);
+  }
+
+  .cardImgViewer {
+    min-width: 255px;
+    height: calc(100vh - 240px - 5rem - 41px);
+  }
+
+  .cardComment {
+    min-width: 170px;
+    height: calc(100vh - 240px - 5rem - 41px - 24px);
+    padding: 12px;
+  }
+
+  .linkToSource {
+    width: 100%;
+  }
+
+  .animalCardMain {    
+    height: calc(100vh - 240px - 5rem - 41px);
+    margin: 0.5rem 0 0 0;
+  }
+  
+  .cardCommentText {
+    max-height: 300px;
+    height: calc(100vh - 240px - 5rem - 41px - 24px - 5rem)
+  }
+}
 
 .animalCard {
   background: linear-gradient(120deg, $colorBasic, $colorDark);
@@ -8,12 +92,8 @@
   box-shadow: 1px 1px 10px 0px $colorEmphasisGreen;
   color: $colorLight;
   font-size: medium;
-  padding: 1rem;
-  margin: 1rem;
   text-align: left;
   position: relative;
-  min-width: 425px;
-  height: calc(100vh - 240px - 4.5rem);
 }
 
 .animalType.leftOriented {
@@ -74,17 +154,19 @@
   text-align: end;
 }
 
-.cardImgViewer {
-  min-width: 255px;
-  height: calc(100vh - 240px - 5rem - 41px);
-}
-
 .cardImgViewer.rightOriented {
   grid-column: 1 / span 1;
 }
 
 .cardImgViewer.leftOriented {
   grid-column: 2 / span 1;
+}
+
+.cardItemHeader {
+  color: $colorEmphasisGreen;
+  font-size: small;
+  font-weight: bold;
+  margin-bottom: 3px;
 }
 
 .iconAnimal {
@@ -135,16 +217,11 @@
 }
 
 .cardCommentText {
-  max-height: 300px;
   overflow-y: auto;
-  height: calc(100vh - 240px - 5rem - 41px - 24px - 5rem)
 }
 
 .cardComment {
   grid-row: 1;
-  min-width: 170px;
-  height: calc(100vh - 240px - 5rem - 41px - 24px);
-  padding: 12px;
 }
 
 .cardComment.leftOriented {  
@@ -157,8 +234,6 @@
 
 .animalCardMain {
   display: grid;
-  height: calc(100vh - 240px - 5rem - 41px);
-  margin: 0.5rem 0 0 0;
 }
 
 .animalCardMain.leftOriented {
@@ -175,7 +250,6 @@
   color: $colorLight;
   display: inline-block;
   border-radius: 5px;
-  width: 100%;
   padding: 0px 10px 3px 10px;
 }
 

@@ -1,21 +1,57 @@
-@import './App';
+@import './ScssVariables.scss';
 
-.carouselImgViewer {
+/* iPads (landscape) ----------- */
+@media only screen 
+and (min-device-width : 768px) 
+and (max-device-width : 1024px) 
+and (orientation : landscape) {
+  .carouselImgViewer {
+    width: $animalCardWidth * 0.6;
+    height: $animalCardHeight - $animalCardHeaderHeight - 5px;
+  }
+
+  .carouselImgViewerMainPhoto {
+    width: $animalCardWidth * 0.6;
+    height: ($animalCardHeight - $animalCardHeaderHeight - 5px) * 0.7;
+  }
+
+  .carouselImgViewer2row {
+    width: $animalCardWidth * 0.6 - $carouselImgViewerMiniPhotosOffset;
+    height: ($animalCardHeight - $animalCardHeaderHeight - 5px) * 0.3;
+  }
+
+  .carouselImgViewerMiniPhotos {
+    width: $animalCardWidth * 0.6 - 28px - $carouselImgViewerMiniPhotosOffset;
+  }
+}
+
+/* Desktops and laptops ----------- */
+@media only screen 
+and (min-width : 1025px) {
+  .carouselImgViewer {
+    height: calc(100vh - 240px - 5rem - 41px);
+  }
+
+  .carouselImgViewerMainPhoto {
+    min-width: 255px;
+    height: calc((100vh - 240px - 5rem - 41px) * 0.7);
+  }
+
+  .carouselImgViewer2row {    
+    height: calc((100vh - 240px - 5rem - 41px) * 0.3);
+  }
+}
+
+  .carouselImgViewer {
     //display: grid;
     //grid-template-columns: 2rem auto 2rem;
     //grid-template-rows: auto auto 1rem;
-    height: calc(100vh - 240px - 5rem - 41px);
   }
   
   .carouselImgViewerMainPhoto {
-    //grid-column-start: 2;
-    //grid-column-end: 2;
-    grid-row: 1 / span 1;
-    justify-content: center;
-    min-width: 255px;
-    align-items: center;
     display: flex;
-    height: calc((100vh - 240px - 5rem - 41px) * 0.7);
+    justify-content: center;
+    align-items: center;
   }
   
   .carouselImgViewerMainImg {
@@ -28,7 +64,6 @@
     display: grid;
     grid-template-rows: auto 13px;
     grid-template-columns: 13px auto 13px;
-    height: calc((100vh - 240px - 5rem - 41px) * 0.3);
   }
   
   .carouselImgViewerGoLeft {
@@ -69,7 +104,7 @@
   }
   
   .carouselSelectedDot {
-    color: $colorEmphasisGreen;
+    color: $colorEmphasisOrange;
   }
   
   .carouselImgViewerMainPhoto.onePhotoCard {
