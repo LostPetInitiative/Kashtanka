@@ -46,16 +46,6 @@ class JobQueue:
             print("Topic {0} already exists".format(topicName))
         admin_client.close()
 
-def get_or_create_eventloop():
-    try:
-        return asyncio.get_event_loop()
-    except RuntimeError as ex:
-        if "There is no current event loop in thread" in str(ex):
-            loop = asyncio.new_event_loop()
-            asyncio.set_event_loop(loop)
-            print("Created event loop")
-            return asyncio.get_event_loop()
-
 class JobQueueProducer(JobQueue):
     '''Posts Jobs as JSON serialized python dicts'''
     def __init__(self, *args, **kwargs):
@@ -66,20 +56,29 @@ class JobQueueProducer(JobQueue):
             client_id = self.appName,
             key_serializer = strSerializer,
             value_serializer = dictSerializer,
+            max_request_size = 32*1024*1024,
+            acks = "all",
+            retries = 10,
             compression_type = "gzip")
 
-    async def Enqueue(self, jobName, jobBody):
-        return self.producer.send(self.topicName, value=jobBody, key= jobName)
-
-    def EnqueueSync(self, jobName, jobBody):
-        # for python < 3.7
-        #loop = get_or_create_eventloop()
-        loop = asyncio.get_event_loop()
-        loop.run_until_complete(asyncio.wait([self.Enqueue(jobName, jobBody)]))
-
+    def Enqueue(self, jobName, jobBody):
+        success = False
+        attempt = 0
+        while (not success) and (attempt < 10):
+            try:
+                self.producer.send(self.topicName, value=jobBody, key= jobName).get()
+                success = True
+            except kafka.errors.KafkaTimeoutError as err:
+                attempt += 1
+                print(f"Error during kafka job message enqueue: {err}. Attempt {attempt}")
+        if success:
+            return
+        else:
+            raise "Failed to enqueue the message to Kafka"
+                
 class JobQueueWorker(JobQueue):
     '''Fetchs sobs as JSON serialized python dicts'''
-    def __init__(self, group_id, *args, **kwargs):
+    def __init__(self, group_id, max_permited_work_time_sec=300, *args, **kwargs):
         super(JobQueueWorker, self).__init__(*args, **kwargs)
 
         self.teardown = False
@@ -88,6 +87,8 @@ class JobQueueWorker(JobQueue):
             client_id = self.appName,
             group_id = group_id,
             key_deserializer = strDeserializer,
+            enable_auto_commit = False,
+            max_poll_interval_ms = max_permited_work_time_sec * 1000,
             value_deserializer = dictDeserializer)
 
     def GetNextJob(self, pollingIntervalMs = 1000):

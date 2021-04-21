@@ -1,4 +1,4 @@
-import kafkaJobQueue
+import kafkajobs
 
 import shutil
 import os
@@ -13,8 +13,8 @@ outputQueueName = os.environ['OUTPUT_QUEUE']
 
 appName = "PetImageDuplicateRemover"
 
-worker = kafkaJobQueue.JobQueueWorker(appName, kafkaBootstrapUrl=kafkaUrl, topicName=inputQueueName, appName=appName)
-resultQueue = kafkaJobQueue.JobQueueProducer(kafkaUrl, outputQueueName, appName)
+worker = kafkajobs.jobqueue.JobQueueWorker(appName, kafkaBootstrapUrl=kafkaUrl, topicName=inputQueueName, appName=appName)
+resultQueue = kafkajobs.jobqueue.JobQueueProducer(kafkaUrl, outputQueueName, appName)
 
 workdir = '/tmp'
 hashSize = 8
@@ -86,7 +86,7 @@ def work():
             print("{0}: Found {1} distinct images".format(uid, hashesCount))
 
             job['images'] = distinctImages
-            resultQueue.EnqueueSync(uid, job)
+            resultQueue.Enqueue(uid, job)
             print("{0}: Posted result in output queue".format(uid))
             worker.Commit()
             print("{0}: Commited".format(uid))
