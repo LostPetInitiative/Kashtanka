@@ -587,13 +587,13 @@ spec:
     spec:
       containers:
       - name: crawler
-        image: lostpetinitiative/crawler-pet911ru-agent:2.0.0-rc5
+        image: lostpetinitiative/crawler-pet911ru-agent:2.0.1
         resources:
           limits:
-            memory: "128Mi"
+            memory: "256Mi"
             cpu: "200m"
           requests:
-            memory: "128Mi"
+            memory: "150Mi"
             cpu: "50m"
         volumeMounts:
           - mountPath: /db
