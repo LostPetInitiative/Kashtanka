@@ -1,0 +1,74 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: label-studio
+  namespace: kashtanka
+spec:
+  selector:
+    matchLabels:
+      app: label-studio
+  strategy:
+    type: Recreate
+  #replicas: 0
+  template:
+    metadata:
+      labels:
+        app: label-studio
+    spec:
+      containers:
+      - name: studio
+        image: heartexlabs/label-studio:latest 
+        resources:
+          limits:
+            memory: "512Mi"
+            cpu: "500m"
+          requests:
+            memory: "512Mi"
+            cpu: "50m"
+        volumeMounts:
+          - mountPath: /label-studio/data
+            name: data
+        env:
+          - name: LABEL_STUDIO_DISABLE_SIGNUP_WITHOUT_LINK
+            value: "true"
+        ports:
+        - containerPort: 8080 
+      volumes:
+        - name: data
+          persistentVolumeClaim:
+            claimName: label-studio
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: label-studio
+  namespace: kashtanka
+  labels:
+    app: label-studio
+spec:
+  ports:
+  - port: 80
+    targetPort: 8080
+    name: web
+  selector:
+    app: label-studio
+---
+apiVersion: traefik.containo.us/v1alpha1
+kind: IngressRoute
+metadata:
+  name: label-studio-tls
+  namespace: kashtanka
+spec:
+  entryPoints:
+    - websecure
+  routes:
+  - match: Host(`label-studio.kashtanka.pet`)
+    kind: Rule
+    middlewares:
+    #- name: admin-auth
+    services:
+    - name: label-studio
+      namespace: kashtanka
+      port: 80
+  tls:
+    certResolver: letsencrypt
