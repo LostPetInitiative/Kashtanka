@@ -10,7 +10,7 @@ setup(
     license='MIT',
     packages=find_packages(),
     install_requires=[ 'scikit-image==0.17.2',
-                      'Pillow==8.0.1',
+                      'Pillow==9.0.1',
                       'kafka-python==2.0.2',
                       'numpy==1.*',
                       ],
