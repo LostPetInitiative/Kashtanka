@@ -587,7 +587,7 @@ spec:
     spec:
       containers:
       - name: crawler
-        image: lostpetinitiative/crawler-pet911ru-agent:2.0.1
+        image: lostpetinitiative/crawler-pet911ru-agent:3.0.1
         resources:
           limits:
             memory: "256Mi"
@@ -599,7 +599,8 @@ spec:
           - mountPath: /db
             name: db
       - name: submitter
-        image: lostpetinitiative/crawler-pet911ru-pipeline-submitter:0.4
+        image: lostpetinitiative/crawler-pet911ru-pipeline-submitter:0.5
+        imagePullPolicy: Always
         resources:
           limits:
             memory: "128Mi"
@@ -610,7 +611,7 @@ spec:
         volumeMounts:
           - mountPath: /db
             name: db
-            readOnly: true
+            #readOnly: true
         env:
         - name: KAFKA_URL
           value: kafka-cluster.default:9092
@@ -623,4 +624,4 @@ spec:
       volumes:
         - name: db
           persistentVolumeClaim:
-            claimName: pet911ru
+            claimName: pet911ru3

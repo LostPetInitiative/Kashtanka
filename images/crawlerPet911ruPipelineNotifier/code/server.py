@@ -11,6 +11,13 @@ app = Quart(__name__)
 
 counter = 1
 
+# debugging card json preparation
+# cardDir = os.path.join(dbPAth,"rl538010")
+# cardJson = pet911.GetPetCard(cardDir)
+# print("card loaded")
+# print(cardJson)
+
+
 producer = kafkajobs.jobqueue.JobQueueProducer(kafkaUrl, outputQueueName, "Crawler-pet911ru-pipeline-submitter")
 
 @app.route('/', methods=['POST']) 

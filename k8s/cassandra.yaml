@@ -63,7 +63,7 @@ spec:
                     fieldRef:
                         fieldPath: status.podIP
             - name: CASSANDRA_SEEDS
-              value: cass-0.cass-hs.default.svc.cluster.local
+              value: cass-1.cass-hs.default.svc.cluster.local
             - name: CASSANDRA_NUM_TOKENS
               value: "32"
             - name: CASSANDRA_DC

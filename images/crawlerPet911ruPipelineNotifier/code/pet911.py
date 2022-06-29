@@ -3,6 +3,9 @@ import json
 import time
 import base64
 
+from webptools import grant_permission,dwebp
+grant_permission()
+
 def GetPetCard(dirPath):
     cardPath = os.path.join(dirPath,"card.json")
     #print("Pasing {0}".format(cardPath))
@@ -13,19 +16,27 @@ def GetPetCard(dirPath):
     images = []
     pet = card['pet']
     for photo in pet['photos'] :        
-        photoPath = os.path.join(dirPath,"{0}.jpg".format(photo['id']))
+        photoPath = os.path.join(dirPath,photo['id'])
         imageType = "jpg"
+        dotIdx = photoPath.rfind('.')
+        if dotIdx != -1:
+            imageType = photoPath[(dotIdx+1):]
         if not os.path.exists(photoPath):
-            photoPath = os.path.join(dirPath,"{0}.jpeg".format(photo['id']))
-            imageType = "jpg"
-        if not os.path.exists(photoPath):
-            photoPath = os.path.join(dirPath,"{0}.png".format(photo['id']))
-            imageType = "png"
-        if not os.path.exists(photoPath):
+            print("The photo {0} is not on disk".format(photo['id']))
             continue
-            raise "The photo {0} is not on disk".format(photo['id'])
+
+        # re-encoding webp
+        if imageType == 'webp':
+            imageType = "jpg"
+            print(dwebp(input_image=photoPath, output_image=photoPath[0:dotIdx]+".jpg",option="-o", logging="-v"))
+            photoPath = photoPath[0:dotIdx]+".jpg"
+            print("Webp re-encoded tp jpeg")
+        elif imageType == "jpeg":
+            imageType = "jpg"
+        
         with open(photoPath, 'rb') as photoFile:
             photo = photoFile.read()
+
             image = {
                 'type': imageType,
                 'data': base64.encodebytes(photo).decode("utf-8").replace("\n","")

@@ -56,9 +56,9 @@ spec:
         imagePullPolicy: Always
         image: "wurstmeister/kafka:2.13-2.6.0"
         resources:
-          #requests:
-          #  memory: "300Mi"
-          #  cpu: "50m"
+          requests:
+           memory: "400Mi"
+           cpu: "50m"
           limits:
             memory: "400Mi"
             cpu: "0.1"
@@ -97,7 +97,7 @@ spec:
     app: kafka-ui
   ports:
   - port: 80
-    targetPort: 9000
+    targetPort: 8080
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -113,13 +113,26 @@ spec:
         app: kafka-ui
     spec:
       containers:
-      - name: kafdrop
-        image: obsidiandynamics/kafdrop      
+      - name: webui
+        # image: provectuslabs/kafka-ui
+        # image: obsidiandynamics/kafdrop      
+        image: quay.io/cloudhut/kowl:master
         env:
-         - name: KAFKA_BROKERCONNECT
+        # kafdrop related
+        #          - name: KAFKA_BROKERCONNECT
+        #            value: kafka-cluster:9092
+        #          - name: SERVER_SERVLET_CONTEXTPATH
+        #            value: /
+        #
+        #  kowl related
+        #  - name: KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS
+        #    value: kafka-cluster:9092
+        #  - name: KAFKA_CLUSTERS_0_ZOOKEEPER
+        #    value: zk-cs
+        #  - name: KAFKA_CLUSTERS_0_NAME
+        #    value: grechka
+         - name: KAFKA_BROKERS
            value: kafka-cluster:9092
-         - name: SERVER_SERVLET_CONTEXTPATH
-           value: /
          - name: JVM_OPTS
            value: -Xms64M -Xmx128M
         resources:
@@ -130,5 +143,38 @@ spec:
             memory: "512Mi"
             cpu: "500m"
         ports:
-        - containerPort: 9000
+        - containerPort: 8080
+# ---
+# apiVersion: apps/v1
+# kind: Deployment
+# metadata:
+#   name: kafka-ui
+# spec:
+#   selector:
+#     matchLabels:
+#       app: kafka-ui
+#   template:
+#     metadata:
+#       labels:
+#         app: kafka-ui
+#     spec:
+#       containers:
+#       - name: kafdrop
+#         image: obsidiandynamics/kafdrop      
+#         env:
+#          - name: KAFKA_BROKERCONNECT
+#            value: kafka-cluster:9092
+#          - name: SERVER_SERVLET_CONTEXTPATH
+#            value: /
+#          - name: JVM_OPTS
+#            value: -Xms64M -Xmx128M
+#         resources:
+#           requests:
+#             memory: "512Mi"
+#             cpu: "50m"
+#           limits:
+#             memory: "512Mi"
+#             cpu: "500m"
+#         ports:
+#         - containerPort: 9000
 
