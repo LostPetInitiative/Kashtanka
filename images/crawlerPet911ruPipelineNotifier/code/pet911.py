@@ -7,6 +7,7 @@ from webptools import grant_permission,dwebp
 grant_permission()
 
 def GetPetCard(dirPath):
+    '''Loads the pet card identified by the dirPath. Retuens dictionary with the pet card data.'''
     cardPath = os.path.join(dirPath,"card.json")
     #print("Pasing {0}".format(cardPath))
     if not os.path.exists(cardPath):
