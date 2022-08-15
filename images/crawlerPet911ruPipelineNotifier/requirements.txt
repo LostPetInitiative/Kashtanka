@@ -1,4 +1,5 @@
 Quart == 0.13.*
 jinja2 < 3.1.0
+kafka-job-scheduler >= 1.*
 webptools
-avro==1.11.0
+argparse

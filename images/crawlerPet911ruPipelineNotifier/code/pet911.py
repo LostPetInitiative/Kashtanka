@@ -26,12 +26,14 @@ def GetPetCard(dirPath):
             print("The photo {0} is not on disk".format(photo['id']))
             continue
 
+        webpConverted = False
         # re-encoding webp
         if imageType == 'webp':
             imageType = "jpg"
             print(dwebp(input_image=photoPath, output_image=photoPath[0:dotIdx]+".jpg",option="-o", logging="-v"))
             photoPath = photoPath[0:dotIdx]+".jpg"
-            print("Webp re-encoded tp jpeg")
+            print("Webp re-encoded to jpeg")            
+            webpConverted = True
         elif imageType == "jpeg":
             imageType = "jpg"
         
@@ -43,6 +45,9 @@ def GetPetCard(dirPath):
                 'data': base64.encodebytes(photo).decode("utf-8").replace("\n","")
             }
             images.append(image)
+        if webpConverted:
+            # removing JPEG to save some space
+            os.remove(photoPath)
     
     if pet['animal'] == "2":
         petKind = "cat"

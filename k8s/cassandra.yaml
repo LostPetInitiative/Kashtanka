@@ -33,7 +33,7 @@ spec:
     matchLabels:
       app: cass
   serviceName: cass-hs
-  replicas: 3
+  replicas: 1
   updateStrategy:
     type: RollingUpdate
   podManagementPolicy: OrderedReady
@@ -63,7 +63,7 @@ spec:
                     fieldRef:
                         fieldPath: status.podIP
             - name: CASSANDRA_SEEDS
-              value: cass-1.cass-hs.default.svc.cluster.local
+              value: cass-0.cass-hs.default.svc.cluster.local
             - name: CASSANDRA_NUM_TOKENS
               value: "32"
             - name: CASSANDRA_DC
@@ -84,8 +84,8 @@ spec:
               - nodetool drain
         resources:
           limits:
-            cpu: "200m"
-            memory: 1Gi
+            cpu: "300m"
+            memory: 1.2Gi
           #requests:
           #  cpu: "200m"
           #  memory: 1Gi

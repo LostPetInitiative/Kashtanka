@@ -12,22 +12,38 @@ import kafkajobs
 
 kafkaUrl = os.environ['KAFKA_URL']
 inputQueueName = os.environ['INPUT_QUEUE']
+
 if 'CARD_STORAGE_REST_API_URL' in os.environ:
     cardStorageRestApiURL = os.environ['CARD_STORAGE_REST_API_URL']
-    print("CARD_STORAGE_REST_API_URL defined : Enabling card storage into {0}".format(cardStorageRestApiURL))
+    print("CARD_STORAGE_REST_API_URL is defined : Enabling card storage into {0}".format(cardStorageRestApiURL))
 else:
     cardStorageRestApiURL = None
     print("CARD_STORAGE_REST_API_URL is not defined. Will not persist cards into a storage")
+
 if 'CARD_INDEX_REST_API_URL' in os.environ:
     cardIndexRestApiURL = os.environ['CARD_INDEX_REST_API_URL']
-    print("CARD_INDEX_REST_API_URL defined : Enabling card indexing into {0}".format(cardIndexRestApiURL))
+    print("CARD_INDEX_REST_API_URL is defined : Enabling card indexing into {0}".format(cardIndexRestApiURL))
 else:
     cardIndexRestApiURL = None
     print("CARD_INDEX_REST_API_URL is not defined. Will not persist cards into a storage")
 
+if 'PERSIST_CARD_WITH_ORIG_IMAGES' in os.environ:
+    persistCardWithOrigImages = os.environ['PERSIST_CARD_WITH_ORIG_IMAGES']
+    print("PERSIST_CARD_WITH_ORIG_IMAGES is defined.")
+else:
+    persistCardWithOrigImages = None
+    print("PERSIST_CARD_WITH_ORIG_IMAGES is not defined. Will not persist cards into a storage")
+
+if 'PERSIST_CALVIN_ZHIRUI_YOLO5_IMAGES' in os.environ:
+    persistCalvinZhiruiYolo5ImagesImages = os.environ['PERSIST_CALVIN_ZHIRUI_YOLO5_IMAGES']
+    print("PERSIST_CALVIN_ZHIRUI_YOLO5_IMAGES is defined.")
+else:
+    persistCalvinZhiruiYolo5ImagesImages = None
+    print("PERSIST_CALVIN_ZHIRUI_YOLO5_IMAGES is not defined.")
 
 
-appName = "processedCardsPersister"
+
+appName = "dataPersister"
 
 worker = kafkajobs.jobqueue.JobQueueWorker(appName, kafkaBootstrapUrl=kafkaUrl, topicName=inputQueueName, appName=appName)
 
@@ -62,7 +78,7 @@ async def work():
         cardCreationTimeStr = datetime.datetime.utcnow().isoformat()[0:-7]+"Z"
 
         # snake_case to PascalCase
-        cassasndaCardJson = { 'CardCreationTime' : cardCreationTimeStr }
+        cassasndaCardJson = { 'CardCreationTime' : cardCreationTimeStr , 'Features': dict() }
         copyIfSet(job, cassasndaCardJson, 'card_type', 'CardType')
         copyIfSet(job, cassasndaCardJson, 'contact_info', 'ContactInfo')
         copyIfSet(job, cassasndaCardJson, 'event_time', 'EventTime')
@@ -109,52 +125,52 @@ async def work():
         for (featuresIdent,vector) in feature_vectors:
             solrCardJson["features_{0}".format(featuresIdent)] = ", ".join(["{0}".format(x) for x in vector])
 
-        if not(cardStorageRestApiURL is None):
+        if not(persistCardWithOrigImages is None) and not(cardStorageRestApiURL is None):
             cardURL = "{0}/PetCards/{1}/{2}/".format(cardStorageRestApiURL,namespace,local_id)
             print("{0}: Putting a card to {1}".format(uid, cardURL))
             response = requests.put(cardURL, json = cassasndaCardJson)
             print("{0}: Got card put status code {1}".format(uid,response.status_code))
-            if response.status_code != 200:
+            if response.status_code // 100 != 2:
                     print("{0}: Unsuccessful status code! Error {1}".format(uid,response.text))
                     exit(1)
+
         if not(cardIndexRestApiURL is None):
             cardIndexURL = "{0}".format(cardIndexRestApiURL)
             print("{0}: Sending a card to {1} for indexing".format(uid, cardIndexURL))
             response = requests.post(cardIndexURL, json = solrCardJson)
             print("{0}: Got card indexing status code {1}".format(uid,response.status_code))
-            if response.status_code != 200:
+            if response.status_code // 100 != 2:
                     print("{0}: Unsuccessful status code! Error {1}".format(uid,response.text))
                     exit(2)
-        imageIdx = 0
-        print("{0}: {1} photos to put".format(uid,len(job['annotated_images'])))
-        for annotatedImage in job['annotated_images']:
-            photoJson = {
-                "AnnotatedImage": annotatedImage["data"],
-                "AnnotatedImageType": "jpg", # our services always produce jpg
-                "ExtractedImage": job['detected_pet_images'][imageIdx]["data"],
-                "DetectionConfidence": float(job['detected_pet_scores'][imageIdx]),
-                "DetectionRotation": job['detected_pet_rotations'][imageIdx]
-            }
-            #print(json.dumps(photoJson))
-            imageURL = "{0}/PetPhotos/{1}/{2}/{3}".format(cardStorageRestApiURL, namespace, local_id, imageIdx+1)
-            print("{0}: Putting a photo {1} to {2}".format(uid, imageIdx+1, imageURL))
-            response = requests.put(imageURL, json = photoJson)
-            print("{0}: Got image put status code {1}".format(uid,response.status_code))
-            if response.status_code != 200:
-                print("{0}: Unsuccessful status code! Error {1}".format(uid,response.text))
-                exit(3)
-            
-            imageIdx+=1
 
-        for (ident,vector) in feature_vectors:
-            featureURL = "{0}/PetCards/{1}/{2}/features/{3}".format(cardStorageRestApiURL, namespace, local_id, ident)
-            featuresJson = {"features": vector}
-            print("{0}: Putting features {1} to {2}".format(uid, ident, featureURL))
-            response = requests.put(featureURL, json = featuresJson)
-            print("{0}: Got features put status code {1}".format(uid,response.status_code))
-            if response.status_code != 200:
-                print("{0}: Unsuccessful status code! Error {1}".format(uid,response.text))
-                exit(4)
+        if not(persistCardWithOrigImages is None) and not(cardStorageRestApiURL is None):
+            imageIdx = 0
+            print("{0}: {1} orig photos to put".format(uid,len(job['images'])))
+            for image in job['images']:
+                photoJson = {
+                    "imageB64": image["data"],
+                    "imageMimeType": "image/jpeg"                    
+                }
+                #print(json.dumps(photoJson))
+                imageURL = "{0}/PetPhotos/{1}/{2}/{3}".format(cardStorageRestApiURL, namespace, local_id, imageIdx+1)
+                print("{0}: Putting a photo {1} to {2}".format(uid, imageIdx+1, imageURL))
+                response = requests.put(imageURL, json = photoJson)
+                print("{0}: Got image put status code {1}".format(uid,response.status_code))
+                if response.status_code // 100 != 2:
+                    print("{0}: Unsuccessful status code! Error {1}".format(uid,response.text))
+                    exit(3)
+                
+                imageIdx+=1
+
+        # for (ident,vector) in feature_vectors:
+        #     featureURL = "{0}/PetCards/{1}/{2}/features/{3}".format(cardStorageRestApiURL, namespace, local_id, ident)
+        #     featuresJson = {"features": vector}
+        #     print("{0}: Putting features {1} to {2}".format(uid, ident, featureURL))
+        #     response = requests.put(featureURL, json = featuresJson)
+        #     print("{0}: Got features put status code {1}".format(uid,response.status_code))
+        #     if response.status_code != 200:
+        #         print("{0}: Unsuccessful status code! Error {1}".format(uid,response.text))
+        #         exit(4)
             
         print("{0}: Job is done. Committing".format(uid))
         worker.Commit()
