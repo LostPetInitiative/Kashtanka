@@ -99,43 +99,6 @@ spec:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: pet-image-detector
-  namespace: kashtanka
-spec:
-  selector:
-    matchLabels:
-      app: pet-image-detector
-  strategy:
-    type: Recreate
-  template:
-    metadata:
-      labels:
-        app: pet-image-detector
-    spec:
-      containers:
-      - name: worker
-        image: lostpetinitiative/pet-image-extractor-yolo4:1.1.6
-        resources:
-          requests:
-            memory: "2048Mi"
-            cpu: "25m"
-          limits:
-            memory: "3072Mi"
-            #memory: "2048Mi"
-            cpu: "4"
-        # ports:
-        # - containerPort: <Port>
-        env:
-        - name: KAFKA_URL
-          value: kafka-cluster.default:9092
-        - name: INPUT_QUEUE
-          value: kashtanka_distinct_photos_pet_cards
-        - name: OUTPUT_QUEUE
-          value: kashtanka_detected_pets
----
-apiVersion: apps/v1
-kind: Deployment
-metadata:
   name: calvin-zhirui-yolo5-head-detector
   namespace: kashtanka
 spec:
@@ -198,22 +161,22 @@ spec:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: processed-cards-persister
+  name: orig-persister
   namespace: kashtanka
 spec:
   selector:
     matchLabels:
-      app: processed-cards-persister
+      app: orig-persister
   strategy:
     type: Recreate
   template:
     metadata:
       labels:
-        app: processed-cards-persister
+        app: orig-persister
     spec:
       containers:
       - name: worker
-        image: lostpetinitiative/processed-cards-persister:1.1.5
+        image:  lostpetinitiative/processed-cards-persister:2.0.0-dev
         resources:
           requests:
             memory: "256Mi"
@@ -225,30 +188,31 @@ spec:
         - name: KAFKA_URL
           value: kafka-cluster.default:9092
         - name: INPUT_QUEUE
-          value: kashtanka_cards_with_features
+          value: kashtanka_distinct_photos_pet_cards
         - name: CARD_STORAGE_REST_API_URL
           value: http://cassandra-rest-api
-        - name: CARD_INDEX_REST_API_URL
-          value: http://solr.default/solr/kashtankacards/update/json/docs
+        - name: PERSIST_CARD_WITH_ORIG_IMAGES
+          value: "true"
 ---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: processed-cards-persister2
+  name: detected-head-persister
   namespace: kashtanka
 spec:
   selector:
     matchLabels:
-      app: processed-cards-persister2
-  replicas: 0
+      app: detected-head-persister
+  strategy:
+    type: Recreate
   template:
     metadata:
       labels:
-        app: processed-cards-persister2
+        app: detected-head-persister
     spec:
       containers:
       - name: worker
-        image: lostpetinitiative/processed-cards-persister:1.1.5
+        image:  lostpetinitiative/processed-cards-persister:2.0.0-dev
         resources:
           requests:
             memory: "256Mi"
@@ -260,85 +224,11 @@ spec:
         - name: KAFKA_URL
           value: kafka-cluster.default:9092
         - name: INPUT_QUEUE
-          value: kashtanka_cards_with_features_no_trello
+          value: kashtanka_calvin_zhirui_yolov5_output
         - name: CARD_STORAGE_REST_API_URL
           value: http://cassandra-rest-api
-        - name: CARD_INDEX_REST_API_URL
-          value: http://solr.default/solr/kashtankacards/update/json/docs
----
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: feature-extractor-dogs
-  namespace: kashtanka
-spec:
-  selector:
-    matchLabels:
-      app: feature-extractor-dogs
-  strategy:
-    type: Recreate
-  template:
-    metadata:
-      labels:
-        app: feature-extractor-dogs
-    spec:
-      containers:
-      - name: worker
-        image: lostpetinitiative/pet-feature-extractor:1.1.3
-        resources:
-          requests:
-            memory: "1280Mi"
-            cpu: "25m"
-          limits:
-            #memory: "3072Mi"
-            memory: "1280Mi"
-            cpu: "1"
-        env:
-        - name: KAFKA_URL
-          value: kafka-cluster.default:9092
-        - name: INPUT_QUEUE
-          value: kashtanka_detected_pets
-        - name: OUTPUT_QUEUE
-          value: kashtanka_cards_with_features
-        - name: ANIMAL_TYPE
-          value: dog
----
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: feature-extractor-cats
-  namespace: kashtanka
-spec:
-  selector:
-    matchLabels:
-      app: feature-extractor-cats
-  strategy:
-    type: Recreate
-  template:
-    metadata:
-      labels:
-        app: feature-extractor-cats
-    spec:
-      containers:
-      - name: worker
-        image: lostpetinitiative/pet-feature-extractor:1.1.3
-        resources:
-          requests:
-            memory: "1280Mi"
-            cpu: "25m"
-          limits:
-            #memory: "3072Mi"
-            memory: "1280Mi"
-            cpu: "1"
-        env:
-        - name: KAFKA_URL
-          value: kafka-cluster.default:9092
-        - name: INPUT_QUEUE
-          value: kashtanka_detected_pets
-        - name: OUTPUT_QUEUE
-          value: kashtanka_cards_with_features
-        - name: ANIMAL_TYPE
-          value: cat
+        - name: PERSIST_CALVIN_ZHIRUI_YOLO5_IMAGES
+          value: "true"
 ---
 apiVersion: apps/v1
 kind: Deployment

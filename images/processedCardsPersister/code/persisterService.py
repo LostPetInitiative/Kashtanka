@@ -35,15 +35,15 @@ else:
     print("PERSIST_CARD_WITH_ORIG_IMAGES is not defined. Will not persist cards into a storage")
 
 if 'PERSIST_CALVIN_ZHIRUI_YOLO5_IMAGES' in os.environ:
-    persistCalvinZhiruiYolo5ImagesImages = os.environ['PERSIST_CALVIN_ZHIRUI_YOLO5_IMAGES']
+    persistCalvinZhiruiYolo5Images = os.environ['PERSIST_CALVIN_ZHIRUI_YOLO5_IMAGES']
     print("PERSIST_CALVIN_ZHIRUI_YOLO5_IMAGES is defined.")
 else:
-    persistCalvinZhiruiYolo5ImagesImages = None
+    persistCalvinZhiruiYolo5Images = None
     print("PERSIST_CALVIN_ZHIRUI_YOLO5_IMAGES is not defined.")
 
 
 
-appName = "dataPersister"
+appName = f"dataPersister_{inputQueueName}"
 
 worker = kafkajobs.jobqueue.JobQueueWorker(appName, kafkaBootstrapUrl=kafkaUrl, topicName=inputQueueName, appName=appName)
 
@@ -78,61 +78,66 @@ async def work():
         cardCreationTimeStr = datetime.datetime.utcnow().isoformat()[0:-7]+"Z"
 
         # snake_case to PascalCase
-        cassasndaCardJson = { 'CardCreationTime' : cardCreationTimeStr , 'Features': dict() }
-        copyIfSet(job, cassasndaCardJson, 'card_type', 'CardType')
-        copyIfSet(job, cassasndaCardJson, 'contact_info', 'ContactInfo')
-        copyIfSet(job, cassasndaCardJson, 'event_time', 'EventTime')
-        copyIfSet(job, cassasndaCardJson, 'event_time_provenance', 'EventTimeProvenance')
-        copyIfSet(job, cassasndaCardJson, 'location', 'Location')
-        copyIfSet(job, cassasndaCardJson, "animal", 'Animal')
-        copyIfSet(job, cassasndaCardJson, "animal_sex", 'AnimalSex')
-        copyIfSet(job, cassasndaCardJson, "provenance_url", 'ProvenanceURL')
+        cassasndaCardJson = None
+        if not(cardStorageRestApiURL is None) and not(persistCardWithOrigImages is None):
+            cassasndaCardJson = { 'CardCreationTime' : cardCreationTimeStr , 'Features': dict() }
+            copyIfSet(job, cassasndaCardJson, 'card_type', 'CardType')
+            copyIfSet(job, cassasndaCardJson, 'contact_info', 'ContactInfo')
+            copyIfSet(job, cassasndaCardJson, 'event_time', 'EventTime')
+            copyIfSet(job, cassasndaCardJson, 'event_time_provenance', 'EventTimeProvenance')
+            copyIfSet(job, cassasndaCardJson, 'location', 'Location')
+            copyIfSet(job, cassasndaCardJson, "animal", 'Animal')
+            copyIfSet(job, cassasndaCardJson, "animal_sex", 'AnimalSex')
+            copyIfSet(job, cassasndaCardJson, "provenance_url", 'ProvenanceURL')
         
-        # solr card schema transforming
-        solrCardJson = {
-            "id":  "{0}/{1}".format(namespace,local_id)
-        }
-        if "location" in job:
-            location = job["location"]
-            if "Address" in location:
-                solrCardJson["address"] = location["Address"]
-            if "Lat" in location and "Lon" in location:
-                solrCardJson["location"] = "{0}, {1}".format(location["Lat"],location["Lon"])
-            if "CoordsProvenance" in location:
-                solrCardJson["location_provenance"] = location["CoordsProvenance"]
-        if "animal" in job:
-            solrCardJson["animal"] = job["animal"].capitalize()
-        if "animal_sex" in job:
-            solrCardJson["sex"] = job["animal_sex"].capitalize()
-        if "card_type" in job:
-            solrCardJson["card_type"] = job["card_type"].capitalize()
-        if "contact_info" in job:
-            contactInfo = job["contact_info"]
-            if "Comment" in contactInfo:
-                solrCardJson["contact_info_comment"] = contactInfo["Comment"]
-            if "Tel" in contactInfo:
-                solrCardJson["contact_info_tel"] = contactInfo["Tel"]
-            if "Email" in contactInfo:
-                solrCardJson["contact_info_email"] = contactInfo["Email"]
-            if "Name" in contactInfo:
-                solrCardJson["contact_info_name"] = contactInfo["Name"]
-        if "event_time" in job:
-            solrCardJson["event_time"] = job["event_time"],
-        if "event_time_provenance" in job:
-            solrCardJson["event_time_provenance"] = job["event_time_provenance"]
-        if "CardCreationTime" in cassasndaCardJson:
-            solrCardJson["card_creation_time"] = cassasndaCardJson["CardCreationTime"]
-        for (featuresIdent,vector) in feature_vectors:
-            solrCardJson["features_{0}".format(featuresIdent)] = ", ".join(["{0}".format(x) for x in vector])
+        if not(cardIndexRestApiURL is None):
+            # solr card schema transforming
+            solrCardJson = {
+                "id":  "{0}/{1}".format(namespace,local_id)
+            }
+            if "location" in job:
+                location = job["location"]
+                if "Address" in location:
+                    solrCardJson["address"] = location["Address"]
+                if "Lat" in location and "Lon" in location:
+                    solrCardJson["location"] = "{0}, {1}".format(location["Lat"],location["Lon"])
+                if "CoordsProvenance" in location:
+                    solrCardJson["location_provenance"] = location["CoordsProvenance"]
+            if "animal" in job:
+                solrCardJson["animal"] = job["animal"].capitalize()
+            if "animal_sex" in job:
+                solrCardJson["sex"] = job["animal_sex"].capitalize()
+            if "card_type" in job:
+                solrCardJson["card_type"] = job["card_type"].capitalize()
+            if "contact_info" in job:
+                contactInfo = job["contact_info"]
+                if "Comment" in contactInfo:
+                    solrCardJson["contact_info_comment"] = contactInfo["Comment"]
+                if "Tel" in contactInfo:
+                    solrCardJson["contact_info_tel"] = contactInfo["Tel"]
+                if "Email" in contactInfo:
+                    solrCardJson["contact_info_email"] = contactInfo["Email"]
+                if "Name" in contactInfo:
+                    solrCardJson["contact_info_name"] = contactInfo["Name"]
+            if "event_time" in job:
+                solrCardJson["event_time"] = job["event_time"],
+            if "event_time_provenance" in job:
+                solrCardJson["event_time_provenance"] = job["event_time_provenance"]
+            if "CardCreationTime" in cassasndaCardJson:
+                solrCardJson["card_creation_time"] = cassasndaCardJson["CardCreationTime"]
+            for (featuresIdent,vector) in feature_vectors:
+                solrCardJson["features_{0}".format(featuresIdent)] = ", ".join(["{0}".format(x) for x in vector])
 
         if not(persistCardWithOrigImages is None) and not(cardStorageRestApiURL is None):
             cardURL = "{0}/PetCards/{1}/{2}/".format(cardStorageRestApiURL,namespace,local_id)
             print("{0}: Putting a card to {1}".format(uid, cardURL))
             response = requests.put(cardURL, json = cassasndaCardJson)
             print("{0}: Got card put status code {1}".format(uid,response.status_code))
-            if response.status_code // 100 != 2:
+            if (response.status_code // 100 != 2) and response.status_code != 409:
                     print("{0}: Unsuccessful status code! Error {1}".format(uid,response.text))
                     exit(1)
+            if(response.status_code == 409):
+                print("{0}: Card already exists.".format(uid))
 
         if not(cardIndexRestApiURL is None):
             cardIndexURL = "{0}".format(cardIndexRestApiURL)
@@ -156,9 +161,33 @@ async def work():
                 print("{0}: Putting a photo {1} to {2}".format(uid, imageIdx+1, imageURL))
                 response = requests.put(imageURL, json = photoJson)
                 print("{0}: Got image put status code {1}".format(uid,response.status_code))
-                if response.status_code // 100 != 2:
+                if (response.status_code // 100 != 2) and response.status_code != 409:
                     print("{0}: Unsuccessful status code! Error {1}".format(uid,response.text))
                     exit(3)
+                if(response.status_code == 409):
+                    print("{0}: Photo {1} already exists.".format(uid, imageIdx+1))
+                
+                imageIdx+=1
+        
+        if not(persistCalvinZhiruiYolo5Images is None) and not(cardStorageRestApiURL is None):
+            imageIdx = 0
+            print("{0}: {1} Cal/Zhirui annotated images to put".format(uid,len(job['yolo5_output'])))
+
+            for toPut in job['yolo5_output']:
+                image = toPut['annotated']
+                photoJson = {
+                    "imageB64": image["data"],
+                    "imageMimeType": "image/jpeg"                    
+                }
+                imageURL = "{0}/PetPhotos/{1}/{2}/{3}/CalZhiruiAnnotatedHead".format(cardStorageRestApiURL, namespace, local_id, imageIdx+1)
+                print("{0}: Putting a photo {1} to {2}".format(uid, imageIdx+1, imageURL))
+                response = requests.put(imageURL, json = photoJson)
+                print("{0}: Got image put status code {1}".format(uid,response.status_code))
+                if (response.status_code // 100 != 2) and response.status_code != 409:
+                    print("{0}: Unsuccessful status code! Error {1}".format(uid,response.text))
+                    exit(3)
+                if(response.status_code == 409):
+                    print("{0}: Photo {1} already exists.".format(uid, imageIdx+1))
                 
                 imageIdx+=1
 
