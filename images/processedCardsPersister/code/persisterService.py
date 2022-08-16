@@ -25,7 +25,7 @@ if 'CARD_INDEX_REST_API_URL' in os.environ:
     print("CARD_INDEX_REST_API_URL is defined : Enabling card indexing into {0}".format(cardIndexRestApiURL))
 else:
     cardIndexRestApiURL = None
-    print("CARD_INDEX_REST_API_URL is not defined. Will not persist cards into a storage")
+    print("CARD_INDEX_REST_API_URL is not defined. Will not persist cards into index")
 
 if 'PERSIST_CARD_WITH_ORIG_IMAGES' in os.environ:
     persistCardWithOrigImages = os.environ['PERSIST_CARD_WITH_ORIG_IMAGES']
@@ -77,20 +77,74 @@ async def work():
 
         cardCreationTimeStr = datetime.datetime.utcnow().isoformat()[0:-7]+"Z"
 
-        # snake_case to PascalCase
-        cassasndaCardJson = None
-        if not(cardStorageRestApiURL is None) and not(persistCardWithOrigImages is None):
-            cassasndaCardJson = { 'CardCreationTime' : cardCreationTimeStr , 'Features': dict() }
-            copyIfSet(job, cassasndaCardJson, 'card_type', 'CardType')
-            copyIfSet(job, cassasndaCardJson, 'contact_info', 'ContactInfo')
-            copyIfSet(job, cassasndaCardJson, 'event_time', 'EventTime')
-            copyIfSet(job, cassasndaCardJson, 'event_time_provenance', 'EventTimeProvenance')
-            copyIfSet(job, cassasndaCardJson, 'location', 'Location')
-            copyIfSet(job, cassasndaCardJson, "animal", 'Animal')
-            copyIfSet(job, cassasndaCardJson, "animal_sex", 'AnimalSex')
-            copyIfSet(job, cassasndaCardJson, "provenance_url", 'ProvenanceURL')
         
-        if not(cardIndexRestApiURL is None):
+        cassasndaCardJson = None
+        if not(cardStorageRestApiURL is None):
+            if not(persistCardWithOrigImages is None):
+                cassasndaCardJson = { 'CardCreationTime' : cardCreationTimeStr , 'Features': dict() }
+                # snake_case to PascalCase
+                copyIfSet(job, cassasndaCardJson, 'card_type', 'CardType')
+                copyIfSet(job, cassasndaCardJson, 'contact_info', 'ContactInfo')
+                copyIfSet(job, cassasndaCardJson, 'event_time', 'EventTime')
+                copyIfSet(job, cassasndaCardJson, 'event_time_provenance', 'EventTimeProvenance')
+                copyIfSet(job, cassasndaCardJson, 'location', 'Location')
+                copyIfSet(job, cassasndaCardJson, "animal", 'Animal')
+                copyIfSet(job, cassasndaCardJson, "animal_sex", 'AnimalSex')
+                copyIfSet(job, cassasndaCardJson, "provenance_url", 'ProvenanceURL')
+
+                cardURL = "{0}/PetCards/{1}/{2}/".format(cardStorageRestApiURL,namespace,local_id)
+                print("{0}: Putting a card to {1}".format(uid, cardURL))
+                response = requests.put(cardURL, json = cassasndaCardJson)
+                print("{0}: Got card put status code {1}".format(uid,response.status_code))
+                if (response.status_code // 100 != 2) and response.status_code != 409:
+                        print("{0}: Unsuccessful status code! Error {1}".format(uid,response.text))
+                        exit(1)
+                if(response.status_code == 409):
+                    print("{0}: Card already exists.".format(uid))
+
+                imageIdx = 0
+                print("{0}: {1} orig photos to put".format(uid,len(job['images'])))
+                for image in job['images']:
+                    photoJson = {
+                        "imageB64": image["data"],
+                        "imageMimeType": "image/jpeg"                    
+                    }
+                    #print(json.dumps(photoJson))
+                    imageURL = "{0}/PetPhotos/{1}/{2}/{3}".format(cardStorageRestApiURL, namespace, local_id, imageIdx+1)
+                    print("{0}: Putting a photo {1} to {2}".format(uid, imageIdx+1, imageURL))
+                    response = requests.put(imageURL, json = photoJson)
+                    print("{0}: Got image put status code {1}".format(uid,response.status_code))
+                    if (response.status_code // 100 != 2) and response.status_code != 409:
+                        print("{0}: Unsuccessful status code! Error {1}".format(uid,response.text))
+                        exit(3)
+                    if(response.status_code == 409):
+                        print("{0}: Photo {1} already exists.".format(uid, imageIdx+1))
+                    
+                    imageIdx+=1
+
+            if not(persistCalvinZhiruiYolo5Images is None):
+                imageIdx = 0
+                print("{0}: {1} Cal/Zhirui annotated images to put".format(uid,len(job['yolo5_output'])))
+
+                for toPut in job['yolo5_output']:
+                    image = toPut['annotated']
+                    photoJson = {
+                        "imageB64": image["data"],
+                        "imageMimeType": "image/jpeg"                    
+                    }
+                    imageURL = "{0}/PetPhotos/{1}/{2}/{3}/CalZhiruiAnnotatedHead".format(cardStorageRestApiURL, namespace, local_id, imageIdx+1)
+                    print("{0}: Putting a photo {1} to {2}".format(uid, imageIdx+1, imageURL))
+                    response = requests.put(imageURL, json = photoJson)
+                    print("{0}: Got image put status code {1}".format(uid,response.status_code))
+                    if (response.status_code // 100 != 2) and response.status_code != 409:
+                        print("{0}: Unsuccessful status code! Error {1}".format(uid,response.text))
+                        exit(3)
+                    if(response.status_code == 409):
+                        print("{0}: Photo {1} already exists.".format(uid, imageIdx+1))
+                    
+                    imageIdx+=1
+        
+        if not(cardIndexRestApiURL is None):            
             # solr card schema transforming
             solrCardJson = {
                 "id":  "{0}/{1}".format(namespace,local_id)
@@ -123,73 +177,20 @@ async def work():
                 solrCardJson["event_time"] = job["event_time"],
             if "event_time_provenance" in job:
                 solrCardJson["event_time_provenance"] = job["event_time_provenance"]
-            if "CardCreationTime" in cassasndaCardJson:
-                solrCardJson["card_creation_time"] = cassasndaCardJson["CardCreationTime"]
-            for (featuresIdent,vector) in feature_vectors:
-                solrCardJson["features_{0}".format(featuresIdent)] = ", ".join(["{0}".format(x) for x in vector])
-
-        if not(persistCardWithOrigImages is None) and not(cardStorageRestApiURL is None):
-            cardURL = "{0}/PetCards/{1}/{2}/".format(cardStorageRestApiURL,namespace,local_id)
-            print("{0}: Putting a card to {1}".format(uid, cardURL))
-            response = requests.put(cardURL, json = cassasndaCardJson)
-            print("{0}: Got card put status code {1}".format(uid,response.status_code))
-            if (response.status_code // 100 != 2) and response.status_code != 409:
-                    print("{0}: Unsuccessful status code! Error {1}".format(uid,response.text))
-                    exit(1)
-            if(response.status_code == 409):
-                print("{0}: Card already exists.".format(uid))
-
-        if not(cardIndexRestApiURL is None):
+            
+            solrCardJson["card_creation_time"] = cardCreationTimeStr
+            # for (featuresIdent,vector) in feature_vectors:
+            #     solrCardJson["features_{0}".format(featuresIdent)] = ", ".join(["{0}".format(x) for x in vector])
+        
             cardIndexURL = "{0}".format(cardIndexRestApiURL)
             print("{0}: Sending a card to {1} for indexing".format(uid, cardIndexURL))
             response = requests.post(cardIndexURL, json = solrCardJson)
             print("{0}: Got card indexing status code {1}".format(uid,response.status_code))
             if response.status_code // 100 != 2:
                     print("{0}: Unsuccessful status code! Error {1}".format(uid,response.text))
-                    exit(2)
-
-        if not(persistCardWithOrigImages is None) and not(cardStorageRestApiURL is None):
-            imageIdx = 0
-            print("{0}: {1} orig photos to put".format(uid,len(job['images'])))
-            for image in job['images']:
-                photoJson = {
-                    "imageB64": image["data"],
-                    "imageMimeType": "image/jpeg"                    
-                }
-                #print(json.dumps(photoJson))
-                imageURL = "{0}/PetPhotos/{1}/{2}/{3}".format(cardStorageRestApiURL, namespace, local_id, imageIdx+1)
-                print("{0}: Putting a photo {1} to {2}".format(uid, imageIdx+1, imageURL))
-                response = requests.put(imageURL, json = photoJson)
-                print("{0}: Got image put status code {1}".format(uid,response.status_code))
-                if (response.status_code // 100 != 2) and response.status_code != 409:
-                    print("{0}: Unsuccessful status code! Error {1}".format(uid,response.text))
-                    exit(3)
-                if(response.status_code == 409):
-                    print("{0}: Photo {1} already exists.".format(uid, imageIdx+1))
-                
-                imageIdx+=1
+                    exit(2)            
         
-        if not(persistCalvinZhiruiYolo5Images is None) and not(cardStorageRestApiURL is None):
-            imageIdx = 0
-            print("{0}: {1} Cal/Zhirui annotated images to put".format(uid,len(job['yolo5_output'])))
-
-            for toPut in job['yolo5_output']:
-                image = toPut['annotated']
-                photoJson = {
-                    "imageB64": image["data"],
-                    "imageMimeType": "image/jpeg"                    
-                }
-                imageURL = "{0}/PetPhotos/{1}/{2}/{3}/CalZhiruiAnnotatedHead".format(cardStorageRestApiURL, namespace, local_id, imageIdx+1)
-                print("{0}: Putting a photo {1} to {2}".format(uid, imageIdx+1, imageURL))
-                response = requests.put(imageURL, json = photoJson)
-                print("{0}: Got image put status code {1}".format(uid,response.status_code))
-                if (response.status_code // 100 != 2) and response.status_code != 409:
-                    print("{0}: Unsuccessful status code! Error {1}".format(uid,response.text))
-                    exit(3)
-                if(response.status_code == 409):
-                    print("{0}: Photo {1} already exists.".format(uid, imageIdx+1))
-                
-                imageIdx+=1
+            
 
         # for (ident,vector) in feature_vectors:
         #     featureURL = "{0}/PetCards/{1}/{2}/features/{3}".format(cardStorageRestApiURL, namespace, local_id, ident)
