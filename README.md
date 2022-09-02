@@ -35,3 +35,6 @@ To deploy your own instance of kashtanka.pet you will need:
 2. Apache Kafka cluster
 2. CassandraDB cluster
 3. Apache Solr 9.0 cluster
+
+# Kubernetes configuration
+yaml files which define the cloud system are located in `k8s` directory.
