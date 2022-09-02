@@ -31,7 +31,7 @@ spec:
     matchLabels:
       app: solr
   serviceName: solr
-  replicas: 1
+  replicas: 3
   updateStrategy:
     type: RollingUpdate
   podManagementPolicy: OrderedReady
@@ -62,11 +62,11 @@ spec:
             cpu: "1000m"
           limits:
             memory: 1600Mi
-            cpu: "1000m"
+            #cpu: "3000m"
         env:
             - name: ZK_HOST
-              #value: zk-0.zk-hs,zk-1.zk-hs,zk-2.zk-hs # solr monitors ZK cluster itself. this, not zk-cs
-              value: zk-0.zk-hs # solr monitors ZK cluster itself. this, not zk-cs
+              value: zk-0.zk-hs,zk-1.zk-hs,zk-2.zk-hs # solr monitors ZK cluster itself. this, not zk-cs
+              #value: zk-0.zk-hs # solr monitors ZK cluster itself. this, not zk-cs
             - name: SOLR_HEAP
               value: 1024m
             - name: SOLR_JAVA_MEM

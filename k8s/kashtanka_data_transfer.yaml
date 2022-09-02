@@ -1,0 +1,126 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: transfer-orig-persister
+  namespace: kashtanka
+spec:
+  selector:
+    matchLabels:
+      app: transfer-orig-persister
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: transfer-orig-persister
+    spec:
+      containers:
+      - name: worker
+        image:  lostpetinitiative/processed-cards-persister:2.0.0-dev
+        imagePullPolicy: Always
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "100m"
+          limits:
+            memory: "256Mi"
+            #cpu: "200m"
+        env:
+        - name: KAFKA_URL
+          value: kafka-cluster.default:9092
+        - name: KAFKA_RETENTION_HOURS
+          value: "6"
+        - name: KAFKA_REPLICATION_FACTOR
+          value: "1"
+        - name: INPUT_QUEUE
+          value: kashtanka_transfer_distinct_photos_pet_cards
+        - name: CARD_STORAGE_REST_API_URL
+          value: http://cassandra-rest-api
+        - name: PERSIST_CARD_WITH_ORIG_IMAGES
+          value: "true"
+        - name: CARD_INDEX_REST_API_URL
+          value: http://solr.default/solr/kashtankacards/update/json/docs
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: transfer-detected-head-persister
+  namespace: kashtanka
+spec:
+  selector:
+    matchLabels:
+      app: transfer-detected-head-persister
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: transfer-detected-head-persister
+    spec:
+      containers:
+      - name: worker
+        image:  lostpetinitiative/processed-cards-persister:2.0.0-dev
+        imagePullPolicy: Always
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "100m"
+          limits:
+            memory: "256Mi"
+            #cpu: "200m"
+        env:
+        - name: KAFKA_URL
+          value: kafka-cluster.default:9092
+        - name: KAFKA_RETENTION_HOURS
+          value: "6"
+        - name: KAFKA_REPLICATION_FACTOR
+          value: "1"
+        - name: INPUT_QUEUE
+          value: kashtanka_transfer_calvin_zhirui_yolov5_output
+        - name: CARD_STORAGE_REST_API_URL
+          value: http://cassandra-rest-api
+        - name: PERSIST_CALVIN_ZHIRUI_YOLO5_IMAGES
+          value: "true"
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: transfer-feature-vector-persister
+  namespace: kashtanka
+spec:
+  selector:
+    matchLabels:
+      app: transfer-feature-vector-persister
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: transfer-feature-vector-persister
+    spec:
+      containers:
+      - name: worker
+        image:  lostpetinitiative/processed-cards-persister:2.0.0-dev
+        imagePullPolicy: Always
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "100m"
+          limits:
+            memory: "256Mi"
+            #cpu: "200m"
+        env:
+        - name: KAFKA_URL
+          value: kafka-cluster.default:9092
+        - name: KAFKA_RETENTION_HOURS
+          value: "6"
+        - name: KAFKA_REPLICATION_FACTOR
+          value: "1"
+        - name: INPUT_QUEUE
+          value: kashtanka_transfer_calvin_zhirui_embeddings_output
+        - name: CARD_STORAGE_REST_API_URL
+          value: http://cassandra-rest-api
+        - name: PERSIST_PHOTO_FEATURES
+          value: CalZhiruiHeadTwinTransformer
+        - name: CALVIN_ZHIRUI_IMAGE_INDEX_REST_API_URL
+          value: http://solr.default/solr/kashtankaimages/update/json/docs

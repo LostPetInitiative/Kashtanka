@@ -1,11 +1,8 @@
-import copy
-
-import shutil
 import os
-import base64
 import asyncio
 import datetime
 import requests
+import numpy as np
 import json
 
 import kafkajobs
@@ -27,6 +24,14 @@ else:
     cardIndexRestApiURL = None
     print("CARD_INDEX_REST_API_URL is not defined. Will not persist cards into index")
 
+if 'CALVIN_ZHIRUI_IMAGE_INDEX_REST_API_URL' in os.environ:
+    calZhiruiIndexRestApiURL = os.environ['CALVIN_ZHIRUI_IMAGE_INDEX_REST_API_URL']
+    print("CALVIN_ZHIRUI_IMAGE_INDEX_REST_API_URL is defined : Enabling photo indexing into {0}".format(calZhiruiIndexRestApiURL))
+else:
+    calZhiruiIndexRestApiURL = None
+    print("CALVIN_ZHIRUI_IMAGE_INDEX_REST_API_URL is not defined. Will not persist cards into index")
+
+
 if 'PERSIST_CARD_WITH_ORIG_IMAGES' in os.environ:
     persistCardWithOrigImages = os.environ['PERSIST_CARD_WITH_ORIG_IMAGES']
     print("PERSIST_CARD_WITH_ORIG_IMAGES is defined.")
@@ -40,6 +45,13 @@ if 'PERSIST_CALVIN_ZHIRUI_YOLO5_IMAGES' in os.environ:
 else:
     persistCalvinZhiruiYolo5Images = None
     print("PERSIST_CALVIN_ZHIRUI_YOLO5_IMAGES is not defined.")
+
+if 'PERSIST_PHOTO_FEATURES' in os.environ:
+    persistPhotoFeatures = os.environ['PERSIST_PHOTO_FEATURES']
+    print(f"PERSIST_PHOTO_FEATURES is defined: {persistPhotoFeatures}")
+else:
+    persistPhotoFeatures = None
+    print("PERSIST_PHOTO_FEATURES is not defined.")
 
 
 
@@ -122,6 +134,21 @@ async def work():
                     
                     imageIdx+=1
 
+            if not(persistPhotoFeatures is None):
+                imageIdx = 0
+                print(f"{uid}: {len(job['image_embeddings'])} image embeddings to persist as {persistPhotoFeatures}")
+                for toPut in job['image_embeddings']:
+                    featuresURL = f"{cardStorageRestApiURL}/PetPhotos/{namespace}/{local_id}/{imageIdx+1}/features/{persistPhotoFeatures}"
+                    vector = kafkajobs.serialization.base64strToNpArray(toPut['embedding']).tolist()
+                    featuresJson = {"features": vector}
+                    print("{0}: Putting features {1} to {2}".format(uid, persistPhotoFeatures, featuresURL))
+                    response = requests.put(featuresURL, json = featuresJson)
+                    print("{0}: Got features put status code {1}".format(uid,response.status_code))
+                    if response.status_code // 100 != 2:
+                        print("{0}: Unsuccessful status code! Error {1}".format(uid,response.text))
+                        exit(4)
+                    imageIdx+=1
+
             if not(persistCalvinZhiruiYolo5Images is None):
                 imageIdx = 0
                 print("{0}: {1} Cal/Zhirui annotated images to put".format(uid,len(job['yolo5_output'])))
@@ -132,7 +159,7 @@ async def work():
                         "imageB64": image["data"],
                         "imageMimeType": "image/jpeg"                    
                     }
-                    imageURL = "{0}/PetPhotos/{1}/{2}/{3}/CalZhiruiAnnotatedHead".format(cardStorageRestApiURL, namespace, local_id, imageIdx+1)
+                    imageURL = "{0}/PetPhotos/{1}/{2}/{3}/processed/CalZhiruiAnnotatedHead".format(cardStorageRestApiURL, namespace, local_id, imageIdx+1)
                     print("{0}: Putting a photo {1} to {2}".format(uid, imageIdx+1, imageURL))
                     response = requests.put(imageURL, json = photoJson)
                     print("{0}: Got image put status code {1}".format(uid,response.status_code))
@@ -144,8 +171,8 @@ async def work():
                     
                     imageIdx+=1
         
-        if not(cardIndexRestApiURL is None):            
-            # solr card schema transforming
+        if not(cardIndexRestApiURL is None):
+             # solr card schema transforming
             solrCardJson = {
                 "id":  "{0}/{1}".format(namespace,local_id)
             }
@@ -188,9 +215,52 @@ async def work():
             print("{0}: Got card indexing status code {1}".format(uid,response.status_code))
             if response.status_code // 100 != 2:
                     print("{0}: Unsuccessful status code! Error {1}".format(uid,response.text))
-                    exit(2)            
-        
+                    exit(2)    
+
+        if not(calZhiruiIndexRestApiURL is None):
+            imageIdx = 0
+            print("{0}: {1} Cal/Zhirui image embeddings to index".format(uid,len(job['image_embeddings'])))
+
+            for toPut in job['image_embeddings']:     
+                # solr card schema transforming
+                imId = f"{namespace}/{local_id}/{imageIdx+1}"
+                solrCardJson = {
+                    "id":  imId,
+                    "num": imageIdx+1
+                }
+                if "location" in job:
+                    location = job["location"]
+                    if "Lat" in location and "Lon" in location:
+                        solrCardJson["location"] = "{0}, {1}".format(location["Lat"],location["Lon"])                    
+                if "animal" in job:
+                    solrCardJson["animal"] = job["animal"].capitalize()
+                if "animal_sex" in job:
+                    solrCardJson["sex"] = job["animal_sex"].capitalize()
+                if "card_type" in job:
+                    solrCardJson["card_type"] = job["card_type"].capitalize()
+                if "event_time" in job:
+                    solrCardJson["event_time"] = job["event_time"],
+                
+                solrCardJson["card_creation_time"] = cardCreationTimeStr
+                
+                # Calvin-Zhiurui embedding
+                vector = kafkajobs.serialization.base64strToNpArray(toPut['embedding'])
+                vector_norm = np.linalg.norm(vector)
+                vector_normalized = vector / vector_norm
+                solrCardJson["calvin_zhirui_embedding"] = vector_normalized.tolist()  #", ".join(["{0}".format(x) for x in vector])
+                solrCardJson["calvin_zhirui_detected_heads"] = toPut['head_count']
             
+                indexURL = "{0}".format(calZhiruiIndexRestApiURL)
+                print("{0}: Sending a image to {1} for indexing".format(imId, indexURL))
+                response = requests.post(indexURL, json = solrCardJson)
+                #print(json.dumps(solrCardJson))
+                print("{0}: Got card indexing status code {1}".format(imId,response.status_code))
+                if response.status_code // 100 != 2:
+                    print("{0}: Unsuccessful status code! Error {1}".format(imId,response.text))
+                    exit(2)
+                imageIdx+=1
+        
+        
 
         # for (ident,vector) in feature_vectors:
         #     featureURL = "{0}/PetCards/{1}/{2}/features/{3}".format(cardStorageRestApiURL, namespace, local_id, ident)

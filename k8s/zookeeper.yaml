@@ -46,7 +46,7 @@ spec:
     matchLabels:
       app: zk
   serviceName: zk-hs
-  replicas: 1
+  replicas: 3
   updateStrategy:
     type: RollingUpdate
   podManagementPolicy: OrderedReady
@@ -75,7 +75,7 @@ spec:
             cpu: "0.01"
           limits:
             memory: "256Mi"
-            cpu: "0.2"
+            #cpu: "0.5"
         ports:
         - containerPort: 2181
           name: client
@@ -87,7 +87,7 @@ spec:
         - sh
         - -c
         - "start-zookeeper \
-          --servers=1 \
+          --servers=3 \
           --data_dir=/var/lib/zookeeper/data \
           --data_log_dir=/var/lib/zookeeper/data/log \
           --conf_dir=/opt/zookeeper/conf \

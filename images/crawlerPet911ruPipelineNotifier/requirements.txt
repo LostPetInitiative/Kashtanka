@@ -3,3 +3,4 @@ jinja2 < 3.1.0
 kafka-job-scheduler >= 1.*
 webptools
 argparse
+tqdm
