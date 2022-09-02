@@ -44,7 +44,8 @@ spec:
               topologyKey: "kubernetes.io/hostname"
       containers:
       - name: rest-api
-        image: lostpetinitiative/kafka-rest-api:0.1.6
+        image: lostpetinitiative/kafka-rest-api:latest
+        imagePullPolicy: Always
         resources:
           requests:
             memory: "128Mi"
@@ -84,7 +85,7 @@ spec:
             memory: "64Mi"
             cpu: "25m"
           limits:
-            memory: "128Mi"
+            memory: "384Mi"
             cpu: "500m"
         # ports:
         # - containerPort: <Port>
@@ -99,59 +100,128 @@ spec:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: pet-image-detector
+  name: calvin-zhirui-yolo5-head-detector
   namespace: kashtanka
 spec:
   selector:
     matchLabels:
-      app: pet-image-detector
+      app: calvin-zhirui-yolo5-head-detector
   strategy:
     type: Recreate
   template:
     metadata:
       labels:
-        app: pet-image-detector
+        app: calvin-zhirui-yolo5-head-detector
     spec:
       containers:
       - name: worker
-        image: lostpetinitiative/pet-image-extractor-yolo4:1.1.6
+        image: lostpetinitiative/calvin_zhirui_yolo5_head_detector:2.0.1
         resources:
           requests:
-            memory: "2048Mi"
-            cpu: "25m"
+            memory: "1024Mi"
+            cpu: "100m"
           limits:
-            #memory: "3072Mi"
-            memory: "2048Mi"
-            cpu: "4"
-        # ports:
-        # - containerPort: <Port>
+            memory: "1024Mi"
+            #memory: "2048Mi"
+          #   cpu: "4"        
         env:
         - name: KAFKA_URL
           value: kafka-cluster.default:9092
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: calvin-zhirui-head-feature-extractor
+  namespace: kashtanka
+spec:
+  selector:
+    matchLabels:
+      app: calvin-zhirui-head-feature-extractor
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: calvin-zhirui-head-feature-extractor
+    spec:
+      containers:
+      - name: worker
+        image: lostpetinitiative/calvin_zhirui_feature_extractor:0.0.1-alpha
+        resources:
+          requests:
+            memory: "1280Mi"
+            cpu: "100m"
+          limits:
+            memory: "3072Mi"
+          #   #memory: "2048Mi"
+          #   cpu: "4"        
+        env:
+        - name: KAFKA_URL
+          value: kafka-cluster.default:9092
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: orig-persister
+  namespace: kashtanka
+spec:
+  selector:
+    matchLabels:
+      app: orig-persister
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: orig-persister
+    spec:
+      containers:
+      - name: worker
+        image:  lostpetinitiative/processed-cards-persister:2.0.0-dev
+        imagePullPolicy: Always
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "100m"
+          limits:
+            memory: "256Mi"
+            cpu: "200m"
+        env:
+        - name: KAFKA_URL
+          value: kafka-cluster.default:9092
+        - name: KAFKA_RETENTION_HOURS
+          value: "24"
+        - name: KAFKA_REPLICATION_FACTOR
+          value: "3"
         - name: INPUT_QUEUE
           value: kashtanka_distinct_photos_pet_cards
-        - name: OUTPUT_QUEUE
-          value: kashtanka_detected_pets
+        - name: CARD_STORAGE_REST_API_URL
+          value: http://cassandra-rest-api
+        - name: PERSIST_CARD_WITH_ORIG_IMAGES
+          value: "true"
+        - name: CARD_INDEX_REST_API_URL
+          value: http://solr.default/solr/kashtankacards/update/json/docs
 ---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: processed-cards-persister
+  name: detected-head-persister
   namespace: kashtanka
 spec:
   selector:
     matchLabels:
-      app: processed-cards-persister
+      app: detected-head-persister
   strategy:
     type: Recreate
   template:
     metadata:
       labels:
-        app: processed-cards-persister
+        app: detected-head-persister
     spec:
       containers:
       - name: worker
-        image: lostpetinitiative/processed-cards-persister:1.1.5
+        image:  lostpetinitiative/processed-cards-persister:2.0.0-dev
+        imagePullPolicy: Always
         resources:
           requests:
             memory: "256Mi"
@@ -162,31 +232,37 @@ spec:
         env:
         - name: KAFKA_URL
           value: kafka-cluster.default:9092
+        - name: KAFKA_RETENTION_HOURS
+          value: "24"
+        - name: KAFKA_REPLICATION_FACTOR
+          value: "3"
         - name: INPUT_QUEUE
-          value: kashtanka_cards_with_features
+          value: kashtanka_calvin_zhirui_yolov5_output
         - name: CARD_STORAGE_REST_API_URL
           value: http://cassandra-rest-api
-        - name: CARD_INDEX_REST_API_URL
-          value: http://solr.default/solr/kashtankacards/update/json/docs
+        - name: PERSIST_CALVIN_ZHIRUI_YOLO5_IMAGES
+          value: "true"
 ---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: processed-cards-persister2
+  name: feature-vector-persister
   namespace: kashtanka
 spec:
   selector:
     matchLabels:
-      app: processed-cards-persister2
-  replicas: 0
+      app: feature-vector-persister
+  strategy:
+    type: Recreate
   template:
     metadata:
       labels:
-        app: processed-cards-persister2
+        app: feature-vector-persister
     spec:
       containers:
       - name: worker
-        image: lostpetinitiative/processed-cards-persister:1.1.5
+        image:  lostpetinitiative/processed-cards-persister:2.0.0-dev
+        imagePullPolicy: Always
         resources:
           requests:
             memory: "256Mi"
@@ -197,86 +273,18 @@ spec:
         env:
         - name: KAFKA_URL
           value: kafka-cluster.default:9092
+        - name: KAFKA_RETENTION_HOURS
+          value: "24"
+        - name: KAFKA_REPLICATION_FACTOR
+          value: "3"
         - name: INPUT_QUEUE
-          value: kashtanka_cards_with_features_no_trello
+          value: kashtanka_calvin_zhirui_embeddings_output
         - name: CARD_STORAGE_REST_API_URL
           value: http://cassandra-rest-api
-        - name: CARD_INDEX_REST_API_URL
-          value: http://solr.default/solr/kashtankacards/update/json/docs
----
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: feature-extractor-dogs
-  namespace: kashtanka
-spec:
-  selector:
-    matchLabels:
-      app: feature-extractor-dogs
-  strategy:
-    type: Recreate
-  template:
-    metadata:
-      labels:
-        app: feature-extractor-dogs
-    spec:
-      containers:
-      - name: worker
-        image: lostpetinitiative/pet-feature-extractor:1.1.3
-        resources:
-          requests:
-            memory: "1280Mi"
-            cpu: "25m"
-          limits:
-            #memory: "3072Mi"
-            memory: "1280Mi"
-            cpu: "1"
-        env:
-        - name: KAFKA_URL
-          value: kafka-cluster.default:9092
-        - name: INPUT_QUEUE
-          value: kashtanka_detected_pets
-        - name: OUTPUT_QUEUE
-          value: kashtanka_cards_with_features
-        - name: ANIMAL_TYPE
-          value: dog
----
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: feature-extractor-cats
-  namespace: kashtanka
-spec:
-  selector:
-    matchLabels:
-      app: feature-extractor-cats
-  strategy:
-    type: Recreate
-  template:
-    metadata:
-      labels:
-        app: feature-extractor-cats
-    spec:
-      containers:
-      - name: worker
-        image: lostpetinitiative/pet-feature-extractor:1.1.3
-        resources:
-          requests:
-            memory: "1280Mi"
-            cpu: "25m"
-          limits:
-            #memory: "3072Mi"
-            memory: "1280Mi"
-            cpu: "1"
-        env:
-        - name: KAFKA_URL
-          value: kafka-cluster.default:9092
-        - name: INPUT_QUEUE
-          value: kashtanka_detected_pets
-        - name: OUTPUT_QUEUE
-          value: kashtanka_cards_with_features
-        - name: ANIMAL_TYPE
-          value: cat
+        - name: PERSIST_PHOTO_FEATURES
+          value: CalZhiruiHeadTwinTransformer
+        - name: CALVIN_ZHIRUI_IMAGE_INDEX_REST_API_URL
+          value: http://solr.default/solr/kashtankaimages/update/json/docs
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -337,7 +345,7 @@ metadata:
 spec:
   ports:
   - port: 80
-    targetPort: 5000
+    targetPort: 80
     name: web
   selector:
     app: cassandra-rest-api
@@ -352,9 +360,11 @@ spec:
     matchLabels:
       app: cassandra-rest-api
   strategy:
-    type: RollingUpdate
-    rollingUpdate:
-      maxSurge: 1
+    type: Recreate
+  # strategy:
+  #   type: RollingUpdate
+  #   rollingUpdate:
+  #     maxSurge: 1
   #replicas: 2
   template:
     metadata:
@@ -373,21 +383,22 @@ spec:
               topologyKey: "kubernetes.io/hostname"
       containers:
       - name: rest-api
-        image: lostpetinitiative/cassandra-rest-api:1.2.0
+        image: lostpetinitiative/cassandra-rest-api:latest
+        imagePullPolicy: Always
         resources:
           requests:
-            memory: "64Mi"
+            memory: "128Mi"
             cpu: "50m"
           limits:
-            memory: "64Mi"
-            cpu: "200m"          
+            memory: "256Mi"
+            cpu: "1000m"          
         env:
         - name: CASSANDRA_ADDRS
           value: cass-hs.default.svc.cluster.local
         - name: KEYSPACE
           value: kashtanka
         ports:
-        - containerPort: 5000
+        - containerPort: 80
 ---
 apiVersion: v1
 kind: Service
@@ -435,7 +446,8 @@ spec:
               topologyKey: "kubernetes.io/hostname"
       containers:
       - name: gateway
-        image: lostpetinitiative/search-api-gateway:0.2.1
+        imagePullPolicy: Always
+        image: lostpetinitiative/search-api-gateway:latest
         resources:
           requests:
             memory: "128Mi"
@@ -458,8 +470,8 @@ spec:
           value: "30"
         - name: REVERSE_TIME_GAP_LENGTH_DAYS
           value: "14"
-        - name: SIMILARITY_THRESHOLD
-          value: "0.95"
+        - name: SIMILARITY_KNN_TOP_K
+          value: "200"
         ports:
         - containerPort: 80
 ---
@@ -498,7 +510,7 @@ spec:
     spec:
       containers:
       - name: web-server
-        image: lostpetinitiative/kashtanka-web-app:0.2.1
+        image: lostpetinitiative/kashtanka-web-app:dev
         resources:
           requests:
             memory: "64Mi"
@@ -587,10 +599,10 @@ spec:
     spec:
       containers:
       - name: crawler
-        image: lostpetinitiative/crawler-pet911ru-agent:3.0.1
+        image: lostpetinitiative/crawler-pet911ru-agent:3.1.3
         resources:
           limits:
-            memory: "256Mi"
+            memory: "512Mi"
             cpu: "200m"
           requests:
             memory: "150Mi"
@@ -599,7 +611,7 @@ spec:
           - mountPath: /db
             name: db
       - name: submitter
-        image: lostpetinitiative/crawler-pet911ru-pipeline-submitter:0.5
+        image: lostpetinitiative/crawler-pet911ru-pipeline-submitter:dev
         imagePullPolicy: Always
         resources:
           limits:
@@ -615,6 +627,10 @@ spec:
         env:
         - name: KAFKA_URL
           value: kafka-cluster.default:9092
+        - name: KAFKA_RETENTION_HOURS
+          value: "24"
+        - name: KAFKA_REPLICATION_FACTOR
+          value: "3"
         - name: OUTPUT_QUEUE
           value: kashtanka_crawled_pet_cards
         - name: DB_PATH
@@ -624,4 +640,4 @@ spec:
       volumes:
         - name: db
           persistentVolumeClaim:
-            claimName: pet911ru3
+            claimName: pet911ru4

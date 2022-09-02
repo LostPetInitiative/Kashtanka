@@ -75,7 +75,7 @@ spec:
             cpu: "0.01"
           limits:
             memory: "256Mi"
-            cpu: "0.2"
+            #cpu: "0.5"
         ports:
         - containerPort: 2181
           name: client
@@ -134,3 +134,50 @@ spec:
       resources:
         requests:
           storage: 512Mi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: zk-ui
+spec:
+  selector:
+    app: zk-ui
+  ports:
+  - port: 9000
+    targetPort: 9000
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: zk-ui
+spec:
+  selector:
+    matchLabels:
+      app: zk-ui
+  template:
+    metadata:
+      labels:
+        app: zk-ui
+    spec:
+      containers:
+      - name: webui
+        image: elkozmon/zoonavigator:latest
+        env:        
+        - name: HTTP_PORT
+          value: "9000"
+        - name: JAVA_XMS
+          value: 64M
+        - name: JAVA_XMX
+          value: 128M
+        - name: AUTO_CONNECT_CONNECTION_STRING
+          value: zk-cs
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "50m"
+          limits:
+            memory: "256Mi"
+            cpu: "500m"
+        ports:
+        - containerPort: 9000
+# ---

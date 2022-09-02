@@ -1,4 +1,3 @@
-import sys
 import kafkajobs
 import requests
 import os
@@ -14,7 +13,7 @@ destRestUrl = os.environ['REST_URL']
 print(f'Topic name: {topicName}')
 print(f'Topic output topic name: {outTopicName}')
 
-appName = "kafka_rest_proxy"
+appName = f"kafka_rest_proxy_{topicName}_to_{outTopicName}"
 
 postUrl = f"{destRestUrl}/{outTopicName}"
 

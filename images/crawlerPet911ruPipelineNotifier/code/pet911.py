@@ -7,12 +7,22 @@ from webptools import grant_permission,dwebp
 grant_permission()
 
 def GetPetCard(dirPath):
+    '''Loads the pet card identified by the dirPath. Retuens dictionary with the pet card data.'''
     cardPath = os.path.join(dirPath,"card.json")
     #print("Pasing {0}".format(cardPath))
     if not os.path.exists(cardPath):
-        raise "Can't find card.json in {0}".format(dirPath)
+        #raise Exception("Can't find card.json in {0}".format(dirPath))
+        return None
     with open(cardPath, 'r') as cardfile:
         card = json.loads(cardfile.read())
+
+    exts_to_type = {
+        "jpg" : "jpg",
+        "jpeg": "jpg",
+        "png" : "png",
+        "webp": "webp"
+    }
+
     images = []
     pet = card['pet']
     for photo in pet['photos'] :        
@@ -20,19 +30,30 @@ def GetPetCard(dirPath):
         imageType = "jpg"
         dotIdx = photoPath.rfind('.')
         if dotIdx != -1:
-            imageType = photoPath[(dotIdx+1):]
+            extCandidate = photoPath[(dotIdx+1):]
+            if extCandidate in exts_to_type:
+                imageType = exts_to_type[extCandidate]
+        if not os.path.exists(photoPath):
+            # probing for jpeg and png images
+            for ext in exts_to_type:
+                if os.path.exists(photoPath + "." + ext):
+                    imageType = exts_to_type[ext]
+                    photoPath = photoPath + "." + ext
+                    break
+
         if not os.path.exists(photoPath):
             print("The photo {0} is not on disk".format(photo['id']))
             continue
 
+        webpConverted = False
         # re-encoding webp
         if imageType == 'webp':
             imageType = "jpg"
-            print(dwebp(input_image=photoPath, output_image=photoPath[0:dotIdx]+".jpg",option="-o", logging="-v"))
-            photoPath = photoPath[0:dotIdx]+".jpg"
-            print("Webp re-encoded tp jpeg")
-        elif imageType == "jpeg":
-            imageType = "jpg"
+            dwebp(input_image=photoPath, output_image=photoPath+".jpg",option="-o", logging="-v")
+            #print(dwebp(input_image=photoPath, output_image=photoPath[0:dotIdx]+".jpg",option="-o", logging="-v"))
+            photoPath = photoPath+".jpg"
+            #print("Webp re-encoded to jpeg")            
+            webpConverted = True
         
         with open(photoPath, 'rb') as photoFile:
             photo = photoFile.read()
@@ -42,6 +63,9 @@ def GetPetCard(dirPath):
                 'data': base64.encodebytes(photo).decode("utf-8").replace("\n","")
             }
             images.append(image)
+        if webpConverted:
+            # removing JPEG to save some space
+            os.remove(photoPath)
     
     if pet['animal'] == "2":
         petKind = "cat"

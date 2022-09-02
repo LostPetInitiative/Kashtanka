@@ -33,7 +33,7 @@ spec:
     matchLabels:
       app: cass
   serviceName: cass-hs
-  replicas: 3
+  replicas: 4
   updateStrategy:
     type: RollingUpdate
   podManagementPolicy: OrderedReady
@@ -58,19 +58,20 @@ spec:
         imagePullPolicy: Always
         image: "dgrechka/k8s-cassandra:0.1"
         env:
-            - name: CASSANDRA_BROADCAST_ADDRESS
-              valueFrom:
-                    fieldRef:
-                        fieldPath: status.podIP
-            - name: CASSANDRA_SEEDS
-              value: cass-1.cass-hs.default.svc.cluster.local
-            - name: CASSANDRA_NUM_TOKENS
-              value: "32"
-            - name: CASSANDRA_DC
-              valueFrom:
+          - name: CASSANDRA_BROADCAST_ADDRESS
+            valueFrom:
                   fieldRef:
-                    fieldPath: metadata.labels['topology.kubernetes.io/zone']
-              # value: dc1
+                      fieldPath: status.podIP
+          - name: CASSANDRA_SEEDS
+            value: cass-0.cass-hs.default.svc.cluster.local
+            #value: cass-hs.default.svc.cluster.local
+          - name: CASSANDRA_NUM_TOKENS
+            value: "32"
+          - name: CASSANDRA_DC
+            valueFrom:
+                fieldRef:
+                  fieldPath: metadata.labels['topology.kubernetes.io/zone']
+            # value: dc1
         securityContext:
           capabilities:
             add:
@@ -84,11 +85,11 @@ spec:
               - nodetool drain
         resources:
           limits:
+            #cpu: "300m"
+            memory: 1.2Gi
+          requests:
             cpu: "200m"
-            memory: 1Gi
-          #requests:
-          #  cpu: "200m"
-          #  memory: 1Gi
+            memory: 1.2Gi
         ports:
         - containerPort: 7000
           name: gossip
@@ -117,6 +118,11 @@ spec:
         #   mountPath: /etc/cassandra/cassandra-env.sh
         #   subPath: cassandra-env.sh
           #readOnly: true
+      tolerations:
+      - key: "role"
+        operator: "Equal"
+        value: "master"
+        effect: "PreferNoSchedule"
       # securityContext:
       #   runAsUser: 1000
       #   fsGroup: 1000
@@ -134,4 +140,4 @@ spec:
       accessModes: [ "ReadWriteOnce" ]
       resources:
         requests:
-          storage: 32Gi
+          storage: 60Gi
