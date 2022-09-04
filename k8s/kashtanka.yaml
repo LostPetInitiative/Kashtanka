@@ -44,15 +44,15 @@ spec:
               topologyKey: "kubernetes.io/hostname"
       containers:
       - name: rest-api
-        image: lostpetinitiative/kafka-rest-api:latest
+        image: lostpetinitiative/kafka-rest-api:dev
         imagePullPolicy: Always
         resources:
           requests:
             memory: "128Mi"
             cpu: "50m"
           limits:
-            memory: "128Mi"
-            cpu: "200m"          
+            #memory: "128Mi"
+            #cpu: "200m"          
         env:
         - name: KAFKA_URL
           value: kafka-cluster.default:9092
@@ -387,11 +387,11 @@ spec:
         imagePullPolicy: Always
         resources:
           requests:
-            memory: "128Mi"
+            memory: "256Mi"
             cpu: "50m"
           limits:
             memory: "256Mi"
-            cpu: "1000m"          
+            #cpu: "1000m"        
         env:
         - name: CASSANDRA_ADDRS
           value: cass-hs.default.svc.cluster.local
