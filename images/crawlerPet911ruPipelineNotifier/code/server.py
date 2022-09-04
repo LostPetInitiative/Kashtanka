@@ -1,6 +1,7 @@
 from quart import Quart, request
 import kafkajobs
-import pet911
+from jsonschema import validate
+from cardLoaders import pet911, kashtanka
 import os
 
 kafkaUrl = os.environ['KAFKA_URL']
@@ -30,6 +31,7 @@ async def post_message():
     for cardId in data_json['cardIds']:
         cardDir = os.path.join(dbPAth,cardId)
         cardJson = pet911.GetPetCard(cardDir)
+        validate(instance=cardJson, schema=kashtanka.schema)
         print("sending #{0}\t({1})".format(counter, cardId))
         producer.Enqueue(str(counter), cardJson)
         print("sent #{0}\t({1})".format(counter, cardId))

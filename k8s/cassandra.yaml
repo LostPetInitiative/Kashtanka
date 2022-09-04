@@ -56,7 +56,7 @@ spec:
       containers:
       - name: cassandra
         imagePullPolicy: Always
-        image: "dgrechka/k8s-cassandra:0.1"
+        image: "dgrechka/k8s-cassandra:latest"
         env:
           - name: CASSANDRA_BROADCAST_ADDRESS
             valueFrom:
@@ -94,45 +94,19 @@ spec:
         - containerPort: 7000
           name: gossip
         - containerPort: 9042
-          name: client
-        # readinessProbe:
-        #   exec:
-        #     command:
-        #     - sh
-        #     - -c
-        #     - "zookeeper-ready 2181"
-        #   initialDelaySeconds: 10
-        #   timeoutSeconds: 5
-        # livenessProbe:
-        #   exec:
-        #     command:
-        #     - sh
-        #     - -c
-        #     - "zookeeper-ready 2181"
-        #   initialDelaySeconds: 10
-        #   timeoutSeconds: 5
+          name: client        
         volumeMounts:
         - name: datadir
           mountPath: /var/lib/cassandra
-        # - name: config
-        #   mountPath: /etc/cassandra/cassandra-env.sh
-        #   subPath: cassandra-env.sh
-          #readOnly: true
+          # NOTE FOR FUTURE:
+          # if you mount /etc/cassandra/cassandra.yaml the image will try to change its owner and fail, as the file is readonly
+          # so if you want to reconfigure cassandra, rebuild the image      
+              
       tolerations:
       - key: "role"
         operator: "Equal"
         value: "master"
-        effect: "PreferNoSchedule"
-      # securityContext:
-      #   runAsUser: 1000
-      #   fsGroup: 1000
-      # volumes:
-      #   - name: config
-      #     configMap:
-      #       name: cassandra-etc
-      #       items:
-      #       - key: cassandra-env.sh
-      #         path: cassandra-env.sh
+        effect: "PreferNoSchedule"            
   volumeClaimTemplates:
   - metadata:
       name: datadir
