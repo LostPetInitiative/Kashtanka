@@ -9,6 +9,7 @@ outputQueueName = os.environ["OUTPUT_QUEUE"]
 dbPAth = os.environ["DB_PATH"]
 
 app = Quart(__name__)
+app.config['MAX_CONTENT_LENGTH'] = 1024*1024*256 # 256Mb
 
 counter = 1
 
@@ -31,6 +32,9 @@ async def post_message():
     for cardId in data_json['cardIds']:
         cardDir = os.path.join(dbPAth,cardId)
         cardJson = pet911.GetPetCard(cardDir)
+        if cardJson is None:
+            print(f"Can't read the card from: {cardDir}")
+            continue
         validate(instance=cardJson, schema=kashtanka.schema)
         print("sending #{0}\t({1})".format(counter, cardId))
         producer.Enqueue(str(counter), cardJson)
