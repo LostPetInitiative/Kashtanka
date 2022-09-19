@@ -84,9 +84,9 @@ spec:
           requests:
             memory: "64Mi"
             cpu: "25m"
-          limits:
-            memory: "384Mi"
-            cpu: "500m"
+          #limits:
+            #memory: "384Mi"
+            #cpu: "500m"
         # ports:
         # - containerPort: <Port>
         env:
@@ -158,6 +158,54 @@ spec:
         env:
         - name: KAFKA_URL
           value: kafka-cluster.default:9092
+---
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: card-matcher
+  namespace: kashtanka
+spec:
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+  selector:
+    matchLabels:
+      app: card-matcher
+  template:
+    metadata:
+      labels:
+        app: card-matcher
+    spec:
+      containers:
+      - name: worker
+        image: lostpetinitiative/card-matcher:latest
+        # resources:
+        #   requests:
+        #     memory: "64Mi"
+        #     cpu: "25m"
+          #limits:
+            #memory: "384Mi"
+            #cpu: "500m"
+        # ports:
+        # - containerPort: <Port>
+        env:
+        - name: KAFKA_URL
+          value: kafka-cluster.default:9092
+        - name: SOLR_ADDR
+          value: http://search-gateway
+        - name: INPUT_QUEUE
+          value: kashtanka_calvin_zhirui_embeddings_output
+        - name: OUTPUT_QUEUE
+          value: kashtanka_card_matches
+        - name: KAFKA_RETENTION_HOURS
+          value: "168"
+        - name: KAFKA_REPLICATION_FACTOR
+          value: "3"
+        - name: SIMILARITY_THRESHOLD
+          value: "0.3"
+        
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -611,7 +659,7 @@ spec:
           - mountPath: /db
             name: db
       - name: submitter
-        image: lostpetinitiative/crawler-pet911ru-pipeline-submitter:dev
+        image: lostpetinitiative/crawler-pet911ru-pipeline-submitter:dev2
         imagePullPolicy: Always
         resources:
           limits:

@@ -44,14 +44,22 @@ spec:
     spec:
       affinity:
         podAntiAffinity:
+          # preferredDuringSchedulingIgnoredDuringExecution:
+          # - labelSelector:
+          #     matchExpressions:
+          #       - key: "app"
+          #         operator: In
+          #         values:
+          #         - cass
+          #   topologyKey: "topology.kubernetes.io/zone"
           requiredDuringSchedulingIgnoredDuringExecution:
-            - labelSelector:
-                matchExpressions:
-                  - key: "app"
-                    operator: In
-                    values:
-                    - cass
-              topologyKey: "topology.kubernetes.io/zone"
+          - labelSelector:
+              matchExpressions:
+                - key: "app"
+                  operator: In
+                  values:
+                  - cass
+            topologyKey: "kubernetes.io/hostname"
       terminationGracePeriodSeconds: 1800
       containers:
       - name: cassandra
@@ -106,7 +114,10 @@ spec:
       - key: "role"
         operator: "Equal"
         value: "master"
-        effect: "PreferNoSchedule"            
+        effect: "PreferNoSchedule"
+      - key: "node.kubernetes.io/disk-pressure"
+        operator: "Exists"
+        effect: "NoSchedule"
   volumeClaimTemplates:
   - metadata:
       name: datadir
