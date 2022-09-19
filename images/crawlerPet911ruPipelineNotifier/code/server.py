@@ -33,7 +33,7 @@ async def post_message():
         cardDir = os.path.join(dbPAth,cardId)
         cardJson = pet911.GetPetCard(cardDir)
         if cardJson is None:
-            print(f"Cand read the card from: {cardDir}")
+            print(f"Can't read the card from: {cardDir}")
             continue
         validate(instance=cardJson, schema=kashtanka.schema)
         print("sending #{0}\t({1})".format(counter, cardId))
