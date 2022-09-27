@@ -181,6 +181,9 @@ async def work():
                 if "Address" in location:
                     solrCardJson["address"] = location["Address"]
                 if "Lat" in location and "Lon" in location:
+                    # it seems that Solr does not accept longatude > 180. thus converting range [0,360) -> [-180,180)
+                    if location["Lon"] > 180.0:
+                        location["Lon"] -= 360.0
                     solrCardJson["location"] = "{0}, {1}".format(location["Lat"],location["Lon"])
                 if "CoordsProvenance" in location:
                     solrCardJson["location_provenance"] = location["CoordsProvenance"]
