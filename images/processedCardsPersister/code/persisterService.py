@@ -182,6 +182,7 @@ async def work():
                     solrCardJson["address"] = location["Address"]
                 if "Lat" in location and "Lon" in location:
                     # it seems that Solr does not accept longatude > 180. thus converting range [0,360) -> [-180,180)
+                    # see https://github.com/LostPetInitiative/Kashtanka/issues/28
                     if location["Lon"] > 180.0:
                         location["Lon"] -= 360.0
                     solrCardJson["location"] = "{0}, {1}".format(location["Lat"],location["Lon"])
@@ -234,6 +235,10 @@ async def work():
                 if "location" in job:
                     location = job["location"]
                     if "Lat" in location and "Lon" in location:
+                        # it seems that Solr does not accept longatude > 180. thus converting range [0,360) -> [-180,180)
+                        # see https://github.com/LostPetInitiative/Kashtanka/issues/28
+                        if location["Lon"] > 180.0:
+                            location["Lon"] -= 360.0
                         solrCardJson["location"] = "{0}, {1}".format(location["Lat"],location["Lon"])                    
                 if "animal" in job:
                     solrCardJson["animal"] = job["animal"].capitalize()
@@ -263,8 +268,6 @@ async def work():
                     exit(2)
                 imageIdx+=1
         
-        
-
         # for (ident,vector) in feature_vectors:
         #     featureURL = "{0}/PetCards/{1}/{2}/features/{3}".format(cardStorageRestApiURL, namespace, local_id, ident)
         #     featuresJson = {"features": vector}
