@@ -50,7 +50,7 @@ spec:
           requests:
             memory: "128Mi"
             cpu: "50m"
-          limits:
+          #limits:
             #memory: "128Mi"
             #cpu: "200m"          
         env:
@@ -120,8 +120,8 @@ spec:
           requests:
             memory: "1024Mi"
             cpu: "100m"
-          limits:
-            memory: "1024Mi"
+          #limits:
+          #  memory: "1024Mi"
             #memory: "2048Mi"
           #   cpu: "4"        
         env:
@@ -557,7 +557,7 @@ spec:
     spec:
       containers:
       - name: web-server
-        image: lostpetinitiative/kashtanka-web-app:dev
+        image: lostpetinitiative/kashtanka-web-app:2.0.1
         resources:
           requests:
             memory: "64Mi"
