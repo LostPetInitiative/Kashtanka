@@ -13,20 +13,20 @@ The production system runs on top of Kubernetes, but nobody stops you from runni
 ![System dataflow](arch.png)
 
 The table lists microservices depicted on the figure.
-|Num in figure| Full Name | Description | Code location |
-|----------|----------|---------|-------------|
-|  1       | Pet911ru crawler | Periodically crawles new card on [pet911.ru](https://pet911.ru) | [Standalone repo](https://github.com/LostPetInitiative/Crawler) |
-|  2       | Duplicate Photo filter | removes duplicated photos from cards | [Separate directory](https://github.com/LostPetInitiative/Kashtanka/tree/main/images/imageDuplicateRemovalService) |
-|  3       | Calvin-Zhirui pet head detector | Detects pet heads by appling YoloV5 | [Standalone repo](https://github.com/LostPetInitiative/Calvin_Zhirui_Yolo5_head_detector) |
-|  4       | Calvin-Zhirui fine grained classification feature extractor | Feature extractor based on Twin Transformer | [Standalone repo](https://github.com/LostPetInitiative/Calvin_Zhirui_Feature_Extractor)
-|  5       | Data persister | Persists the cards, processed images and feature vectors to the persistent storage or index | [Separate directory](https://github.com/LostPetInitiative/Kashtanka/tree/main/images/processedCardsPersister)
-|  6       | Card Storage REST API | Provides HTTP access to the pet cards storage | [Standalone repo](https://github.com/LostPetInitiative/CardStorageRestAPI)
-|  7       | Card Index REST API | Provices HTTP access to the index of pet cards | [Standalone repo](https://github.com/LostPetInitiative/CardIndexRestAPI)
-|  8       | Card matcher | Queries the index to get possible lost/found cards match | TBD |
-|  9       | Trello card creator | Creates Trello cards with found matched for human evaluation | [Separate directory](https://github.com/LostPetInitiative/Kashtanka/tree/main/images/trelloCardCreator)
-|  10      | Telegram notifier | Sends messages about new found matches into the Telegram channel | RBD |
-|  11      | Web app | The web application of the system  | [Standalone repo](https://github.com/LostPetInitiative/WebApp) |
-|  12      | Pipeline submitter | REST API for pushing cards into ML data processing pipeline | [Separate directory](https://github.com/LostPetInitiative/Kashtanka/tree/main/images/crawlerPet911ruPipelineNotifier)
+|Num in figure| Full Name | Description | Code location | Latest release |
+|----------|----------|---------|-------------|-------|
+|  1       | Pet911ru crawler | Periodically crawles new card on [pet911.ru](https://pet911.ru) | [Standalone repo](https://github.com/LostPetInitiative/Crawler) | [![Latest docker image version](https://img.shields.io/docker/v/lostpetinitiative/crawler-pet911ru-agent?label=docker%20image&sort=semver)](https://hub.docker.com/r/lostpetinitiative/crawler-pet911ru-agent) |
+|  2       | Duplicate Photo filter | removes duplicated photos from cards | [Separate directory](https://github.com/LostPetInitiative/Kashtanka/tree/main/images/imageDuplicateRemovalService) | [![Latest docker image version](https://img.shields.io/docker/v/lostpetinitiative/duplicate-image-remover?label=docker%20image&sort=semver)](https://hub.docker.com/r/lostpetinitiative/duplicate-image-remover) |
+|  3       | Calvin-Zhirui pet head detector | Detects pet heads by appling YoloV5 | [Standalone repo](https://github.com/LostPetInitiative/Calvin_Zhirui_Yolo5_head_detector) |  [![Latest docker image version](https://img.shields.io/docker/v/lostpetinitiative/calvin_zhirui_yolo5_head_detector?label=docker%20image&sort=semver)](https://hub.docker.com/r/lostpetinitiative/calvin_zhirui_yolo5_head_detector)  |
+|  4       | Calvin-Zhirui fine grained classification feature extractor | Feature extractor based on Twin Transformer | [Standalone repo](https://github.com/LostPetInitiative/Calvin_Zhirui_Feature_Extractor) |  [![Latest docker image version](https://img.shields.io/docker/v/lostpetinitiative/calvin_zhirui_feature_extractor?label=docker%20image&sort=semver)](https://hub.docker.com/r/lostpetinitiative/calvin_zhirui_feature_extractor)   |
+|  5       | Data persister | Persists the cards, processed images and feature vectors to the persistent storage or index | [Separate directory](https://github.com/LostPetInitiative/Kashtanka/tree/main/images/processedCardsPersister) |  [![Latest docker image version](https://img.shields.io/docker/v/lostpetinitiative/processed-cards-persister?label=docker%20image&sort=semver)](https://hub.docker.com/r/lostpetinitiative/processed-cards-persister) | 
+|  6       | Card Storage REST API | Provides HTTP access to the pet cards storage | [Standalone repo](https://github.com/LostPetInitiative/CardStorageRestAPI) | [![Latest docker image version](https://img.shields.io/docker/v/lostpetinitiative/cassandra-rest-api?label=docker%20image&sort=semver)](https://hub.docker.com/r/lostpetinitiative/cassandra-rest-api) |
+|  7       | Card Index REST API | Provices HTTP access to the index of pet cards | [Standalone repo](https://github.com/LostPetInitiative/CardIndexRestAPI) | [![Latest docker image version](https://img.shields.io/docker/v/lostpetinitiative/search-api-gateway?label=docker%20image&sort=semver)](https://hub.docker.com/r/lostpetinitiative/search-api-gateway) |
+|  8       | Card matcher | Queries the index to get possible lost/found cards match | [Standalone repo](https://github.com/LostPetInitiative/CardMatcher) | [![Latest docker image version](https://img.shields.io/docker/v/lostpetinitiative/card-matcher?label=docker%20image&sort=semver)](https://hub.docker.com/r/lostpetinitiative/card-matcher) |
+|  9       | Trello card creator | Creates Trello cards with found matched for human evaluation | [Separate directory](https://github.com/LostPetInitiative/Kashtanka/tree/main/images/trelloCardCreator) | [![Latest docker image version](https://img.shields.io/docker/v/lostpetinitiative/trello-found-card-creator?label=docker%20image&sort=semver)](https://hub.docker.com/r/lostpetinitiative/trello-found-card-creator)  | 
+|  10      | Telegram notifier | Sends messages about new found matches into the Telegram channel | RBD |   |
+|  11      | Web app | The web application of the system  | [Standalone repo](https://github.com/LostPetInitiative/WebApp) | [![Latest docker image version](https://img.shields.io/docker/v/lostpetinitiative/kashtanka-web-app?label=docker%20image&sort=semver)](https://hub.docker.com/r/lostpetinitiative/kashtanka-web-app) |
+|  12      | Pipeline submitter | REST API for pushing cards into ML data processing pipeline | [Separate directory](https://github.com/LostPetInitiative/Kashtanka/tree/main/images/crawlerPet911ruPipelineNotifier)| [![Latest docker image version](https://img.shields.io/docker/v/lostpetinitiative/crawler-pet911ru-pipeline-submitter?label=docker%20image&sort=semver)](https://hub.docker.com/r/lostpetinitiative/crawler-pet911ru-pipeline-submitter)  |
 
 
 ## Prerequisites
