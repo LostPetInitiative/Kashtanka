@@ -27,6 +27,8 @@ The table lists microservices depicted on the figure.
 |  10      | Telegram notifier | Sends messages about new found matches into the Telegram channel | RBD |   |
 |  11      | Web app | The web application of the system  | [Standalone repo](https://github.com/LostPetInitiative/WebApp) | [![Latest docker image version](https://img.shields.io/docker/v/lostpetinitiative/kashtanka-web-app?label=docker%20image&sort=semver)](https://hub.docker.com/r/lostpetinitiative/kashtanka-web-app) |
 |  12      | Pipeline submitter | REST API for pushing cards into ML data processing pipeline | [Separate directory](https://github.com/LostPetInitiative/Kashtanka/tree/main/images/crawlerPet911ruPipelineNotifier)| [![Latest docker image version](https://img.shields.io/docker/v/lostpetinitiative/crawler-pet911ru-pipeline-submitter?label=docker%20image&sort=semver)](https://hub.docker.com/r/lostpetinitiative/crawler-pet911ru-pipeline-submitter)  |
+|  13      | Poiskzoo.ru crawler | Periodically crawles new card on [poiskzoo.ru](https://poiskzoo.ru) | [Standalone repo](https://github.com/LostPetInitiative/poiskzoo-ru-crawler)| [![Latest docker image version](https://img.shields.io/docker/v/lostpetinitiative/poiskzoo-ru-crawler?label=docker%20image&sort=semver)](https://hub.docker.com/r/lostpetinitiative/poiskzoo-ru-crawler)  |
+|  14      | Kafka REST API | REST API for pushing any messages to Kafka topics | [Separate directory](https://github.com/LostPetInitiative/Kashtanka/tree/main/images/kafkaRestAPI)| [![Latest docker image version](https://img.shields.io/docker/v/lostpetinitiative/kafka-rest-api?label=docker%20image&sort=semver)](https://hub.docker.com/r/lostpetinitiative/kafka-rest-api)  |
 
 
 ## Prerequisites
