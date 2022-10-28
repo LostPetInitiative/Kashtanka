@@ -6,6 +6,7 @@ import base64
 import asyncio
 import datetime
 import base64
+from time import sleep
 import requests
 import json
 
@@ -16,6 +17,7 @@ inputQueueName = os.environ['INPUT_QUEUE']
 trelloKey = os.environ['TRELLO_KEY']
 trelloToken = os.environ['TRELLO_TOKEN']
 trelloIdList = os.environ['TRELLO_LIST']
+cardStorageURL = os.environ['CARD_STORAGE_URL']
 trelloAppMemberId = os.environ['TRELLO_APP_MEMBER_ID']
 
 appName = "processedCardsTrelloCardsCreator"
@@ -28,16 +30,47 @@ async def work():
     print("Service started. Pooling for a job")
     while True:        
         job = worker.GetNextJob(5000)
-        #print("Got job {0}".format(job))
-        uid = job["uid"]
+        uid = job["TargetID"]
         print("{0}: Starting to process the job".format(uid))
         
         splitted = uid.split("_")
         namespace = splitted[0]
         local_id = splitted[1]
 
-        if (job['card_type'] == "found") and (len(job['annotated_images']) > 0):
+        similarities = job["PossibleMatches"]
+        if len(similarities) == 0:
+            print(f"There are no matches. Skipping {uid}")
+            worker.Commit()
+            continue
+        topSimilarity = similarities[0]["CosSimilarity"]
+        print(f"Top similarity is {topSimilarity}")
 
+        #query the card from storage REST API
+        cardResp = requests.request(
+            "GET",
+            f'{cardStorageURL}/PetCards/{namespace}/{local_id}')
+        if not cardResp.ok:
+            print(f"Unsuccessful card fetch {uid}")
+            exit(3)
+        else:
+            print(f"Fetched card for {uid}")
+        card = cardResp.json()
+        cardType = card["cardType"]
+
+        photoResp = requests.request(
+            "GET",
+            f"{cardStorageURL}/PetPhotos/{namespace}/{local_id}"
+        )
+        if not photoResp.ok:
+            print(f"Unsuccessful photos metadata fetch {uid}")
+            exit(3)
+        else:
+            print(f"Fetched photos metadata for {uid}")
+        photos = photoResp.json()
+        photoCount = len(photos)
+        print(f"{photoCount} photos stored for {uid}")
+
+        if (cardType == "found") and (photoCount > 0):
             # creating a trello card
             url = "https://api.trello.com/1/cards"
 
@@ -45,9 +78,9 @@ async def work():
                 'key': trelloKey,
                 'token': trelloToken,
                 'idList': trelloIdList,
-                'pos': "bottom",
+                'pos': 1.0 - topSimilarity,
                 'name': f"{namespace}/{local_id}",
-                'desc': f"Доступны возможные совпадения",
+                'desc': f"Доступны возможные совпадения\nCosSim (CZHTTE): {topSimilarity}",
                 'idMembers' : [trelloAppMemberId]
             }
 
@@ -67,31 +100,41 @@ async def work():
                     cardID = result['id']
                     print("{0}: Successfully created Trello card. ID is {1}".format(uid, cardID))
 
-                    url = f"https://api.trello.com/1/cards/{cardID}/attachments"
-                    headers = {
-                        "Accept": "application/json"
-                    }
-                    
-                    #attaching image
-                    query = {
-                        'key': trelloKey,
-                        'token': trelloToken,
-                        'mimeType':'image/jpeg',
-                        'name': 'фото.jpg',
-                        'setCover': True
-                    }
-
-                    response = requests.request(
-                        "POST",
-                        url,
-                        files=dict(file=base64.decodebytes(job['annotated_images'][0]['data'].encode("utf-8"))),
-                        headers=headers,
-                        params=query
+                    # attaching image
+                    # fetning image
+                    photoBytesResp = requests.request(
+                        "GET",
+                        f"{cardStorageURL}/PetPhotos/{namespace}/{local_id}/1?preferableProcessingsStr=CalZhiruiAnnotatedHead"
                     )
-                    if response.ok:
-                        print("{0}: Successfully added photo attachment Trello card. ID is {1}".format(uid, cardID))
+                    if not photoBytesResp.ok:
+                        print(f"Unsuccessful photo fetch {uid}")
+                        exit(3)
                     else:
-                        print("{0}: Error during attaching photo to Trello card; http code {1}; {2}".format(uid, response.status_code, response.text))
+                        print(f"Fetched photo for {uid}")
+        
+                        url = f"https://api.trello.com/1/cards/{cardID}/attachments"
+                        headers = {
+                            "Accept": "application/json"
+                        }
+                        query = {
+                            'key': trelloKey,
+                            'token': trelloToken,
+                            'mimeType':'image/jpeg',
+                            'name': 'фото.jpg',
+                            'setCover': True
+                        }
+
+                        response = requests.request(
+                            "POST",
+                            url,
+                            files=dict(file=photoBytesResp.content),
+                            headers=headers,
+                            params=query
+                        )
+                        if response.ok:
+                            print("{0}: Successfully added photo attachment Trello card. ID is {1}".format(uid, cardID))
+                        else:
+                            print("{0}: Error during attaching photo to Trello card; http code {1}; {2}".format(uid, response.status_code, response.text))
 
                     # attaching URL
                     query = {
@@ -110,9 +153,6 @@ async def work():
                         print("{0}: Successfully added URL attachment Trello card. ID is {1}".format(uid, cardID))
                     else:
                         print("{0}: Error during attaching URL to Trello card; http code {1}; {2}".format(uid, response.status_code, response.text))
-                    
-
-
                 else:
                     retryCount += 1
                     print("{0}: Error during creation of Trello card: http code {1}, {2}".format(uid,response.status_code, response.text))
@@ -126,6 +166,8 @@ async def work():
         print("{0}: Job is done. Committing".format(uid))
         worker.Commit()
         print("{0}: Commited".format(uid))
+
+        sleep(10)
     
 
 asyncio.run(work(),debug=False)

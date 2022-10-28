@@ -551,7 +551,7 @@ spec:
     spec:
       containers:
       - name: web-server
-        image: lostpetinitiative/kashtanka-web-app:2.0.3
+        image: lostpetinitiative/kashtanka-web-app:2.2.1
         resources:
           requests:
             memory: "64Mi"
@@ -586,10 +586,6 @@ spec:
   selector:
     matchLabels:
       app: beta-web-app
-  strategy:
-    type: RollingUpdate
-    rollingUpdate:
-      maxSurge: 1
   template:
     metadata:
       labels:
@@ -597,7 +593,8 @@ spec:
     spec:
       containers:
       - name: web-server
-        image: lostpetinitiative/kashtanka-web-app:0.2.1
+        image: lostpetinitiative/kashtanka-web-app:latest
+        imagePullPolicy: Always
         resources:
           requests:
             memory: "64Mi"
