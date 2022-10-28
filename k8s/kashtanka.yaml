@@ -346,7 +346,7 @@ spec:
     spec:
       containers:
       - name: worker
-        image: lostpetinitiative/trello-found-card-creator:2.0.0
+        image: lostpetinitiative/trello-found-card-creator:2.1.0
         resources:
           requests:
             memory: "64Mi"
