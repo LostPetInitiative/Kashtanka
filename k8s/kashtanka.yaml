@@ -346,7 +346,7 @@ spec:
     spec:
       containers:
       - name: worker
-        image: lostpetinitiative/trello-found-card-creator:2.1.0
+        image: lostpetinitiative/trello-found-card-creator:2.2.0
         resources:
           requests:
             memory: "64Mi"
@@ -699,7 +699,7 @@ spec:
     spec:
       containers:
       - name: crawler
-        image: lostpetinitiative/poiskzoo-ru-crawler:1.0.0
+        image: lostpetinitiative/poiskzoo-ru-crawler:1.0.2
         resources:
           limits:
             memory: "64Mi"
@@ -726,21 +726,23 @@ metadata:
   name: trello-board-maintainer
   namespace: kashtanka
 spec:
-  schedule: "2 1 * * *"
+  schedule: "5 */2 * * *"
   jobTemplate:
     spec:
       template:
         spec:
           containers:
           - name: card-archiver
-            image: lostpetinitiative/trello-board-maintainer:1.0.0
+            image: lostpetinitiative/trello-board-maintainer:1.1.0
             imagePullPolicy: IfNotPresent
             env:
               - name: CARD_INACTIVITY_ARCHIVAL_THRESHOLD_HOURS
                 value: "336" # 14 days
-              - name: TRELLO_LISTS
+              - name: TRELLO_ARCHIVE_LISTS
                 # see https://trello.com/b/66wM5H6l/%D0%BD%D0%B0%D0%B9%D0%B4%D0%B5%D0%BD%D0%BD%D1%8B%D0%B5-%D0%BF%D0%B8%D1%82%D0%BE%D0%BC%D1%86%D1%8B.json
                 value: 5fc9266403ad5778d7508dcb,5fc9266403ad5778d7508dcd,5fc9266403ad5778d7508dcc,5fe3b028597cd218d75af9ca,5feb481793a6e136097bd508
+              - name: TRELLO_REORDER_LISTS
+                value: 5fc9266403ad5778d7508dcb # На проверку человеком
               - name: TRELLO_KEY
                 valueFrom:
                   secretKeyRef:
