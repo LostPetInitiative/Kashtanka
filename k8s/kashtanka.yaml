@@ -751,7 +751,7 @@ spec:
     spec:
       containers:
       - name: web-server
-        image: lostpetinitiative/kashtanka-web-app:2.2.1
+        image: lostpetinitiative/kashtanka-web-app:2.5.0
         resources:
           requests:
             memory: "64Mi"

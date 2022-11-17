@@ -23,6 +23,14 @@ spec:
 apiVersion: traefik.containo.us/v1alpha1
 kind: Middleware
 metadata:
+  name: compress
+  namespace: kashtanka
+spec:
+  compress: {}
+---
+apiVersion: traefik.containo.us/v1alpha1
+kind: Middleware
+metadata:
   name: development-cors
   namespace: kashtanka
 spec:
@@ -54,6 +62,7 @@ spec:
     #- name: demo-access-auth
     - name: strip-api-prefixes
     - name: development-cors
+    - name: compress
     services:
     - name: cassandra-rest-api
       port: 80
@@ -64,6 +73,7 @@ spec:
     #- name:  demo-access-auth
     - name: strip-api-prefixes
     - name: development-cors
+    - name: compress
     services:
     - name: search-gateway
       port: 80
@@ -72,6 +82,7 @@ spec:
     kind: Rule
     middlewares:
     #- name: demo-access-auth
+    - name: compress
     services:
     - name: beta-web-app
       namespace: kashtanka
@@ -81,6 +92,7 @@ spec:
     kind: Rule
     middlewares:
     #- name: demo-access-auth
+    - name: compress
     services:
     - name: web-app
       namespace: kashtanka

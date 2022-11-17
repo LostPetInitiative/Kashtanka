@@ -1,0 +1,275 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: vk-crawlers-common
+  namespace: kashtanka
+data:
+  lost_found_text_classifier_endpoint: "http://lost-found-message-text-classifier/invocations"
+  cat_dog_text_classifier_endpoint: "http://cat-dog-message-text-classifier/invocations"
+  male_female_text_classifier_endpoint: "http://male-female-message-text-classifier/invocations"
+  pipeline_notification_url: "http://kafka-rest-api/kashtanka_crawled_pet_cards"
+  # must be equal to the number defined crawlers
+  num_of_crawlers: "3"
+  min_polling_interval_sec: "600"
+  target_api_requests_count_per_day: "4000" # Actually, 5000 is the limit
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: vk-crawler-poterjashkansk
+  namespace: kashtanka
+spec:
+  selector:
+    matchLabels:
+      app: vk-crawler-poterjashkansk
+  strategy:
+    type: Recreate
+  #replicas: 0
+  template:
+    metadata:
+      labels:
+        app: vk-crawler-poterjashkansk
+    spec:
+      containers:
+      - name: crawler
+        image: lostpetinitiative/vk-crawler:1.0.1
+        imagePullPolicy: "Always"
+        resources:
+          limits:
+            memory: "64Mi"
+            cpu: "200m"
+          requests:
+            memory: "64Mi"
+            cpu: "100m"
+        volumeMounts:
+          - mountPath: /db
+            name: db
+        env:
+        - name: CARDS_DIR
+          value: /db
+        - name: VK_TOKEN
+          valueFrom:
+            secretKeyRef:
+              name: vk-creds
+              key: vk_crawler_service_token
+        - name: LOST_FOUND_CLASSIFIER_ENDPOINT
+          valueFrom:
+            configMapKeyRef:
+              name: vk-crawlers-common
+              key: lost_found_text_classifier_endpoint
+        - name: CAT_DOG_CLASSIFIER_ENDPOINT
+          valueFrom:
+            configMapKeyRef:
+              name: vk-crawlers-common
+              key: cat_dog_text_classifier_endpoint
+        - name: MALE_FEMALE_CLASSIFIER_ENDPOINT
+          valueFrom:
+            configMapKeyRef:
+              name: vk-crawlers-common
+              key: male_female_text_classifier_endpoint
+        - name: PIPELINE_NOTIFICATATION_URL
+          valueFrom:
+            configMapKeyRef:
+              name: vk-crawlers-common
+              key: pipeline_notification_url
+        - name: NUM_OF_CRAWLERS
+          valueFrom:
+            configMapKeyRef:
+              name: vk-crawlers-common
+              key: num_of_crawlers
+        - name: MIN_POLL_INTERVAL_SEC
+          valueFrom:
+            configMapKeyRef:
+              name: vk-crawlers-common
+              key: min_polling_interval_sec
+        - name: API_REQUESTS_PET_DAY
+          valueFrom:
+            configMapKeyRef:
+              name: vk-crawlers-common
+              key: target_api_requests_count_per_day
+        - name: LOCATION_ADDRESS
+          value: "г. Новосибирск."
+        - name: LOCATION_LAT
+          value: "55.030204"
+        - name: LOCATION_LON
+          value: "82.920430"
+        - name: VK_GROUP_NAME
+          value: "poterjashkansk"
+      volumes:
+        - name: db
+          persistentVolumeClaim:
+            claimName: vk-crawler-poterjashkansk
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: vk-crawler-club46290079
+  namespace: kashtanka
+spec:
+  selector:
+    matchLabels:
+      app: vk-crawler-club46290079
+  strategy:
+    type: Recreate
+  #replicas: 0
+  template:
+    metadata:
+      labels:
+        app: vk-crawler-club46290079
+    spec:
+      containers:
+      - name: crawler
+        image: lostpetinitiative/vk-crawler:1.0.1
+        imagePullPolicy: "Always"
+        resources:
+          limits:
+            memory: "64Mi"
+            cpu: "200m"
+          requests:
+            memory: "64Mi"
+            cpu: "100m"
+        volumeMounts:
+          - mountPath: /db
+            name: db
+        env:
+        - name: CARDS_DIR
+          value: /db
+        - name: VK_TOKEN
+          valueFrom:
+            secretKeyRef:
+              name: vk-creds
+              key: vk_crawler_service_token
+        - name: LOST_FOUND_CLASSIFIER_ENDPOINT
+          valueFrom:
+            configMapKeyRef:
+              name: vk-crawlers-common
+              key: lost_found_text_classifier_endpoint
+        - name: CAT_DOG_CLASSIFIER_ENDPOINT
+          valueFrom:
+            configMapKeyRef:
+              name: vk-crawlers-common
+              key: cat_dog_text_classifier_endpoint
+        - name: MALE_FEMALE_CLASSIFIER_ENDPOINT
+          valueFrom:
+            configMapKeyRef:
+              name: vk-crawlers-common
+              key: male_female_text_classifier_endpoint
+        - name: PIPELINE_NOTIFICATATION_URL
+          valueFrom:
+            configMapKeyRef:
+              name: vk-crawlers-common
+              key: pipeline_notification_url
+        - name: NUM_OF_CRAWLERS
+          valueFrom:
+            configMapKeyRef:
+              name: vk-crawlers-common
+              key: num_of_crawlers
+        - name: MIN_POLL_INTERVAL_SEC
+          valueFrom:
+            configMapKeyRef:
+              name: vk-crawlers-common
+              key: min_polling_interval_sec
+        - name: API_REQUESTS_PET_DAY
+          valueFrom:
+            configMapKeyRef:
+              name: vk-crawlers-common
+              key: target_api_requests_count_per_day
+        - name: LOCATION_ADDRESS
+          value: "г. Екатеринбург."
+        - name: LOCATION_LAT
+          value: "56.838011"
+        - name: LOCATION_LON
+          value: "60.597474"
+        - name: VK_GROUP_NAME
+          value: "club46290079"
+      volumes:
+        - name: db
+          persistentVolumeClaim:
+            claimName: vk-crawler-club46290079
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: vk-crawler-poteryashki-nn
+  namespace: kashtanka
+spec:
+  selector:
+    matchLabels:
+      app: vk-crawler-poteryashki-nn
+  strategy:
+    type: Recreate
+  #replicas: 0
+  template:
+    metadata:
+      labels:
+        app: vk-crawler-poteryashki-nn
+    spec:
+      containers:
+      - name: crawler
+        image: lostpetinitiative/vk-crawler:1.0.1
+        imagePullPolicy: "Always"
+        resources:
+          limits:
+            memory: "64Mi"
+            cpu: "200m"
+          requests:
+            memory: "64Mi"
+            cpu: "100m"
+        volumeMounts:
+          - mountPath: /db
+            name: db
+        env:
+        - name: CARDS_DIR
+          value: /db
+        - name: VK_TOKEN
+          valueFrom:
+            secretKeyRef:
+              name: vk-creds
+              key: vk_crawler_service_token
+        - name: LOST_FOUND_CLASSIFIER_ENDPOINT
+          valueFrom:
+            configMapKeyRef:
+              name: vk-crawlers-common
+              key: lost_found_text_classifier_endpoint
+        - name: CAT_DOG_CLASSIFIER_ENDPOINT
+          valueFrom:
+            configMapKeyRef:
+              name: vk-crawlers-common
+              key: cat_dog_text_classifier_endpoint
+        - name: MALE_FEMALE_CLASSIFIER_ENDPOINT
+          valueFrom:
+            configMapKeyRef:
+              name: vk-crawlers-common
+              key: male_female_text_classifier_endpoint
+        - name: PIPELINE_NOTIFICATATION_URL
+          valueFrom:
+            configMapKeyRef:
+              name: vk-crawlers-common
+              key: pipeline_notification_url
+        - name: NUM_OF_CRAWLERS
+          valueFrom:
+            configMapKeyRef:
+              name: vk-crawlers-common
+              key: num_of_crawlers
+        - name: MIN_POLL_INTERVAL_SEC
+          valueFrom:
+            configMapKeyRef:
+              name: vk-crawlers-common
+              key: min_polling_interval_sec
+        - name: API_REQUESTS_PET_DAY
+          valueFrom:
+            configMapKeyRef:
+              name: vk-crawlers-common
+              key: target_api_requests_count_per_day
+        - name: LOCATION_ADDRESS
+          value: "г. Нижний Новгород"
+        - name: LOCATION_LAT
+          value: "56.326797"
+        - name: LOCATION_LON
+          value: "44.006516"
+        - name: VK_GROUP_NAME
+          value: "poteryashki_nn"
+      volumes:
+        - name: db
+          persistentVolumeClaim:
+            claimName: vk-crawler-poteryashki-nn
