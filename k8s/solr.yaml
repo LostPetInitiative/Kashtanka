@@ -73,9 +73,27 @@ spec:
               value: -Xms512m -Xmx1024m
         ports:
         - containerPort: 8983
+        startupProbe:
+          httpGet:
+            path: solr/kashtankaimages/admin/ping
+            port: 8983
+          failureThreshold: 30
+          periodSeconds: 10
+          timeoutSeconds: 3
+        livenessProbe:
+          httpGet:
+            path: solr/kashtankaimages/admin/ping
+            port: 8983
+          periodSeconds: 60
+          timeoutSeconds: 3
+        readinessProbe:
+          timeoutSeconds: 3
+          httpGet:
+            path: solr/kashtankaimages/admin/ping
+            port: 8983
         volumeMounts:
         - name: datadir
-          mountPath: /var/solr      
+          mountPath: /var/solr
   volumeClaimTemplates:
   - metadata:
       name: datadir

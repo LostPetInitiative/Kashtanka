@@ -9,7 +9,7 @@ data:
   male_female_text_classifier_endpoint: "http://male-female-message-text-classifier/invocations"
   pipeline_notification_url: "http://kafka-rest-api/kashtanka_crawled_pet_cards"
   # must be equal to the number defined crawlers
-  num_of_crawlers: "3"
+  num_of_crawlers: "5"
   min_polling_interval_sec: "600"
   target_api_requests_count_per_day: "4000" # Actually, 5000 is the limit
 ---
@@ -32,7 +32,7 @@ spec:
     spec:
       containers:
       - name: crawler
-        image: lostpetinitiative/vk-crawler:1.0.1
+        image: lostpetinitiative/vk-crawler:1.0.2
         imagePullPolicy: "Always"
         resources:
           limits:
@@ -119,7 +119,7 @@ spec:
     spec:
       containers:
       - name: crawler
-        image: lostpetinitiative/vk-crawler:1.0.1
+        image: lostpetinitiative/vk-crawler:1.0.2
         imagePullPolicy: "Always"
         resources:
           limits:
@@ -206,7 +206,7 @@ spec:
     spec:
       containers:
       - name: crawler
-        image: lostpetinitiative/vk-crawler:1.0.1
+        image: lostpetinitiative/vk-crawler:1.0.2
         imagePullPolicy: "Always"
         resources:
           limits:
@@ -273,3 +273,177 @@ spec:
         - name: db
           persistentVolumeClaim:
             claimName: vk-crawler-poteryashki-nn
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: vk-crawler-findcatsha
+  namespace: kashtanka
+spec:
+  selector:
+    matchLabels:
+      app: vk-crawler-findcatsha
+  strategy:
+    type: Recreate
+  #replicas: 0
+  template:
+    metadata:
+      labels:
+        app: vk-crawler-findcatsha
+    spec:
+      containers:
+      - name: crawler
+        image: lostpetinitiative/vk-crawler:1.0.2
+        imagePullPolicy: "Always"
+        resources:
+          limits:
+            memory: "64Mi"
+            cpu: "200m"
+          requests:
+            memory: "64Mi"
+            cpu: "100m"
+        volumeMounts:
+          - mountPath: /db
+            name: db
+        env:
+        - name: CARDS_DIR
+          value: /db
+        - name: VK_TOKEN
+          valueFrom:
+            secretKeyRef:
+              name: vk-creds
+              key: vk_crawler_service_token
+        - name: LOST_FOUND_CLASSIFIER_ENDPOINT
+          valueFrom:
+            configMapKeyRef:
+              name: vk-crawlers-common
+              key: lost_found_text_classifier_endpoint
+        - name: CAT_DOG_CLASSIFIER_ENDPOINT
+          valueFrom:
+            configMapKeyRef:
+              name: vk-crawlers-common
+              key: cat_dog_text_classifier_endpoint
+        - name: MALE_FEMALE_CLASSIFIER_ENDPOINT
+          valueFrom:
+            configMapKeyRef:
+              name: vk-crawlers-common
+              key: male_female_text_classifier_endpoint
+        - name: PIPELINE_NOTIFICATATION_URL
+          valueFrom:
+            configMapKeyRef:
+              name: vk-crawlers-common
+              key: pipeline_notification_url
+        - name: NUM_OF_CRAWLERS
+          valueFrom:
+            configMapKeyRef:
+              name: vk-crawlers-common
+              key: num_of_crawlers
+        - name: MIN_POLL_INTERVAL_SEC
+          valueFrom:
+            configMapKeyRef:
+              name: vk-crawlers-common
+              key: min_polling_interval_sec
+        - name: API_REQUESTS_PET_DAY
+          valueFrom:
+            configMapKeyRef:
+              name: vk-crawlers-common
+              key: target_api_requests_count_per_day
+        - name: LOCATION_ADDRESS
+          value: "г. Шадринск"
+        - name: LOCATION_LAT
+          value: "56.087042"
+        - name: LOCATION_LON
+          value: "63.629747"
+        - name: VK_GROUP_NAME
+          value: "findcatsha"
+      volumes:
+        - name: db
+          persistentVolumeClaim:
+            claimName: vk-crawler-findcatsha
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: vk-crawler-public191189454
+  namespace: kashtanka
+spec:
+  selector:
+    matchLabels:
+      app: vk-crawler-public191189454
+  strategy:
+    type: Recreate
+  #replicas: 0
+  template:
+    metadata:
+      labels:
+        app: vk-crawler-public191189454
+    spec:
+      containers:
+      - name: crawler
+        image: lostpetinitiative/vk-crawler:1.0.2
+        imagePullPolicy: "Always"
+        resources:
+          limits:
+            memory: "64Mi"
+            cpu: "200m"
+          requests:
+            memory: "64Mi"
+            cpu: "100m"
+        volumeMounts:
+          - mountPath: /db
+            name: db
+        env:
+        - name: CARDS_DIR
+          value: /db
+        - name: VK_TOKEN
+          valueFrom:
+            secretKeyRef:
+              name: vk-creds
+              key: vk_crawler_service_token
+        - name: LOST_FOUND_CLASSIFIER_ENDPOINT
+          valueFrom:
+            configMapKeyRef:
+              name: vk-crawlers-common
+              key: lost_found_text_classifier_endpoint
+        - name: CAT_DOG_CLASSIFIER_ENDPOINT
+          valueFrom:
+            configMapKeyRef:
+              name: vk-crawlers-common
+              key: cat_dog_text_classifier_endpoint
+        - name: MALE_FEMALE_CLASSIFIER_ENDPOINT
+          valueFrom:
+            configMapKeyRef:
+              name: vk-crawlers-common
+              key: male_female_text_classifier_endpoint
+        - name: PIPELINE_NOTIFICATATION_URL
+          valueFrom:
+            configMapKeyRef:
+              name: vk-crawlers-common
+              key: pipeline_notification_url
+        - name: NUM_OF_CRAWLERS
+          valueFrom:
+            configMapKeyRef:
+              name: vk-crawlers-common
+              key: num_of_crawlers
+        - name: MIN_POLL_INTERVAL_SEC
+          valueFrom:
+            configMapKeyRef:
+              name: vk-crawlers-common
+              key: min_polling_interval_sec
+        - name: API_REQUESTS_PET_DAY
+          valueFrom:
+            configMapKeyRef:
+              name: vk-crawlers-common
+              key: target_api_requests_count_per_day
+        - name: LOCATION_ADDRESS
+          value: "г. Петрозаводск"
+        - name: LOCATION_LAT
+          value: "61.791244"
+        - name: LOCATION_LON
+          value: "34.391273"
+        - name: VK_GROUP_NAME
+          value: "club191189454"
+      volumes:
+        - name: db
+          persistentVolumeClaim:
+            claimName: vk-crawler-public191189454
