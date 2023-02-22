@@ -239,8 +239,10 @@ async def work():
                     if "Lat" in location and "Lon" in location:
                         # it seems that Solr does not accept longatude > 180. thus converting range [0,360) -> [-180,180)
                         # see https://github.com/LostPetInitiative/Kashtanka/issues/28
-                        if location["Lon"] > 180.0:
+                        while location["Lon"] > 180.0:
                             location["Lon"] -= 360.0
+                        while location["Lon"] < -180.0:
+                            location["Lon"] += 360.0
                         solrCardJson["location"] = "{0}, {1}".format(location["Lat"],location["Lon"])                    
                 if "animal" in job:
                     solrCardJson["animal"] = job["animal"].capitalize()
