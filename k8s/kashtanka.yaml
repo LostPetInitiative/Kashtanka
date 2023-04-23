@@ -883,7 +883,7 @@ spec:
       volumes:
         - name: db
           persistentVolumeClaim:
-            claimName: pet911ru4
+            claimName: pet911ru5
 ---
 apiVersion: apps/v1
 kind: Deployment
