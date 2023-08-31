@@ -845,10 +845,10 @@ spec:
         image: lostpetinitiative/crawler-pet911ru-agent:3.1.4
         resources:
           limits:
-            memory: "512Mi"
+            memory: "1024Mi"
             cpu: "200m"
           requests:
-            memory: "150Mi"
+            memory: "1024Mi"
             cpu: "50m"
         volumeMounts:
           - mountPath: /db
@@ -883,7 +883,7 @@ spec:
       volumes:
         - name: db
           persistentVolumeClaim:
-            claimName: pet911ru5
+            claimName: pet911ru6
 ---
 apiVersion: apps/v1
 kind: Deployment
