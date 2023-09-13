@@ -19,7 +19,6 @@ calculate_heap_sizes()
     case "`uname`" in
         Linux)
             # see https://github.com/docker-library/cassandra/issues/60
-            # must be not 1048576, less (e.g. 1000000), otherwise K8s will kill pod due to OOM
             system_memory_in_mb=`cat /sys/fs/cgroup/memory/memory.limit_in_bytes | awk '{print int($1 / 1048576)}'`
             # see https://stackoverflow.com/questions/2394988/get-ceiling-integer-from-number-in-linux-bash
             # as    opt/cassandra/bin/nodetool: 48: [: Illegal number: 0.199219
@@ -303,7 +302,7 @@ JVM_OPTS="$JVM_OPTS -Dcom.sun.management.jmxremote.password.file=/etc/cassandra/
 # To use mx4j, an HTML interface for JMX, add mx4j-tools.jar to the lib/
 # directory.
 # See http://cassandra.apache.org/doc/3.11/operating/metrics.html#jmx
-# By default mx4j listens on the broadcast_address, port 8081. Uncomment the following lines
+# By default mx4j listens on 0.0.0.0:8081. Uncomment the following lines
 # to control its listen address and port.
 #MX4J_ADDRESS="-Dmx4jaddress=127.0.0.1"
 #MX4J_PORT="-Dmx4jport=8081"
