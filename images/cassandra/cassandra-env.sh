@@ -20,7 +20,11 @@ calculate_heap_sizes()
         Linux)
             # see https://github.com/docker-library/cassandra/issues/60
             system_memory_in_mb=`cat /sys/fs/cgroup/memory/memory.limit_in_bytes | awk '{print int($1 / 1000000)}'`
-            system_cpu_cores=`cat /sys/fs/cgroup/cpu/cpu.shares | awk '{print $1 / 1024}'`
+            # see https://stackoverflow.com/questions/2394988/get-ceiling-integer-from-number-in-linux-bash
+            # as    opt/cassandra/bin/nodetool: 48: [: Illegal number: 0.199219
+            #       expr: non-integer argument
+            # warinig is printed, if ceiling is not used
+            system_cpu_cores=`cat /sys/fs/cgroup/cpu/cpu.shares | awk '{ r=$1 % 1024; q=$1/1024; if (r != 0) q=int(q+1); print q}'`
         ;;
         FreeBSD)
             system_memory_in_bytes=`sysctl hw.physmem | awk '{print $2}'`
