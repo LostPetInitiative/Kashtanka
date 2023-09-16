@@ -4,6 +4,7 @@ import datetime
 import requests
 import numpy as np
 import json
+from PIL import Image
 
 import kafkajobs
 
@@ -58,6 +59,17 @@ else:
 appName = f"dataPersister_{inputQueueName}"
 
 worker = kafkajobs.jobqueue.JobQueueWorker(appName, kafkaBootstrapUrl=kafkaUrl, topicName=inputQueueName, appName=appName)
+
+def ReduceImageSize(serializedImage,targetWidth=400):
+    decodedNp = kafkajobs.serialization.imageB64SerializedStructToNp(serializedImage)
+    decodedPilImg = Image.fromarray(decodedNp.astype('uint8'), 'RGB')
+    shape = decodedNp.shape
+    ratio = shape[0]/targetWidth
+    resizedPilImg = decodedPilImg.resize((int(shape[1] / ratio), targetWidth))
+    resizedNp = np.array(resizedPilImg)
+    
+    encoded = kafkajobs.serialization.imageNpToB64SerializedStruct(resizedNp)
+    return encoded
 
 async def work():
     print("Service started. Pooling for a job")
@@ -116,7 +128,12 @@ async def work():
 
                 imageIdx = 0
                 print("{0}: {1} orig photos to put".format(uid,len(job['images'])))
+                
                 for image in job['images']:
+
+                    # reducing image size to save cassandra disk space
+                    image = ReduceImageSize(image)
+
                     photoJson = {
                         "imageB64": image["data"],
                         "imageMimeType": "image/jpeg"                    

@@ -33,7 +33,7 @@ spec:
     matchLabels:
       app: cass
   serviceName: cass-hs
-  replicas: 4
+  replicas: 2
   updateStrategy:
     type: RollingUpdate
   podManagementPolicy: OrderedReady
@@ -64,7 +64,7 @@ spec:
       containers:
       - name: cassandra
         imagePullPolicy: Always
-        image: "dgrechka/k8s-cassandra:latest"
+        image: "dgrechka/k8s-cassandra:0.4"
         env:
           - name: CASSANDRA_BROADCAST_ADDRESS
             valueFrom:
@@ -94,15 +94,17 @@ spec:
         resources:
           limits:
             #cpu: "300m"
-            memory: 1.2Gi
+            memory: "1280Mi"
           requests:
             cpu: "200m"
-            memory: 1.2Gi
+            memory: "1280Mi"
         ports:
         - containerPort: 7000
           name: gossip
         - containerPort: 9042
-          name: client        
+          name: client
+        - containerPort: 7199
+          name: jmx
         volumeMounts:
         - name: datadir
           mountPath: /var/lib/cassandra
