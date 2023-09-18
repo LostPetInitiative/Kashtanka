@@ -65,6 +65,9 @@ def ReduceImageSize(serializedImage,targetWidth=400):
     decodedPilImg = Image.fromarray(decodedNp.astype('uint8'), 'RGB')
     shape = decodedNp.shape
     ratio = shape[0]/targetWidth
+    if ratio <= 1.0:
+        # we do not need to reduce size as the size is already smaller
+        return serializedImage
     resizedPilImg = decodedPilImg.resize((int(shape[1] / ratio), targetWidth))
     resizedNp = np.array(resizedPilImg)
     
@@ -171,7 +174,7 @@ async def work():
                 print("{0}: {1} Cal/Zhirui annotated images to put".format(uid,len(job['yolo5_output'])))
 
                 for toPut in job['yolo5_output']:
-                    image = toPut['annotated']
+                    image = ReduceImageSize(toPut['annotated'])
                     photoJson = {
                         "imageB64": image["data"],
                         "imageMimeType": "image/jpeg"                    
