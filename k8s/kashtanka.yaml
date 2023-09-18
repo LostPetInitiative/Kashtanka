@@ -85,7 +85,7 @@ spec:
             memory: "192Mi"
             cpu: "25m"
           limits:
-            memory: "1024Mi"
+            memory: "2048Mi"
             cpu: "1000m"
         env:
         - name: KAFKA_URL
@@ -119,7 +119,7 @@ spec:
             memory: "384Mi"
             cpu: "100m"
           limits:
-            memory: "1024Mi"
+            memory: "2048Mi"
             cpu: "8"        
         env:
         - name: KAFKA_URL
@@ -528,7 +528,7 @@ spec:
     spec:
       containers:
       - name: worker
-        image: lostpetinitiative/trello-found-card-creator:2.2.1
+        image: lostpetinitiative/trello-found-card-creator:2.2.2
         resources:
           requests:
             memory: "64Mi"

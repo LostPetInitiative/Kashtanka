@@ -64,7 +64,7 @@ spec:
       containers:
       - name: cassandra
         imagePullPolicy: Always
-        image: "dgrechka/k8s-cassandra:0.4"
+        image: "dgrechka/k8s-cassandra:0.5"
         env:
           - name: CASSANDRA_BROADCAST_ADDRESS
             valueFrom:
