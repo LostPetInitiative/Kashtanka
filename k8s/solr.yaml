@@ -71,21 +71,23 @@ spec:
               value: 1024m
             - name: SOLR_JAVA_MEM
               value: -Xms512m -Xmx1024m
+            - name: SOLR_OPTS
+              value: -Dsolr.prometheus.exporter.enabled=true
         ports:
         - containerPort: 8983
-        startupProbe:
-          httpGet:
-            path: solr/kashtankaimages/admin/ping
-            port: 8983
-          failureThreshold: 30
-          periodSeconds: 10
-          timeoutSeconds: 3
-        livenessProbe:
-          httpGet:
-            path: solr/kashtankaimages/admin/ping
-            port: 8983
-          periodSeconds: 60
-          timeoutSeconds: 3
+        # startupProbe:
+        #   httpGet:
+        #     path: solr/kashtankaimages/admin/ping
+        #     port: 8983
+        #   failureThreshold: 30
+        #   periodSeconds: 10
+        #   timeoutSeconds: 3
+        # livenessProbe:
+        #   httpGet:
+        #     path: solr/kashtankaimages/admin/ping
+        #     port: 8983
+        #   periodSeconds: 60
+        #   timeoutSeconds: 3
         readinessProbe:
           timeoutSeconds: 3
           httpGet:
@@ -102,3 +104,70 @@ spec:
       resources:
         requests:
           storage: 8Gi
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: solr-prometheus-exporter
+data:
+  solr-prometheus-exporter.xml: |
+    <config>
+      <requesthandler name="/admin/metrics" url="http://solr:8983/solr/admin/metrics" />
+    </config>
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: solr-prometheus-exporter
+spec:
+  selector:
+    app.kubernetes.io/name: solr-prometheus-exporter
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 9983
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: solr-prometheus-exporter
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: solr-prometheus-exporter
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: solr-prometheus-exporter
+    spec:
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            - labelSelector:
+                matchExpressions:
+                  - key: "app"
+                    operator: In
+                    values:
+                    - solr
+              topologyKey: "topology.kubernetes.io/zone"
+      containers:
+      - name: solr-prometheus-exporter
+        image: solr:9
+        command:
+        - solr-exporter
+        args:
+        - "-p"
+        - "9983"
+        - "-f"
+        - "/etc/solr-exporter/solr-prometheus-exporter.xml"
+        ports:
+        - containerPort: 9983
+        volumeMounts:
+        - name: solr-prometheus-exporter-config
+          mountPath: /etc/solr-exporter
+      volumes:
+      - name: solr-prometheus-exporter-config
+        configMap:
+          name: solr-prometheus-exporter
+

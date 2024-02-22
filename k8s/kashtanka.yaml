@@ -358,7 +358,7 @@ spec:
     spec:
       containers:
       - name: worker
-        image: lostpetinitiative/card-matcher:1.0.1
+        image: lostpetinitiative/card-matcher:1.0.2
         resources:
           requests:
             memory: "64Mi"
@@ -401,7 +401,7 @@ spec:
     spec:
       containers:
       - name: worker
-        image:  lostpetinitiative/processed-cards-persister:2.1.1
+        image:  lostpetinitiative/processed-cards-persister:2.1.2
         imagePullPolicy: Always
         resources:
           requests:
@@ -444,14 +444,14 @@ spec:
     spec:
       containers:
       - name: worker
-        image:  lostpetinitiative/processed-cards-persister:2.1.1
+        image:  lostpetinitiative/processed-cards-persister:2.1.2
         imagePullPolicy: Always
         resources:
           requests:
             memory: "256Mi"
             cpu: "100m"
           limits:
-            memory: "256Mi"
+            memory: "1024Mi"
             cpu: "200m"
         env:
         - name: KAFKA_URL
@@ -485,7 +485,7 @@ spec:
     spec:
       containers:
       - name: worker
-        image:  lostpetinitiative/processed-cards-persister:2.1.1
+        image:  lostpetinitiative/processed-cards-persister:2.1.2
         imagePullPolicy: Always
         resources:
           requests:
@@ -842,10 +842,11 @@ spec:
     spec:
       containers:
       - name: crawler
-        image: lostpetinitiative/crawler-pet911ru-agent:3.1.4
+        #image: lostpetinitiative/crawler-pet911ru-agent:3.1.6
+        image: lostpetinitiative/crawler-pet911ru-agent:dev
         resources:
           limits:
-            memory: "2048Mi"
+            memory: "4Gi"
             cpu: "500m"
           requests:
             memory: "1024Mi"

@@ -1087,7 +1087,7 @@ client_encryption_options:
 #
 # none
 #   nothing is compressed.
-internode_compression: dc
+internode_compression: all
 
 # Enable or disable tcp_nodelay for inter-dc communication.
 # Disabling it will result in larger (but fewer) network packets being sent,
